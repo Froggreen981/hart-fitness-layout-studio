@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {simplePolygon,polygonOverlap,inspect,itemPoints,validateProject,size} from './dist/model.mjs';
+import {resizeArea,localPoint,areaFromWorldPoints,printTiles} from './dist/editor.mjs';
+const concave=[[0,0],[10,0],[10,3],[3,3],[3,10],[0,10]];
+assert(simplePolygon(concave));assert(!simplePolygon([[0,0],[10,10],[0,10],[10,0]]));
+assert(!polygonOverlap(concave,[[5,5],[7,5],[7,7],[5,7]]));assert(polygonOverlap(concave,[[1,5],[2,5],[2,7],[1,7]]));
+const area={id:'a',name:'Storage',kind:'area',category:'area',x:10,y:10,width:10,length:10,rotation:0,locked:false,buffer:0,color:'#0062a5',placement:'allowed',storage:true};
+const resized=resizeArea(area,'e',{x:25,y:15});assert.equal(resized.width,15);assert.equal(resized.x,10);assert.equal(resized.y,10);
+const rotated={...area,rotation:90};const r=resizeArea(rotated,'e',{x:15,y:25});assert.equal(r.width,15);assert(Math.abs(r.x-10)<1e-9);assert(Math.abs(r.y-10)<1e-9);
+const shaped=areaFromWorldPoints(area,concave);assert.deepEqual(itemPoints(shaped),concave);
+const equipment={...area,id:'e',name:'Bike',kind:'bike',category:'cardio',storedIn:'a'};assert.equal(inspect([area,equipment],{width:5,length:5}).get('e').length,0);
+const p={version:2,active:'l',layouts:[{id:'l',name:'Test',room:{width:50,length:50},items:[shaped,{...equipment,storedIn:shaped.id}]}]};assert.equal(validateProject(JSON.parse(JSON.stringify(p))).layouts[0].items[1].storedIn,'a');
+assert.throws(()=>validateProject({...p,layouts:[{...p.layouts[0],items:[{...shaped,vertices:[[0,0],[1,1],[0,1],[1,0]]}]}]}));
+assert.deepEqual(printTiles({x:10,y:20,w:40,h:60},2,2),[{x:10,y:20,w:20,h:30},{x:30,y:20,w:20,h:30},{x:10,y:50,w:20,h:30},{x:30,y:50,w:20,h:30}]);
+const tilted={...area,rotation:37},world=itemPoints(tilted);world[0][0]+=1;const tiltShape=areaFromWorldPoints(tilted,world);assert.equal(tiltShape.rotation,37);assert(itemPoints(tiltShape).every((p,n)=>p.every((v,k)=>Math.abs(v-world[n][k])<1e-9)));
+console.log('14 contour, resize, storage, import, and print-region checks passed.');

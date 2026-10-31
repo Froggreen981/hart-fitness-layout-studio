@@ -1,0 +1,8 @@
+import {size,intersects} from './model.mjs';
+export const STORAGE_ID='@storage';
+export const isEquipment=i=>!['area','obstacle'].includes(i.category);
+export function storagePose(i){return {...i,x:i.storageX??2,y:i.storageY??2};}
+export function nextStoragePosition(items,item){const [w,h]=size(item),occupied=items.filter(i=>i.storedIn&&i.id!==item.id).map(i=>{const p=storagePose(i),[w,h]=size(i);return {x:p.x-1,y:p.y-1,w:w+2,h:h+2};}),rowWidth=Math.max(40,w+4);for(let y=2;y<=2000;y+=2)for(let x=2;x+w<=rowWidth;x+=2)if(!occupied.some(b=>intersects({x,y,w,h},b)))return {x,y};return {x:2,y:2002};}
+export function storeEquipment(items,item){if(!isEquipment(item))return;const p=Number.isFinite(item.storageX)&&Number.isFinite(item.storageY)?{x:item.storageX,y:item.storageY}:nextStoragePosition(items,item);item.storageX=p.x;item.storageY=p.y;item.storedIn=STORAGE_ID;}
+export function migrateStorage(project){let changed=false;for(const layout of project.layouts){const zones=layout.items.filter(i=>i.category==='area'&&i.storage),ids=new Set(zones.map(i=>i.id));for(const i of layout.items)if(i.storedIn&&(ids.has(i.storedIn)||i.storedIn===STORAGE_ID)){if(i.storedIn!==STORAGE_ID||!Number.isFinite(i.storageX)||!Number.isFinite(i.storageY)){storeEquipment(layout.items,i);changed=true;}}if(zones.length){layout.items=layout.items.filter(i=>!ids.has(i.id));changed=true;}}return changed;}
+export function storageView(items){const stored=items.filter(i=>i.storedIn);return {x:0,y:0,w:Math.max(40,...stored.map(i=>storagePose(i).x+size(i)[0]+3)),h:Math.max(22,...stored.map(i=>storagePose(i).y+size(i)[1]+3))};}

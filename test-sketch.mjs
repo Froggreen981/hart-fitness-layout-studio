@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {gymSketch} from './dist/sketch.mjs';
+import {inspect,roomArea,validateProject,wallPoints,polygonOverlap} from './dist/model.mjs';
+const l=gymSketch(),p={version:2,active:l.id,layouts:[l]};
+assert.deepEqual(validateProject(JSON.parse(JSON.stringify(p))).layouts[0].room,l.room);
+assert.equal(roomArea(l.room),7920);
+assert.equal(inspect(l.items,l.room).get('gym-sketch-desk').length,0);
+const i={...l.items[0],id:'test',width:2,length:2,x:80,y:60};
+assert.ok(inspect([i],l.room).get(i.id).includes('Outside room'));
+assert.equal(inspect([{...i,x:80,y:30}],l.room).get(i.id).length,0);
+assert.ok(inspect([{...i,x:72,y:10}],l.room).get(i.id).includes('Wall conflict'));
+assert.ok(inspect([{...i,x:44,y:55}],l.room).get(i.id).includes('Wall conflict'));
+assert.throws(()=>validateProject({...p,layouts:[{...l,room:{...l.room,innerWidth:110}}]}));
+assert.throws(()=>validateProject({...p,layouts:[{...l,room:{...l.room,walls:[{...l.room.walls[0],x2:NaN}]}}]}));
+assert.throws(()=>validateProject({...p,layouts:[{...l,room:{...l.room,zones:[{name:'x',x:NaN,y:0}]}}]}));
+console.log('10 sketch geometry, wall collision, and save validation checks passed.');

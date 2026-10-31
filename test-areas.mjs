@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {size,itemPoints,rotateItem,inspect,validateProject,normalizeAngle,getBuffers} from './dist/model.mjs';
+const base={id:'machine',name:'Custom',category:'strength',kind:'custom',width:10,length:1,rotation:45,x:10,y:10,buffer:0,locked:false};
+const room={width:50,length:50};
+const first=inspect([base,{...base,id:'other',y:12}],room);assert.ok(!first.get('machine').includes('Footprint overlap'),'oriented polygons must not use overlapping bounding boxes as collisions');
+assert.ok(inspect([base,{...base,id:'other',x:10.1,y:10.1}],room).get('machine').includes('Footprint overlap'));
+const original={...base,rotation:0};const c0=[original.x+original.width/2,original.y+original.length/2];rotateItem(original,13.37);const [w,h]=size(original);assert.ok(Math.abs(original.x+w/2-c0[0])<1e-10);assert.ok(Math.abs(original.y+h/2-c0[1])<1e-10);
+assert.equal(normalizeAngle(-10),350);assert.equal(normalizeAngle(400),40);
+const area={...base,id:'area',category:'area',kind:'area',name:'Walkway',color:'#68a67c',placement:'allowed',width:20,length:20,rotation:0,x:5,y:5};
+assert.equal(inspect([base,area],room).get(base.id).length,0);
+assert.ok(inspect([base,{...area,placement:'keep-clear'}],room).get(base.id).some(m=>m.includes('keep-clear')));
+assert.equal(inspect([{...area,placement:'keep-clear'}],room).get(area.id).length,0);
+const template={id:'template',name:'Reusable',category:'strength',kind:'custom',width:4,length:7,rotation:23.5,buffers:{front:1,rear:2,left:3,right:4}};
+const p={version:2,active:'l',library:[template],layouts:[{id:'l',name:'Test',room,items:[original,area]}]};
+const restored=validateProject(JSON.parse(JSON.stringify(p)));assert.equal(restored.library[0].rotation,23.5);assert.deepEqual(getBuffers(restored.library[0]),template.buffers);assert.equal(restored.layouts[0].items[0].rotation,13.37);assert.equal(restored.layouts[0].items[1].color,area.color);
+assert.throws(()=>validateProject({...p,library:[{...template,width:-1}]}));
+assert.throws(()=>validateProject({...p,layouts:[{...p.layouts[0],items:[{...area,color:'red\" onclick=\"bad'}]}]}));
+assert.throws(()=>validateProject({...p,layouts:[{...p.layouts[0],items:[{...base,rotation:Infinity}]}]}));
+const fixed={...base,id:'fixed',category:'obstacle',kind:'column',rotation:0,width:2,length:2,x:10,y:10};
+for(const locked of [false,true]){const result=inspect([{...fixed,locked},{...area,placement:'keep-clear'}],room);assert(!result.get('fixed').some(m=>m.includes('keep-clear')),'fixed objects are not equipment, regardless of lock state');}
+assert(inspect([{...base,locked:true},{...area,placement:'keep-clear'}],room).get(base.id).some(m=>m.includes('keep-clear')),'locking equipment must not exempt it');
+assert(inspect([fixed,{...base,rotation:0,width:2,length:2,x:10,y:10}],room).get('fixed').includes('Footprint overlap'),'fixed object collision checks stay active');
+console.log('19 area, arbitrary rotation, polygon collision, and library persistence checks passed.');

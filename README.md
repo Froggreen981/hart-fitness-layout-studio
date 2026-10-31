@@ -2,6 +2,12 @@
 
 A static, dependency-free floor planner for the BYU-Idaho Hart Fitness Center.
 
+**Live planner:** https://froggreen981.github.io/hart-fitness-layout-studio/
+
+**Source:** https://github.com/Froggreen981/hart-fitness-layout-studio
+
+Moving from the original site? Export JSON there, then Import on the live planner to transfer your saved layouts, templates, and storage inventory.
+
 ## Editing
 
 - Set rectangular or L-shaped room dimensions in feet. Edit full-wall and half-wall endpoints and thickness under Walls & half walls. Changing room size does not rescale existing objects.
@@ -53,6 +59,6 @@ Full walls are black; half walls are grey. Fixed obstacles use a full footprint 
 
 ## GitHub hosting
 
-A GitHub Pages workflow is prepared in `.github/workflows/pages.yml`. It tests the application and publishes only `dist/` on successful pushes to `main`. See [GitHub Pages deployment and layout transfer](GITHUB-PAGES.md) for setup and migration. Repository creation and initial Pages activation require GitHub account access; a prepared workflow alone does not mean the site is live there.
+GitHub Pages is active through `.github/workflows/pages.yml`. It tests the application and publishes only `dist/` on successful pushes to `main`. See [GitHub Pages deployment and layout transfer](GITHUB-PAGES.md) for migration instructions. The original site remains available for exporting browser-saved projects. No user layout exports or browser storage are included in this repository.
 
 Fixed objects are excluded from keep-clear equipment warnings regardless of their lock state. They continue to participate in physical footprint, wall, and buffer conflict checks. Locked exercise equipment remains equipment and is still checked against keep-clear areas.

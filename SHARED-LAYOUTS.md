@@ -76,7 +76,7 @@ Local preview reported `http://terminal.local:4173/` but the browser connection 
 
 The existing geometry, editing, printing-region, storage and import regression checks are retained. New integration tests execute the API against real SQLite, including staff authorization, concurrent saves/publications, recovery, idempotency, history and imports beyond 100 layouts. Client tests exercise the actual editor save queue, separate recovery copies, offline recovery and lost-response retries.
 
-The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, deployed entrypoint routing, and anonymous staff rejection. All 27 test files/subtests pass, including the existing inline regression assertions.
+The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, deployed entrypoint routing, and anonymous staff rejection. All 28 test files/subtests pass, including the existing inline regression assertions.
 
 Browser rendering and deployed D1 behavior require the live checks above. Source retrieval is now working.
 
@@ -84,3 +84,7 @@ Browser rendering and deployed D1 behavior require the live checks above. Source
 
 After the shared deployment and latest map are verified, add the reviewed equipment/exercise/muscle catalog and the patron muscle selector.
 
+
+## Updated browser verification
+
+Owner sign-in is confirmed. The selected manager has application editor permission and Site visitor access. Two owner tabs verified persistent saved coordinates and stale-save rejection with recoverable changes. The live planner renders the latest Hart geometry and BYU-Idaho styling. The Save now button now returns to its idle enabled state after a successful save. The manager identity still needs its own signed-in verification. No test arrangement has been published as the physical gym.

@@ -48,7 +48,7 @@ export class SharedEditor{
   }catch(e){
    if(e.status===409){this.blocked=true;this.report('Save conflict. Save your recovery as a separate draft or reload the shared version.');}
    else this.report('Not saved to shared workspace. '+e.message+' Retry when connected.');
-  }finally{this.running=false;}
+  }finally{this.running=false;this.onStatus?.(this.status);}
  }
  async saveRecovery(project){
   const recovery=this.recoveryPending?this.recovery.project:project;

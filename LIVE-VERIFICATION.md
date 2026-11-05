@@ -32,7 +32,7 @@ Record the two verified identities/roles without passwords or session data, the 
 
 ## Completed automated/hosted checks
 
-- 27 Node test files/subtests pass, including the existing inline geometry, editing, storage, import and print-region assertions.
+- 28 Node test files/subtests pass, including the existing inline geometry, editing, storage, import and print-region assertions.
 - Tests cover two staff roles, recoverable stale saves, SQLite persistence, simultaneous publication conflicts, immutable history, imports beyond 100 drafts, the latest Hart geometry and deployable Worker entrypoints.
 - GitHub Shared layout verification passes.
 - Deployed D1 has the four expected tables.
@@ -42,3 +42,11 @@ Record the two verified identities/roles without passwords or session data, the 
 ## Browser limitation in the authoring session
 
 Managed local preview reported a URL, but the browser connection was refused. Hosted sign-in advanced to an OpenAI passkey verification screen. Signed-in rendering, real two-account persistence and actual-state publishing are still unverified.
+
+## Live progress after owner sign-in
+
+The owner session is verified in the deployed browser. The manager has application editor permission and Site visitor access. The manager has not yet signed in for independent testing.
+
+Two owner browser tabs verified persistent D1 saves after reload, rejection of a stale save, and an available recovery action. The BYU-Idaho planner and latest Hart wall geometry render in the live browser. A save-button state bug found during that testing is fixed: save controls are notified after the request finishes. A regression test covers the final idle state.
+
+The live current publication remains empty. Test drafts are unpublished and can be archived. Real manager-session verification and publication of a physically checked arrangement are still required before merging.

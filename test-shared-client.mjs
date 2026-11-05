@@ -52,3 +52,12 @@ test('a lost save response can be retried without a false conflict or extra revi
  assert.equal(editor.known.get('draft').revision,2);assert.equal(s.values.has(editor.key),false);
 });
 
+
+test('save controls are notified after the running state clears',async t=>{
+ const s=setup(t);await s.create();const editor=await SharedEditor.open('draft');
+ const states=[];editor.onStatus=status=>states.push({status,running:editor.running});
+ editor.project.layouts[0].items[0].x=60;editor.queue(editor.project);await editor.flush();
+ assert.ok(states.some(s=>s.running));
+ assert.equal(states.at(-1).running,false);
+ assert.equal(states.at(-1).status,'Saved to shared workspace');
+});

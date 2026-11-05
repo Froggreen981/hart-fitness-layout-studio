@@ -1,4 +1,4 @@
-import {roomPoints,wallPoints,itemPoints} from './model.mjs';
+import {roomPoints,wallPolygons,itemPoints,size} from './model.mjs';
 import {request,escapeHTML as esc} from './shared-api.mjs';
 const $=id=>document.getElementById(id);
 let publication=null,selected=null,running=false;
@@ -14,12 +14,16 @@ function render(){
  $('mapName').textContent=layout.name;$('publishedAt').textContent='Updated '+new Date(publication.publishedAt).toLocaleString();
  $('publicMap').setAttribute('viewBox','-3 -3 '+(room.width+6)+' '+(room.length+6));
  let svg='<polygon points="'+roomPoints(room).map(p=>p.join(',')).join(' ')+'" fill="white" stroke="#172b3a" stroke-width=".6"/>';
- for(const wall of room.walls||[])svg+='<polygon points="'+wallPoints(wall).map(p=>p.join(',')).join(' ')+'" fill="'+(wall.type==='half'?'#9a9fa5':'#172b3a')+'"><title>'+esc(wall.name)+'</title></polygon>';
+ for(const wall of room.walls||[])for(const polygon of wallPolygons(wall))svg+='<polygon points="'+polygon.map(p=>p.join(',')).join(' ')+'" fill="'+(wall.type==='half'?'#9a9fa5':'#172b3a')+'"><title>'+esc(wall.name)+'</title></polygon>';
  const list=layout.items.filter(i=>!['area','obstacle'].includes(i.category));
  for(const item of layout.items){
   const equipment=list.includes(item),points=itemPoints(item).map(p=>p.join(',')).join(' ');
   svg+='<polygon points="'+points+'" fill="'+(item.category==='area'?item.color||colors.area:colors[item.category]||colors.strength)+'" fill-opacity="'+(item.category==='area'?'.15':'1')+'" stroke="#657d8f" stroke-width=".12"'+(equipment?' data-equipment="'+esc(item.id)+'" role="button" tabindex="0" aria-pressed="false" aria-label="'+esc(item.name+(item.status==='out-of-service'?', out of service':''))+'"':'')+'><title>'+esc(item.name)+'</title></polygon>';
-  if(item.category==='area')svg+='<text x="'+(item.x+item.width/2)+'" y="'+(item.y+item.length/2)+'" text-anchor="middle" font-size="1.4" fill="#466174" pointer-events="none">'+esc(item.name)+'</text>';
+  if(item.category==='area'){
+   const label=item.label||{x:.5,y:.5,rotation:0},[w,h]=size(item),a=item.rotation*Math.PI/180,dx=(label.x-.5)*item.width,dy=(label.y-.5)*item.length;
+   const x=item.x+w/2+dx*Math.cos(a)-dy*Math.sin(a),y=item.y+h/2+dx*Math.sin(a)+dy*Math.cos(a);
+   svg+='<text transform="translate('+x+' '+y+') rotate('+(item.rotation+label.rotation)+')" text-anchor="middle" font-size="1.4" fill="#466174" pointer-events="none">'+esc(item.name)+'</text>';
+  }
  }
  $('publicMap').innerHTML=svg;
  $('equipmentList').innerHTML=list.length?list.map(i=>'<button data-equipment="'+esc(i.id)+'" aria-pressed="false">'+esc(i.name)+(i.status==='out-of-service'?' (unavailable)':'')+'</button>').join(''):'<p>No equipment is listed on this published map.</p>';

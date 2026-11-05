@@ -30,7 +30,7 @@ function documentFor(layout,library=[]){
 const take=(o,keys)=>Object.fromEntries(keys.filter(k=>o[k]!==undefined).map(k=>[k,o[k]]));
 export function publicLayout(layout){
   const room=take(layout.room,['width','length','shape','innerWidth','upperLength','boundary','points','outline','vertices']);
-  if(layout.room.walls)room.walls=layout.room.walls.map(w=>take(w,['name','type','x1','x2','y1','y2','thickness']));
+  if(layout.room.walls)room.walls=layout.room.walls.map(w=>({...take(w,['name','type','x1','x2','y1','y2','thickness']),...(w.projections?{projections:w.projections.map(p=>take(p,['x1','x2','y1','y2','thickness']))}:{})}));
   if(layout.room.zones)room.zones=layout.room.zones.map(z=>take(z,['name','x','y','angle']));
   return {name:layout.name,room,items:layout.items.filter(i=>!i.storedIn).map(i=>({...take(i,['id','kind','category','x','y','width','length','rotation','color','placement','vertices','label']),name:i.publicName||i.name,status:i.status==='out-of-service'?'out-of-service':'available'}))};
 }

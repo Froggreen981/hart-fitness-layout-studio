@@ -30,32 +30,29 @@ The development server uses a persistent local SQLite database at .gym-dev.sqlit
 
 The browser planner remains at index.html. Import browser layouts or a JSON export from the original planner to populate shared drafts. Do not publish a sample arrangement as the actual gym.
 
-## Hosted setup still required
+## Source reconciliation and hosting
 
-The existing Sites source service could not be reached from this restricted workspace. No hosted database or live site was changed.
+The latest Sites source was recovered from the existing Site's source repository at commit `45b73a0902e3c7174f8eac16b3992964014d94e5` (saved version 10). Its `dist/building-plan.mjs`, fixtures, geometry, editing controls and building-plan regression tests are integrated into this branch. The preserved plan has a square lower-right exterior, the wider lower CrossFit opening, blocked man door, full-wall projections and three half walls with their returns. The spinning area remains excluded. No floor geometry was recreated from memory.
 
-Before hosting:
+The shared editor keeps the latest planner controls. It does not auto-add reference arrangements to an opened shared draft. Existing browser layouts and storage are retained under `gym-layout-studio-v1`; importing creates separate shared drafts. The original Sites source commit and saved version remain recoverable. The former 100-layout validation and reference-install caps are removed; paginated listings and request byte limits bound individual operations without capping the number of experimental drafts.
 
-1. Recover and reconcile the latest Sites source with this feature branch. The GitHub baseline is older than the hosted Hart geometry.
-2. Retain the existing Site ID, audience, domain, and relevant hosting configuration.
-3. Bind a provisioned D1 database as DB.
-4. Apply worker/schema.sql as a versioned schema migration through the hosting workflow. Do not create tables inside request handlers.
-5. Set STAFF_OWNER_EMAIL to the verified owner email through the host's runtime environment settings.
-6. Package build/server/index.mjs through the host's supported Worker workflow.
-7. Verify that only Sites dispatch can reach the Worker and that its authenticated identity headers are trusted.
-8. Import the latest real layout, check geometry and equipment against the gym, and publish the first actual-state arrangement.
-9. Add each manager's application permission and site visitor access separately. No invitation emails are sent by this application.
-10. Verify save/load and a stale-save conflict with two signed-in staff accounts before opening patron access.
+The existing `.openai/hosting.json` now declares `d1: "DB"` and preserves the Site identity. The build emits `dist/server/index.js`, embeds static assets and excludes local test-identity code. The initial schema is generated from `db/schema.ts` into `drizzle/0000_shared_layouts.sql` with its journal and snapshot. Sites applies the migration before uploading the Worker. Local tests use that same SQL through `scripts/sqlite-db.mjs`. No schema is created by production request handlers.
 
-The production API trusts the identity headers supplied by Sites dispatch: oai-authenticated-user-id and oai-authenticated-user-email. It must not be exposed as an unprotected standalone Worker accepting client-supplied identity headers. A later move to independently managed Cloudflare hosting needs authenticated request verification for that host.
+`STAFF_OWNER_EMAIL` is configured through the Site runtime settings as a secret using the verified Site owner. Its value is never stored in source. The Site keeps its existing custom audience and domain. The API trusts only identity headers injected by Sites dispatch. Do not deploy this Worker to a standalone public endpoint that accepts arbitrary client identity headers. A move to a different host requires verified authentication at that host.
 
-## Geometry compatibility
+## Remaining release verification
 
-The development branch starts from GitHub main at 3a6921e4306aa7aeefac5c656bc09e9f46faeecd. The newer hosted planner was inaccessible because the source host could not resolve and the available browser required sign-in.
+- Deploy the prepared Worker and confirm the four D1 tables exist.
+- Sign in as the owner through ChatGPT and confirm the owner role in Shared layouts.
+- Obtain the manager's exact email. The selected role is **editor**. Add their email under Shared layouts > Staff access, then grant that same person visitor access in the Site's access settings. These are separate checks. No invitation is sent by this application.
+- Export any useful browser-only work from its original address before importing it. Alternatively, New Hart draft creates an unpublished copy of the latest building plan. A plan reference is not evidence of actual equipment locations.
+- In two independently signed-in staff sessions, open the same draft, save from one and verify a stale save from the other is rejected with recoverable changes. Reload and reopen in a fresh session to verify persistence.
+- As the manager/editor, verify publishing is forbidden. As owner, verify that publishing requires physical-state confirmation and both draft/current revision checks. Publish only an arrangement checked against the physical gym.
+- Verify the read-only map has identical walls, projections, area labels and equipment; later draft edits must not change it.
+- Verify anonymous access policy before opening the map to patrons. The current custom Site audience still requires authorized visitor sign-in.
+- Merge PR #1 only after those live checks pass. Do not begin the muscle selector before this milestone.
 
-Imports preserve room data, walls, equipment, IDs, planning buffers, storage assignments, contours, labels, and templates. The compatibility layer accepts traced/polygon outlines stored in boundary, points, outline, or vertices. Its polygon checks and public renderer retain those coordinates. This is not a claim that the latest hosted export has been verified. Imported traced outlines are displayed with overall boundary controls locked in the recovered editor; interior wall coordinates remain editable. Reconcile the newer hosted outline-editing controls before enabling boundary resizing.
-
-The newer hosted Hart outline, corrected CrossFit opening, and wall projections must be verified using its actual source or a current export before release. No remembered or newly estimated floor plan has replaced it.
+Local preview reported `http://terminal.local:4173/` but the browser connection was refused. The live browser reached the Site's ChatGPT sign-in gate; no signed-in owner or manager session has been verified.
 
 ## API
 
@@ -79,9 +76,9 @@ The newer hosted Hart outline, corrected CrossFit opening, and wall projections 
 
 The existing geometry, editing, printing-region, storage and import regression checks are retained. New integration tests execute the API against real SQLite, including staff authorization, concurrent saves/publications, recovery, idempotency, history and imports beyond 100 layouts. Client tests exercise the actual editor save queue, separate recovery copies, offline recovery and lost-response retries.
 
-The generated Worker is parsed as ESM and its fetch entry point is verified during the build.
+The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, deployed entrypoint routing, and anonymous staff rejection. All 27 test files/subtests pass, including the existing inline regression assertions.
 
-Browser rendering and deployed D1 behavior remain unverified. This environment blocked the local preview connection as well as the Sites source connection.
+Browser rendering and deployed D1 behavior require the live checks above. Source retrieval is now working.
 
 ## Next feature
 

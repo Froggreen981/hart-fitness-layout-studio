@@ -1,4 +1,3 @@
-.openai/
 node_modules/
 .env
 .env.*
@@ -10,3 +9,6 @@ exports/
 
 .gym-dev.sqlite*
 build/
+
+dist/server/
+dist/.openai/

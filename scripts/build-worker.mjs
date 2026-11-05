@@ -2,7 +2,7 @@ import {readFile,mkdir,writeFile,readdir} from 'node:fs/promises';
 import {resolve,relative,extname} from 'node:path';
 const root=resolve('.'),staticRoot=resolve('dist'),assets={};
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg'};
-async function collect(directory){for(const entry of await readdir(directory,{withFileTypes:true})){const path=resolve(directory,entry.name);if(entry.isDirectory())await collect(path);else assets['/'+relative(staticRoot,path).replaceAll('\\','/')]=[types[extname(path)]||'application/octet-stream',(await readFile(path)).toString('base64')];}}
+async function collect(directory){for(const entry of await readdir(directory,{withFileTypes:true})){const path=resolve(directory,entry.name);if(entry.isDirectory()){if(!['server','.openai'].includes(entry.name))await collect(path);}else assets['/'+relative(staticRoot,path).replaceAll('\\','/')]=[types[extname(path)]||'application/octet-stream',(await readFile(path)).toString('base64')];}}
 await collect(staticRoot);
 const model=(await readFile('dist/model.mjs','utf8')).replaceAll('export ','');
 const service=(await readFile('worker/service.mjs','utf8')).replace(/^import[^\n]*\n/,'').replaceAll('export ','');
@@ -16,7 +16,7 @@ export default {async fetch(request,env){
  return new Response(request.method==='HEAD'?null:bytes,{headers:{'Content-Type':asset[0],'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'}});
 }};
 `;
-await mkdir('build/server',{recursive:true});await writeFile('build/server/index.mjs',output);
+await mkdir('dist/server',{recursive:true});await mkdir('dist/.openai',{recursive:true});await writeFile('dist/server/index.js',output);await writeFile('dist/.openai/hosting.json',await readFile('.openai/hosting.json'));
 console.log('Built dependency-free Worker with '+Object.keys(assets).length+' embedded planner assets.');
 const module=await import('data:text/javascript;base64,'+Buffer.from(output).toString('base64'));
 if(typeof module.default?.fetch!=='function')throw new Error('Worker fetch export missing.');

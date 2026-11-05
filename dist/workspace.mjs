@@ -1,3 +1,4 @@
+import {buildingPlan} from './building-plan.mjs';
 import {request,send,escapeHTML as esc,editLink} from './shared-api.mjs';
 const $=id=>document.getElementById(id),when=v=>new Date(v).toLocaleString();
 let user,current=null,drafts=[],draftOffset=null,historyOffset=null,publishAction=null,nameAction=null;
@@ -57,6 +58,7 @@ $('publishForm').onsubmit=async e=>{e.preventDefault();if(!$('confirmActual').ch
  try{const p=publishAction;await send(p.restore?'/api/history/'+p.restore+'/restore':'/api/drafts/'+p.id+'/publish',{requestId:p.requestId,expectedCurrentId:p.expectedCurrentId,expectedRevision:p.expectedRevision,confirmActual:true});$('publishDialog').close();notice('Current gym map updated.');await refresh();}
  catch(err){$('publishError').textContent=err.message;}finally{$('confirmPublish').disabled=false;}
 };
+$('newDraft').onclick=async()=>{try{const layout={...buildingPlan(),id:crypto.randomUUID(),name:'Hart layout draft'};const doc=await send('/api/drafts',{layout,library:[]});location.href=editLink(doc.layout.id);}catch(err){error(err);}};
 $('refresh').onclick=()=>refresh().catch(error);
 $('showArchived').onchange=()=>loadDrafts().catch(error);
 $('moreDrafts').onclick=()=>loadDrafts(true).catch(error);

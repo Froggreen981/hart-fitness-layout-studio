@@ -1,4 +1,3 @@
-.openai/
 node_modules/
 .env
 .env.*
@@ -6,3 +5,10 @@ node_modules/
 *.zip
 exports/
 .DS_Store
+
+
+.gym-dev.sqlite*
+build/
+
+dist/server/
+dist/.openai/

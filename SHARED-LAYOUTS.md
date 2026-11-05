@@ -53,7 +53,7 @@ The production API trusts the identity headers supplied by Sites dispatch: oai-a
 
 The development branch starts from GitHub main at 3a6921e4306aa7aeefac5c656bc09e9f46faeecd. The newer hosted planner was inaccessible because the source host could not resolve and the available browser required sign-in.
 
-Imports preserve room data, walls, equipment, IDs, planning buffers, storage assignments, contours, labels, and templates. The compatibility layer accepts traced/polygon outlines stored in boundary, points, outline, or vertices. Its polygon checks and public renderer retain those coordinates. This is not a claim that the latest hosted export has been verified.
+Imports preserve room data, walls, equipment, IDs, planning buffers, storage assignments, contours, labels, and templates. The compatibility layer accepts traced/polygon outlines stored in boundary, points, outline, or vertices. Its polygon checks and public renderer retain those coordinates. This is not a claim that the latest hosted export has been verified. Imported traced outlines are displayed with overall boundary controls locked in the recovered editor; interior wall coordinates remain editable. Reconcile the newer hosted outline-editing controls before enabling boundary resizing.
 
 The newer hosted Hart outline, corrected CrossFit opening, and wall projections must be verified using its actual source or a current export before release. No remembered or newly estimated floor plan has replaced it.
 

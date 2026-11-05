@@ -42,7 +42,7 @@ The existing `.openai/hosting.json` now declares `d1: "DB"` and preserves the Si
 
 ## Remaining release verification
 
-- Deploy the prepared Worker and confirm the four D1 tables exist.
+- **Done:** version 11 deployed successfully on November 5, 2026. Live D1 exposes `gym_drafts`, `gym_imports`, `gym_publications`, and `gym_staff`. The deployed `/api/current` returns `{current:null}` until a physically verified arrangement is published. Anonymous `/api/session` and `/api/drafts` return 401. A service request carrying forged owner identity headers also returns 401, confirming dispatch strips caller-supplied identity. GitHub Shared layout verification passed for commit `5ac018fb6095d1b3d6c381421a38948a815539ce`.
 - Sign in as the owner through ChatGPT and confirm the owner role in Shared layouts.
 - Obtain the manager's exact email. The selected role is **editor**. Add their email under Shared layouts > Staff access, then grant that same person visitor access in the Site's access settings. These are separate checks. No invitation is sent by this application.
 - Export any useful browser-only work from its original address before importing it. Alternatively, New Hart draft creates an unpublished copy of the latest building plan. A plan reference is not evidence of actual equipment locations.
@@ -52,7 +52,7 @@ The existing `.openai/hosting.json` now declares `d1: "DB"` and preserves the Si
 - Verify anonymous access policy before opening the map to patrons. The current custom Site audience still requires authorized visitor sign-in.
 - Merge PR #1 only after those live checks pass. Do not begin the muscle selector before this milestone.
 
-Local preview reported `http://terminal.local:4173/` but the browser connection was refused. The live browser reached the Site's ChatGPT sign-in gate; no signed-in owner or manager session has been verified.
+Local preview reported `http://terminal.local:4173/` but the browser connection was refused. The live browser reached the Site's ChatGPT sign-in gate. Secure Google sign-in advanced to an OpenAI passkey verification screen; no signed-in owner or manager session has been verified. Browser and two-account verification remain blocking checks for merge.
 
 ## API
 

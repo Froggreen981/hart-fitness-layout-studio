@@ -1,6 +1,8 @@
 # Hart Fitness Center Layout Studio
 
-A static, dependency-free floor planner for the BYU-Idaho Hart Fitness Center.
+A dependency-free floor planner for the BYU-Idaho Hart Fitness Center.
+
+This development branch adds shared staff drafts, a published current gym map, revision history, and a read-only map backed by a Worker and D1-compatible storage. See [Shared layouts implementation](SHARED-LAYOUTS.md) for setup, verification, and the remaining hosted-source reconciliation. Static GitHub Pages continues to support the browser-only planner.
 
 **Live planner:** https://froggreen981.github.io/hart-fitness-layout-studio/
 
@@ -62,3 +64,4 @@ Full walls are black; half walls are grey. Fixed obstacles use a full footprint 
 GitHub Pages is active through `.github/workflows/pages.yml`. It tests the application and publishes only `dist/` on successful pushes to `main`. See [GitHub Pages deployment and layout transfer](GITHUB-PAGES.md) for migration instructions. The original site remains available for exporting browser-saved projects. No user layout exports or browser storage are included in this repository.
 
 Fixed objects are excluded from keep-clear equipment warnings regardless of their lock state. They continue to participate in physical footprint, wall, and buffer conflict checks. Locked exercise equipment remains equipment and is still checked against keep-clear areas.
+

@@ -6,3 +6,7 @@ node_modules/
 *.zip
 exports/
 .DS_Store
+
+
+.gym-dev.sqlite*
+build/

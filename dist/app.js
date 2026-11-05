@@ -1,3 +1,4 @@
+import {SharedEditor,bindSharedEditor} from './shared-client.mjs';
 import {STORAGE_ID,isEquipment,storagePose,storeEquipment,migrateStorage,storageView} from './storage.mjs';
 import {localPoint,resizeArea,areaFromWorldPoints,printTiles} from './editor.mjs';
 import {gymSketch} from './sketch.mjs';
@@ -8,7 +9,11 @@ const templates=[{kind:'treadmill',name:'Treadmill',category:'cardio',width:3,le
 const uid=()=>crypto.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2),fmt=n=>Number(n.toFixed(2)).toLocaleString('en-US',{maximumFractionDigits:2});
 function newItem(t,x,y,n){return {...t,id:uid(),name:t.name+(n?' '+String(n).padStart(2,'0'):''),x,y,rotation:t.rotation??0,buffer:0,buffers:getBuffers(t),locked:false};}
 function initial(){const items=[];for(let n=0;n<6;n++)items.push(newItem(templates[0],5+n*5,4,n+1));for(let n=0;n<3;n++)items.push(newItem(templates[2],40+n*5,5,n+1));items.push(newItem(templates[3],5,19,1),newItem(templates[3],19,19,2),newItem(templates[4],42,18,1),newItem(templates[4],52,18,2));for(let n=0;n<4;n++)items.push(newItem(templates[5],7+n*8,33,n+1));items.push(newItem({kind:'column',name:'Column',width:2,length:2,category:'obstacle'},36,20),newItem({kind:'column',name:'Column',width:2,length:2,category:'obstacle'},36,33));for(const i of items)if(i.category==='obstacle')i.locked=true;const id=uid();return {version:2,active:id,layouts:[{id,name:'Sample layout',room:{width:64,length:44},items}]};}
-let project=initial(),storageAvailable=true;try{const saved=localStorage.getItem('gym-layout-studio-v1');if(saved)project=validateProject(JSON.parse(saved));}catch{storageAvailable=false;}
+const sharedId=new URLSearchParams(location.search).get('draft');
+let cloud=null;
+if(sharedId){try{cloud=await SharedEditor.open(sharedId);}catch(e){document.body.innerHTML='<main style="padding:40px"><h1>Shared draft unavailable</h1><p>'+esc(e.message)+'</p><a href="workspace.html">Return to shared layouts</a></main>';throw e;}}
+let project=cloud?structuredClone(cloud.project):initial(),storageAvailable=true;
+if(!cloud)try{const saved=localStorage.getItem('gym-layout-studio-v1');if(saved)project=validateProject(JSON.parse(saved));}catch{storageAvailable=false;}
 let addedSketch=false;if(!project.sketchInstalled&&!project.layouts.some(l=>l.id==='gym-memory-draft-v1')){project.layouts.push(gymSketch());project.active='gym-memory-draft-v1';addedSketch=true;}
 project.sketchInstalled=true;
 function migrateAreas(project){project.library??=[];let areasMigrated=false;
@@ -25,7 +30,7 @@ function updateSelectionUI(){const count=selection.size;$('selectionCount').text
 function toggleSelected(id){if(selection.has(id))selection.delete(id);else selection.add(id);selected=selection.has(id)?id:[...selection].at(-1)||null;}
 
 function toast(message){$('toast').textContent=message;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}
-function persist(){try{localStorage.setItem('gym-layout-studio-v1',JSON.stringify(project));storageAvailable=true;$('saveStatus').textContent='Saved on this browser';}catch{storageAvailable=false;$('saveStatus').textContent='Export to keep your work';toast('Browser storage unavailable. Export JSON to keep your layouts.');}}
+function persist(){if(cloud){cloud.queue(project);return;}try{localStorage.setItem('gym-layout-studio-v1',JSON.stringify(project));storageAvailable=true;$('saveStatus').textContent='Saved on this browser';}catch{storageAvailable=false;$('saveStatus').textContent='Export to keep your work';toast('Browser storage unavailable. Export JSON to keep your layouts.');}}
 function checkpoint(){undo.push(JSON.stringify(project));if(undo.length>60)undo.shift();redo=[];}
 function change(fn){checkpoint();fn();persist();render();}
 function history(back){const from=back?undo:redo,to=back?redo:undo;if(!from.length)return;to.push(JSON.stringify(project));project=JSON.parse(from.pop());reconcileSelection();persist();render();}
@@ -72,7 +77,7 @@ $('layoutList').addEventListener('click',e=>{const el=e.target.closest('[data-la
 for(const [id,key] of [['roomWidth','width'],['roomLength','length']])$(id).onchange=e=>{const val=Number(e.target.value);try{validateRoomGeometry({...layout().room,[key]:val});}catch(err){toast(err.message);render();return;}if(!Number.isFinite(val)||val<5||val>500){toast('Room dimensions must be between 5 and 500 ft.');render();return;}change(()=>layout().room[key]=val);};
 $('copyBtn').onclick=()=>{$('layoutName').value='Option '+String.fromCharCode(65+Math.min(project.layouts.length-1,25));$('nameDialog').showModal();$('layoutName').select();};
 $('nameDialog').addEventListener('close',()=>{if($('nameDialog').returnValue!=='save')return;const name=$('layoutName').value.trim();if(!name)return;change(()=>{const copy=JSON.parse(JSON.stringify(layout()));copy.id=uid();copy.name=name;project.layouts.push(copy);project.active=copy.id;});toast('Layout copied. Try a new arrangement.');});
-$('blankBtn').onclick=()=>change(()=>{const l={id:uid(),name:'Blank layout '+project.layouts.length,room:{...layout().room},items:[]};project.layouts.push(l);project.active=l.id;selectOnly(null);});
+$('blankBtn').onclick=()=>change(()=>{const l={id:uid(),name:'Blank layout '+project.layouts.length,room:structuredClone(layout().room),items:[]};project.layouts.push(l);project.active=l.id;selectOnly(null);});
 $('undoBtn').onclick=()=>history(true);$('redoBtn').onclick=()=>history(false);$('snapToggle').onchange=()=>toast($('snapToggle').checked?'Snap to ½ ft enabled.':'Snap disabled.');$('bufferToggle').onchange=renderBoard;
 function setZoom(v){zoom=Math.min(12,Math.max(.5,v));renderBoard();} $('zoomIn').onclick=()=>setZoom(zoom+.25);$('zoomOut').onclick=()=>setZoom(zoom-.25);$('fitBtn').onclick=()=>{camera={x:0,y:0};setZoom(1);$('boardScroll').scrollTo(0,0);};
 function download(data,name,type){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([data],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -153,7 +158,9 @@ $('storageBoard').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const
 $('board').addEventListener('pointerup',()=>{renderStorage();renderInventory();});
 $('areasList').addEventListener('click',()=>{renderStorage();renderInventory();});
 $('selectAllBtn').addEventListener('click',()=>{renderStorage();renderInventory();});$('clearSelectionBtn').addEventListener('click',()=>{renderStorage();renderInventory();});
+if(cloud)bindSharedEditor(cloud,{getProject:()=>project});
 render();persist();
 
 document.addEventListener('keyup',e=>{if(e.key==='Escape'&&!e.target.isContentEditable&&!['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)){renderStorage();renderInventory();}});
 $('reviewList').addEventListener('click',()=>{renderStorage();renderInventory();});
+

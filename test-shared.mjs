@@ -32,9 +32,12 @@ test('staff roles allow a second account to edit but reserve publishing permissi
  await call('/api/staff','POST',{email:manager,role:'publisher'});
  await call('/api/staff','POST',{email:editor,role:'editor'});
  await create(call);
- const doc=(await call('/api/drafts/layout-a','GET',undefined,manager)).data;
+ const doc=(await call('/api/drafts/layout-a','GET',undefined,editor)).data;
  doc.layout.items[0].x=20;
- assert.equal((await call('/api/drafts/layout-a','PUT',{...doc,expectedRevision:1},manager)).status,200);
+ assert.equal((await call('/api/drafts/layout-a','PUT',{...doc,expectedRevision:1},editor)).status,200);
+ const reloaded=await call('/api/drafts/layout-a','GET',undefined,manager);
+ assert.equal(reloaded.data.layout.items[0].x,20);
+ assert.equal(reloaded.data.revision,2);
  assert.equal((await publish(call,'layout-a',2,null,crypto.randomUUID(),editor)).status,403);
  assert.equal((await publish(call,'layout-a',2,null,crypto.randomUUID(),manager)).status,201);
  assert.equal((await call('/api/staff','POST',{email:'bad@example.test',role:'publisher'},editor)).status,403);

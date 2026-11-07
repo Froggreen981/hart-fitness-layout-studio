@@ -40,19 +40,9 @@ The existing `.openai/hosting.json` now declares `d1: "DB"` and preserves the Si
 
 `STAFF_OWNER_EMAIL` is configured through the Site runtime settings as a secret using the verified Site owner. Its value is never stored in source. The Site keeps its existing custom audience and domain. The API trusts only identity headers injected by Sites dispatch. Do not deploy this Worker to a standalone public endpoint that accepts arbitrary client identity headers. A move to a different host requires verified authentication at that host.
 
-## Remaining release verification
+## Release verification
 
-- **Done:** version 11 deployed successfully on November 5, 2026. Live D1 exposes `gym_drafts`, `gym_imports`, `gym_publications`, and `gym_staff`. The deployed `/api/current` returns `{current:null}` until a physically verified arrangement is published. Anonymous `/api/session` and `/api/drafts` return 401. A service request carrying forged owner identity headers also returns 401, confirming dispatch strips caller-supplied identity. GitHub Shared layout verification passed for commit `5ac018fb6095d1b3d6c381421a38948a815539ce`.
-- Sign in as the owner through ChatGPT and confirm the owner role in Shared layouts.
-- Obtain the manager's exact email. The selected role is **editor**. Add their email under Shared layouts > Staff access, then grant that same person visitor access in the Site's access settings. These are separate checks. No invitation is sent by this application.
-- Export any useful browser-only work from its original address before importing it. Alternatively, New Hart draft creates an unpublished copy of the latest building plan. A plan reference is not evidence of actual equipment locations.
-- In two independently signed-in staff sessions, open the same draft, save from one and verify a stale save from the other is rejected with recoverable changes. Reload and reopen in a fresh session to verify persistence.
-- As the manager/editor, verify publishing is forbidden. As owner, verify that publishing requires physical-state confirmation and both draft/current revision checks. Publish only an arrangement checked against the physical gym.
-- Verify the read-only map has identical walls, projections, area labels and equipment; later draft edits must not change it.
-- Verify anonymous access policy before opening the map to patrons. The current custom Site audience still requires authorized visitor sign-in.
-- Merge PR #1 only after those live checks pass. Do not begin the muscle selector before this milestone.
-
-Local preview reported `http://terminal.local:4173/` but the browser connection was refused. The live browser reached the Site's ChatGPT sign-in gate. Secure Google sign-in advanced to an OpenAI passkey verification screen; no signed-in owner or manager session has been verified. Browser and two-account verification remain blocking checks for merge.
+The current deployment, account checks, and release gate are tracked in [LIVE-VERIFICATION.md](LIVE-VERIFICATION.md). Verify the manager in their own session and publish a physically checked arrangement before merging PR #1 or starting the muscle selector.
 
 ## API
 
@@ -76,15 +66,10 @@ Local preview reported `http://terminal.local:4173/` but the browser connection 
 
 The existing geometry, editing, printing-region, storage and import regression checks are retained. New integration tests execute the API against real SQLite, including staff authorization, concurrent saves/publications, recovery, idempotency, history and imports beyond 100 layouts. Client tests exercise the actual editor save queue, separate recovery copies, offline recovery and lost-response retries.
 
-The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, deployed entrypoint routing, and anonymous staff rejection. All 28 test files/subtests pass, including the existing inline regression assertions.
+The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, deployed entrypoint routing, and anonymous staff rejection. All 30 test files/subtests pass, including the existing inline regression assertions.
 
-Browser rendering and deployed D1 behavior require the live checks above. Source retrieval is now working.
+The deployed browser and D1 checks are recorded in the release checklist.
 
 ## Next feature
 
 After the shared deployment and latest map are verified, add the reviewed equipment/exercise/muscle catalog and the patron muscle selector.
-
-
-## Updated browser verification
-
-Owner sign-in is confirmed. The selected manager has application editor permission and Site visitor access. Two owner tabs verified persistent saved coordinates and stale-save rejection with recoverable changes. The live planner renders the latest Hart geometry and BYU-Idaho styling. The Save now button now returns to its idle enabled state after a successful save. The manager identity still needs its own signed-in verification. No test arrangement has been published as the physical gym.

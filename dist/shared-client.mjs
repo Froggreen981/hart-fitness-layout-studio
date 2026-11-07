@@ -10,7 +10,7 @@ export class SharedEditor{
   this.id=id;this.user=user;this.project={version:2,active:id,layouts:[doc.layout],library:doc.library||[],sketchInstalled:true};
   this.known=new Map([[id,{revision:doc.revision,fingerprint:this.fingerprint(doc.layout,doc.library||[])}]]);
   const prefix='gym-shared-recovery:'+encodeURIComponent(user.email)+':'+id+':';
-  this.key=prefix+crypto.randomUUID();this.pending=null;this.running=false;this.blocked=false;this.timer=null;this.status='Saved to shared workspace';this.recovery=null;
+  this.key=prefix+crypto.randomUUID();this.pending=null;this.retrySnapshot=null;this.running=false;this.blocked=false;this.timer=null;this.status='Saved to shared workspace';this.recovery=null;
   try{for(let n=0;n<localStorage.length;n++){const key=localStorage.key(n);if(!key?.startsWith(prefix))continue;const recovery=JSON.parse(localStorage.getItem(key));if(recovery?.project&&!recovery.ignored&&(!this.recovery||recovery.savedAt>this.recovery.savedAt)){this.recovery=recovery;this.recoveryKey=key;}}}catch{this.recovery=null;}
   this.recoveryPending=!!this.recovery?.project;
   window.addEventListener('online',()=>{if(!this.blocked)this.flush();});
@@ -21,7 +21,7 @@ export class SharedEditor{
  queue(project){
   if(this.recoveryPending)return;
   const changed=project.layouts.some(l=>this.known.get(l.id)?.fingerprint!==this.fingerprint(l,project.library||[]));
-  if(!changed&&!this.pending){this.report('Saved to shared workspace');return;}
+  if(!changed&&!this.pending&&!this.running){this.report('Saved to shared workspace');return;}
   this.pending=structuredClone(project);
   try{localStorage.setItem(this.key,JSON.stringify({project:this.pending,revisions:Object.fromEntries([...this.known].map(([id,v])=>[id,v.revision])),savedAt:new Date().toISOString()}));this.recoveryUnavailable=false;}
   catch{this.recoveryUnavailable=true;}
@@ -33,7 +33,11 @@ export class SharedEditor{
   clearTimeout(this.timer);this.running=true;
   try{
    while(this.pending){
-    const snapshot=this.pending;this.pending=null;this.report('Saving to shared workspace');
+    // Resolve a possibly committed write before sending a newer edit against its revision.
+    const snapshot=this.retrySnapshot??this.pending;
+    if(snapshot===this.pending)this.pending=null;
+    this.retrySnapshot=null;
+    this.report('Saving to shared workspace');
     try{
      for(const layout of snapshot.layouts){
       const known=this.known.get(layout.id),fingerprint=this.fingerprint(layout,snapshot.library||[]);
@@ -41,7 +45,11 @@ export class SharedEditor{
       const result=await send('/api/drafts'+(known?'/'+encodeURIComponent(layout.id):''),{layout,library:snapshot.library||[],...(known?{expectedRevision:known.revision}:{})},known?'PUT':'POST');
       this.known.set(layout.id,{revision:result.revision,fingerprint});
      }
-    }catch(e){if(!this.pending)this.pending=snapshot;throw e;}
+    }catch(e){
+     this.pending??=snapshot;
+     if(e.status===undefined||e.status>=500)this.retrySnapshot=snapshot;
+     throw e;
+    }
    }
    try{localStorage.removeItem(this.key);}catch{}
    this.report('Saved to shared workspace');
@@ -54,7 +62,7 @@ export class SharedEditor{
   const recovery=this.recoveryPending?this.recovery.project:project;
   const requestId=this.recoveryRequestId||(this.recoveryRequestId=crypto.randomUUID());
   const result=await send('/api/import',{project:recovery,requestId});
-  this.pending=null;this.blocked=false;this.recoveryPending=false;
+  this.pending=null;this.retrySnapshot=null;this.blocked=false;this.recoveryPending=false;
   try{localStorage.removeItem(this.key);if(this.recoveryKey){const old=localStorage.getItem(this.recoveryKey);if(old===JSON.stringify(this.recovery))localStorage.removeItem(this.recoveryKey);}}catch{}
   return result;
  }

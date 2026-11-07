@@ -1,18 +1,16 @@
 # Shared-layout release verification
 
-Deployed: Sites version 11, November 5, 2026. Existing Site and audience retained. Source: PR #1 in Froggreen981/hart-fitness-layout-studio. No actual-state arrangement has been published.
+The staff workspace is live at https://gym.huffworkshop.com/workspace.html with its custom visitor audience. Source changes are tracked in PR #1 in Froggreen981/hart-fitness-layout-studio. The current gym map awaits a verified equipment arrangement.
 
 ## Owner and manager setup
 
-1. Open the deployed Gym Layout Studio and complete ChatGPT sign-in as the existing Site owner. The shared workspace is the home page; `workspace.html` opens it directly. The page must show your account and **Staff access**. A 403 means the signed-in account does not match the configured owner or staff allowlist.
-2. Obtain the manager's exact ChatGPT sign-in email. In **Staff access**, add it with **Edit drafts**, the selected role.
-3. In the Site access settings, add that same manager as an allowed visitor. Application staff permission and Site visitor permission are separate. Do not grant source-editor access to use the gym planner.
-4. Have the manager open the Site in their own signed-in browser. Confirm they can see drafts and cannot see publishing or owner staff controls.
+1. The owner session, the manager's **Edit drafts** role, and the manager's Site visitor grant are confirmed. Application staff permission and Site visitor permission are separate.
+2. Have the manager open the workspace in their own signed-in browser. Confirm they can open drafts and that the workspace omits publishing and owner staff controls.
 
 ## Real layout and persistence
 
 1. At the original planner address, export useful browser layouts as JSON. Keep the exported backup. Browser saves do not transfer between domains or profiles automatically.
-2. In Shared layouts, use **Import JSON**. This creates new drafts and preserves existing drafts. **New Hart draft** can create an unpublished reference floor plan if no equipment arrangement is ready.
+2. In Shared layouts, use **Import JSON** to create new drafts while preserving existing ones. To build the arrangement from the floor plan, use **New Hart draft** and record equipment by area during the walkthrough. Capture each machine's name, footprint, position and orientation. The building drawing supplies the room geometry. The walkthrough supplies the current equipment positions.
 3. Open a draft, move a machine, and wait for **Saved to shared workspace**. Close it, reload, and reopen in a different signed-in session. The saved position must persist.
 4. In owner and manager sessions, open the same saved draft before either edits it. Save from the owner. Then save a different change from the manager. The second save must show a conflict and retain its recovery copy. **Save recovery as separate drafts** must create a separate proposal without replacing the first save.
 
@@ -32,21 +30,13 @@ Record the two verified identities/roles without passwords or session data, the 
 
 ## Completed automated/hosted checks
 
-- 28 Node test files/subtests pass, including the existing inline geometry, editing, storage, import and print-region assertions.
+- 30 Node test files/subtests pass, including the existing inline geometry, editing, storage, import and print-region assertions.
 - Tests cover two staff roles, recoverable stale saves, SQLite persistence, simultaneous publication conflicts, immutable history, imports beyond 100 drafts, the latest Hart geometry and deployable Worker entrypoints.
-- GitHub Shared layout verification passes.
+- Shared-editor regression tests cover undo while a save is in flight and retry after a lost response while a newer edit is pending.
 - Deployed D1 has the four expected tables.
 - Live public snapshot reads work through the authorized service boundary; staff endpoints reject identity-less requests with 401.
 - Forged owner headers through Sites dispatch receive 401.
 
-## Browser limitation in the authoring session
+## Live browser progress
 
-Managed local preview reported a URL, but the browser connection was refused. Hosted sign-in advanced to an OpenAI passkey verification screen. Signed-in rendering, real two-account persistence and actual-state publishing are still unverified.
-
-## Live progress after owner sign-in
-
-The owner session is verified in the deployed browser. The manager has application editor permission and Site visitor access. The manager has not yet signed in for independent testing.
-
-Two owner browser tabs verified persistent D1 saves after reload, rejection of a stale save, and an available recovery action. The BYU-Idaho planner and latest Hart wall geometry render in the live browser. A save-button state bug found during that testing is fixed: save controls are notified after the request finishes. A regression test covers the final idle state.
-
-The live current publication remains empty. Test drafts are unpublished and can be archived. Real manager-session verification and publication of a physically checked arrangement are still required before merging.
+Two owner browser tabs verified persistent D1 saves after reload, rejection of a stale save, and an available recovery action. The BYU-Idaho planner renders the corrected Hart wall geometry, including the lower CrossFit opening and blocked man door. The manager's independent sign-in and the first physical-state publication are the remaining live checks.

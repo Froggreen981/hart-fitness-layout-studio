@@ -8,18 +8,27 @@ function setup(t){
  const before={fetch:globalThis.fetch,window:globalThis.window,localStorage:globalThis.localStorage};
  globalThis.window={addEventListener(){}};
  globalThis.localStorage={get length(){return values.size;},key(n){return [...values.keys()][n]||null;},getItem(k){return values.get(k)||null;},setItem(k,v){values.set(k,v);},removeItem(k){values.delete(k);}};
- let offline=false,loseResponse=false;
+ let offline=false,loseResponse=false,nextSave=null;
  const fetcher=async(path,options={})=>{
   if(offline)throw new TypeError('Network unavailable');
   const headers=new Headers(options.headers);headers.set('oai-authenticated-user-id','owner');headers.set('oai-authenticated-user-email','owner@example.test');
   const result=await api(new Request('https://gym.example.test'+path,{...options,headers}),env);
+  if(nextSave&&options.method==='PUT'){
+   const save=nextSave;nextSave=null;
+   save.started();await save.released;
+  }
   if(loseResponse&&options.method==='PUT'){loseResponse=false;throw new TypeError('Response lost');}
   return result;
  };
  globalThis.fetch=fetcher;
  t.after(()=>{db.close();for(const [key,value]of Object.entries(before))if(value===undefined)delete globalThis[key];else globalThis[key]=value;});
  const layout={id:'draft',name:'Client test',room:{width:100,length:90},items:[{id:'rack',name:'Rack',category:'strength',kind:'rack',width:4,length:7,x:10,y:10,rotation:0,locked:false,buffer:0}]};
- return {values,fetcher,offline:v=>offline=v,loseResponse:()=>loseResponse=true,async create(){return fetcher('/api/drafts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({layout,library:[]})});}};
+ function holdNextSave(){
+  const started=Promise.withResolvers(),released=Promise.withResolvers();
+  nextSave={started:started.resolve,released:released.promise};
+  return {started:started.promise,release:released.resolve};
+ }
+ return {values,fetcher,holdNextSave,offline:v=>offline=v,loseResponse:()=>loseResponse=true,async create(){return fetcher('/api/drafts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({layout,library:[]})});}};
 }
 test('two editor tabs keep separate recovery copies and reject a stale save',async t=>{
  const s=setup(t);await s.create();
@@ -52,6 +61,30 @@ test('a lost save response can be retried without a false conflict or extra revi
  assert.equal(editor.known.get('draft').revision,2);assert.equal(s.values.has(editor.key),false);
 });
 
+for(const loseResponse of [false,true]){
+ test(`undo during an in-flight save is preserved${loseResponse?' after a lost response':''}`,async t=>{
+  const s=setup(t);await s.create();const editor=await SharedEditor.open('draft');
+  const held=s.holdNextSave();
+  if(loseResponse)s.loseResponse();
+  editor.project.layouts[0].items[0].x=50;
+  editor.queue(editor.project);
+  const saving=editor.flush();
+  await held.started;
+  editor.project.layouts[0].items[0].x=10;
+  editor.queue(editor.project);
+  held.release();
+  await saving;
+  if(loseResponse){
+   assert.equal(JSON.parse(s.values.get(editor.key)).project.layouts[0].items[0].x,10);
+   await editor.flush();
+  }
+  const actual=await(await s.fetcher('/api/drafts/draft')).json();
+  assert.equal(actual.layout.items[0].x,10);
+  assert.equal(actual.revision,3);
+  assert.equal(editor.blocked,false);
+  assert.equal(s.values.has(editor.key),false);
+ });
+}
 
 test('save controls are notified after the running state clears',async t=>{
  const s=setup(t);await s.create();const editor=await SharedEditor.open('draft');

@@ -22,9 +22,9 @@ export class SharedEditor{
     }
    }
   }catch{}
-  this.recoveryPending=!!this.recovery?.project;
+  this.recoveryPending=!!this.recovery?.project;this.recoveryAttempt=null;this.recovering=false;
   window.addEventListener('online',()=>{if(!this.blocked)this.flush();});
-  window.addEventListener('beforeunload',e=>{if(this.pending||this.running){e.preventDefault();e.returnValue='';}});
+  window.addEventListener('beforeunload',e=>{if(this.pending||this.running||this.recovering){e.preventDefault();e.returnValue='';}});
  }
  fingerprint(layout,library){return JSON.stringify({layout,library});}
  report(message){this.status=message+(this.recoveryUnavailable&&(this.pending||this.running||this.blocked)?' Browser recovery is unavailable; export JSON before leaving.':'');this.onStatus?.(this.status);}
@@ -35,11 +35,12 @@ export class SharedEditor{
   this.pending=structuredClone(project);
   try{localStorage.setItem(this.key,JSON.stringify({project:this.pending,revisions:Object.fromEntries([...this.known].map(([id,v])=>[id,v.revision])),savedAt:new Date().toISOString()}));this.recoveryUnavailable=false;}
   catch{this.recoveryUnavailable=true;}
-  if(this.blocked){this.report('Save conflict. Your changes are kept in this tab and recovery storage.');return;}
+  if(this.recoveryAttempt){this.report('Finish saving the separate recovery copy.');return;}
+  if(this.blocked){this.report('Automatic save paused. Your changes are kept in this tab and recovery storage.');return;}
   this.report('Waiting to save');clearTimeout(this.timer);this.timer=setTimeout(()=>this.flush(),400);
  }
  async flush(){
-  if(this.running||this.blocked||this.recoveryPending||!this.pending)return;
+  if(this.running||this.blocked||this.recoveryPending||this.recoveryAttempt||!this.pending)return;
   clearTimeout(this.timer);this.running=true;
   try{
    while(this.pending){
@@ -69,12 +70,28 @@ export class SharedEditor{
   }finally{this.running=false;this.onStatus?.(this.status);}
  }
  async saveRecovery(project){
-  const recovery=this.recoveryPending?this.recovery.project:project;
-  const requestId=this.recoveryRequestId||(this.recoveryRequestId=crypto.randomUUID());
-  const result=await send('/api/import',{project:recovery,requestId});
-  this.pending=null;this.retrySnapshot=null;this.blocked=false;this.recoveryPending=false;
-  try{localStorage.removeItem(this.key);if(this.recoveryKey){const old=localStorage.getItem(this.recoveryKey);if(old===JSON.stringify(this.recovery))localStorage.removeItem(this.recoveryKey);}}catch{}
-  return result;
+  if(this.running||this.recovering)throw new Error('Wait for the current save to finish.');
+  clearTimeout(this.timer);
+  // An uncertain import must retry the same project with the same request ID.
+  const attempt=this.recoveryAttempt??={
+   project:structuredClone(this.recoveryPending?this.recovery.project:project),
+   requestId:crypto.randomUUID(),pending:this.pending
+  };
+  this.recovering=true;this.report('Saving separate recovery drafts');
+  try{
+   const result=await send('/api/import',{project:attempt.project,requestId:attempt.requestId});
+   const newerEdits=this.pending!==attempt.pending;
+   this.recoveryAttempt=null;this.retrySnapshot=null;this.blocked=newerEdits;this.recoveryPending=false;
+   if(!newerEdits)this.pending=null;
+   try{
+    if(!newerEdits)localStorage.removeItem(this.key);
+    if(this.recoveryKey&&localStorage.getItem(this.recoveryKey)===JSON.stringify(this.recovery))localStorage.removeItem(this.recoveryKey);
+   }catch{}
+   return {...result,newerEdits};
+  }catch(e){
+   if(e.status>=400&&e.status<500)this.recoveryAttempt=null;
+   throw e;
+  }finally{this.recovering=false;this.onStatus?.(this.status);}
  }
 }
 export function bindSharedEditor(cloud,{getProject}){
@@ -83,9 +100,20 @@ export function bindSharedEditor(cloud,{getProject}){
  banner.innerHTML='<a href="workspace.html">Shared layouts</a><a href="map.html">Current gym map</a><p>This is a draft. Publish from Shared layouts when it matches the physical gym.</p><button id="retryShared">Save now</button><button id="saveSharedRecovery">Save recovery as separate drafts</button><button id="reloadShared">Reload shared version</button><div id="sharedRecovery" hidden><p>Unsaved work from an earlier visit is available. Keep it as separate drafts or continue with the latest shared version.</p><button id="keepRecovered">Keep recovery as separate drafts</button><button id="useShared">Use latest shared version</button></div>';
  document.querySelector('.topbar').after(banner);
  const $=id=>document.getElementById(id);
- cloud.onStatus=message=>{$('saveStatus').textContent=message;$('saveSharedRecovery').hidden=!cloud.pending&&!cloud.blocked;$('retryShared').disabled=cloud.running||cloud.blocked;};
+ cloud.onStatus=message=>{
+  $('saveStatus').textContent=message;$('saveSharedRecovery').hidden=!cloud.pending&&!cloud.blocked;
+  $('saveSharedRecovery').disabled=$('keepRecovered').disabled=cloud.running||cloud.recovering;
+  $('retryShared').disabled=cloud.running||cloud.blocked||!!cloud.recoveryAttempt;
+  $('useShared').disabled=!!cloud.recoveryAttempt;
+ };
  $('retryShared').onclick=()=>cloud.flush();
- const save=async()=>{try{const r=await cloud.saveRecovery(getProject());location.href=r.imported.length===1?editLink(r.imported[0].id):'workspace.html';}catch(e){cloud.report(e.message);}};
+ const save=async()=>{
+  try{
+   const r=await cloud.saveRecovery(getProject());
+   if(r.newerEdits){cloud.report('Saved the recovery copy. Newer edits are still in this tab. Save them as separate drafts.');return;}
+   location.href=r.imported.length===1?editLink(r.imported[0].id):'workspace.html';
+  }catch(e){cloud.report(e.message);}
+ };
  $('saveSharedRecovery').onclick=save;$('keepRecovered').onclick=save;
  $('reloadShared').onclick=()=>location.reload();
  if(cloud.recoveryPending){$('sharedRecovery').hidden=false;document.querySelector('.workspace').inert=true;}

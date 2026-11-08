@@ -40,3 +40,7 @@ Record the two verified identities/roles without passwords or session data, the 
 ## Live browser progress
 
 Two owner browser tabs verified persistent D1 saves after reload, rejection of a stale save, and an available recovery action. The BYU-Idaho planner renders the corrected Hart wall geometry, including the lower CrossFit opening and blocked man door. The manager's independent sign-in and the first physical-state publication are the remaining live checks.
+
+## Workout integration release checks
+
+The separate workout integration branch adds opt-in, read-only routes over published data. Production activation requires verifying supported backend access through the existing Sites gateway and configuring the integration secret. Keep the custom visitor audience in place. Run the staging checks in [WORKOUT-API.md](WORKOUT-API.md) before giving the workout team live access. The first physically verified production publication is still required to verify real equipment positions.

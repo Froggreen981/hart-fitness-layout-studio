@@ -11,7 +11,17 @@ export class SharedEditor{
   this.known=new Map([[id,{revision:doc.revision,fingerprint:this.fingerprint(doc.layout,doc.library||[])}]]);
   const prefix='gym-shared-recovery:'+encodeURIComponent(user.email)+':'+id+':';
   this.key=prefix+crypto.randomUUID();this.pending=null;this.retrySnapshot=null;this.running=false;this.blocked=false;this.timer=null;this.status='Saved to shared workspace';this.recovery=null;
-  try{for(let n=0;n<localStorage.length;n++){const key=localStorage.key(n);if(!key?.startsWith(prefix))continue;const recovery=JSON.parse(localStorage.getItem(key));if(recovery?.project&&!recovery.ignored&&(!this.recovery||recovery.savedAt>this.recovery.savedAt)){this.recovery=recovery;this.recoveryKey=key;}}}catch{this.recovery=null;}
+  try{
+   for(let n=0;n<localStorage.length;n++){
+    const key=localStorage.key(n);
+    if(!key?.startsWith(prefix))continue;
+    let recovery;
+    try{recovery=JSON.parse(localStorage.getItem(key));}catch{continue;}
+    if(recovery?.project&&!recovery.ignored&&(!this.recovery||recovery.savedAt>this.recovery.savedAt)){
+     this.recovery=recovery;this.recoveryKey=key;
+    }
+   }
+  }catch{}
   this.recoveryPending=!!this.recovery?.project;
   window.addEventListener('online',()=>{if(!this.blocked)this.flush();});
   window.addEventListener('beforeunload',e=>{if(this.pending||this.running){e.preventDefault();e.returnValue='';}});

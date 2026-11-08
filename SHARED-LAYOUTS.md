@@ -48,7 +48,8 @@ The current deployment, account checks, and release gate are tracked in [LIVE-VE
 
 | Route | Access and behavior |
 | --- | --- |
-| GET /api/current | Current public snapshot only; no staff notes, stored equipment, or draft metadata. |
+| GET /api/current | Existing visitor-gated snapshot contract. Omits staff notes, stored equipment and draft metadata. |
+| GET/HEAD /api/v1/layout and /api/v1/equipment | Read-only integration routes, disabled until separately configured. See [Workout API](WORKOUT-API.md). |
 | GET /api/session | Authorized staff identity and role. |
 | GET /api/drafts | Staff-only bounded page of draft metadata. |
 | POST /api/drafts | Create a draft, preserving physical equipment IDs. |
@@ -70,6 +71,6 @@ The generated Worker is parsed as ESM and its fetch entry point is verified duri
 
 The deployed browser and D1 checks are recorded in the release checklist.
 
-## Next feature
+## Workout app integration
 
-After the shared deployment and latest map are verified, add the reviewed equipment/exercise/muscle catalog and the patron muscle selector.
+The versioned API uses the same immutable publication as the visitor map. See the [workout app guide](WORKOUT-API.md) for rendering, equipment IDs, conditional caching, and the restricted service setup. The standalone muscle selector is deferred.

@@ -94,3 +94,15 @@ test('save controls are notified after the running state clears',async t=>{
  assert.equal(states.at(-1).running,false);
  assert.equal(states.at(-1).status,'Saved to shared workspace');
 });
+
+test('a corrupt recovery record does not hide a valid copy from another tab',async t=>{
+ const s=setup(t);await s.create();
+ const first=await SharedEditor.open('draft');
+ s.values.set(first.key+'-corrupt','{"project":');
+ first.project.layouts[0].items[0].x=55;
+ first.queue(first.project);clearTimeout(first.timer);
+ const reopened=await SharedEditor.open('draft');
+ assert.equal(reopened.recoveryPending,true);
+ assert.equal(reopened.recoveryKey,first.key);
+ assert.equal(reopened.recovery.project.layouts[0].items[0].x,55);
+});

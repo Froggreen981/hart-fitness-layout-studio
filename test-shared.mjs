@@ -168,3 +168,18 @@ test('shared database survives closing and reopening the server connection',asyn
  }finally{rmSync(join(directory,'gym.sqlite'),{force:true});rmdirSync(directory);}
 });
 
+
+test('overlapping identical publish and restore requests each append only once',async t=>{
+ const {call}=setup(t);await create(call);
+ const key='concurrent-publish';
+ const publishes=await Promise.all([publish(call,'layout-a',1,null,key),publish(call,'layout-a',1,null,key)]);
+ assert.deepEqual(publishes.map(r=>r.status).sort(),[200,201]);
+ assert.deepEqual(publishes[0].data,publishes[1].data);
+ const restore='/api/history/'+key+'/restore';
+ const body={expectedCurrentId:key,requestId:'concurrent-restore',confirmActual:true};
+ const restores=await Promise.all([call(restore,'POST',body),call(restore,'POST',body)]);
+ assert.deepEqual(restores.map(r=>r.status).sort(),[200,201]);
+ assert.deepEqual(restores[0].data,restores[1].data);
+ assert.equal((await call('/api/history')).data.history.length,2);
+ assert.equal((await publish(call,'layout-a',1,key,body.requestId)).status,409);
+});

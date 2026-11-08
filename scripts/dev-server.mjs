@@ -20,7 +20,7 @@ const server=createServer(async(req,res)=>{
    headers.set('oai-authenticated-user-id',actor==='anonymous'?'':'local-'+(actor||'owner'));
    headers.set('oai-authenticated-user-email',actor==='anonymous'?'':actor||owner);
    const request=new Request(url,{method:req.method,headers,...(!['GET','HEAD'].includes(req.method)?{body:Buffer.concat(chunks)}:{})});
-   const response=await api(request,{DB:db,STAFF_OWNER_EMAIL:owner});
+   const response=await api(request,{DB:db,STAFF_OWNER_EMAIL:owner,WORKOUT_API_TOKEN_SHA256:process.env.WORKOUT_API_TOKEN_SHA256});
    res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));return;
   }
   let path=decodeURIComponent(url.pathname);if(path==='/')path='/workspace.html';

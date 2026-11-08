@@ -94,3 +94,51 @@ test('save controls are notified after the running state clears',async t=>{
  assert.equal(states.at(-1).running,false);
  assert.equal(states.at(-1).status,'Saved to shared workspace');
 });
+
+test('a corrupt recovery record does not hide a valid copy from another tab',async t=>{
+ const s=setup(t);await s.create();
+ const first=await SharedEditor.open('draft');
+ s.values.set(first.key+'-corrupt','{"project":');
+ first.project.layouts[0].items[0].x=55;
+ first.queue(first.project);clearTimeout(first.timer);
+ const reopened=await SharedEditor.open('draft');
+ assert.equal(reopened.recoveryPending,true);
+ assert.equal(reopened.recoveryKey,first.key);
+ assert.equal(reopened.recovery.project.layouts[0].items[0].x,55);
+});
+
+test('a recovery import retry preserves its original snapshot and newer edits',async t=>{
+ const s=setup(t);await s.create();
+ const editor=await SharedEditor.open('draft');
+ const started=Promise.withResolvers(),released=Promise.withResolvers();
+ let loseImport=true;
+ globalThis.fetch=async(path,options)=>{
+  const response=await s.fetcher(path,options);
+  if(path==='/api/import'&&loseImport){
+   loseImport=false;started.resolve();await released.promise;
+   throw new TypeError('Import response lost');
+  }
+  return response;
+ };
+ const rack=editor.project.layouts[0].items[0];
+ rack.x=40;editor.queue(editor.project);
+ const first=editor.saveRecovery(editor.project);
+ await started.promise;
+ rack.x=50;editor.queue(editor.project);
+ await editor.flush();
+ assert.equal((await(await s.fetcher('/api/drafts/draft')).json()).layout.items[0].x,10);
+ released.resolve();
+ await assert.rejects(first,/response lost/);
+
+ const retried=await editor.saveRecovery(editor.project);
+ assert.equal(retried.newerEdits,true);
+ assert.equal((await(await s.fetcher('/api/drafts/'+retried.imported[0].id)).json()).layout.items[0].x,40);
+ assert.equal(JSON.parse(s.values.get(editor.key)).project.layouts[0].items[0].x,50);
+
+ const latest=await editor.saveRecovery(editor.project);
+ assert.equal(latest.newerEdits,false);
+ assert.notEqual(latest.imported[0].id,retried.imported[0].id);
+ assert.equal((await(await s.fetcher('/api/drafts/'+latest.imported[0].id)).json()).layout.items[0].x,50);
+ assert.equal((await(await s.fetcher('/api/drafts')).json()).drafts.length,3);
+ assert.equal(s.values.has(editor.key),false);
+});

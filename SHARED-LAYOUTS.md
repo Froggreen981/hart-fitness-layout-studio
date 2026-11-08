@@ -48,7 +48,8 @@ The current deployment, account checks, and release gate are tracked in [LIVE-VE
 
 | Route | Access and behavior |
 | --- | --- |
-| GET /api/current | Current public snapshot only; no staff notes, stored equipment, or draft metadata. |
+| GET /api/current | Existing visitor-gated snapshot contract. Omits staff notes, stored equipment and draft metadata. |
+| GET/HEAD /api/v1/layout and /api/v1/equipment | Read-only integration routes, disabled until separately configured. See [Workout API](WORKOUT-API.md). |
 | GET /api/session | Authorized staff identity and role. |
 | GET /api/drafts | Staff-only bounded page of draft metadata. |
 | POST /api/drafts | Create a draft, preserving physical equipment IDs. |
@@ -66,10 +67,10 @@ The current deployment, account checks, and release gate are tracked in [LIVE-VE
 
 The existing geometry, editing, printing-region, storage and import regression checks are retained. New integration tests execute the API against real SQLite, including staff authorization, concurrent saves/publications, recovery, idempotency, history and imports beyond 100 layouts. Client tests exercise the actual editor save queue, separate recovery copies, offline recovery and lost-response retries.
 
-The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, deployed entrypoint routing, and anonymous staff rejection. All 30 test files/subtests pass, including the existing inline regression assertions.
+The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, deployed entrypoint routing, and anonymous staff rejection. The deployed shared-layout baseline passed 30 test files/subtests. The integration branch adds coverage for workout API authorization, conditional requests, geometry and publication transitions, concurrent publication retries, recovery imports, and current-map selection after a publication changes.
 
 The deployed browser and D1 checks are recorded in the release checklist.
 
-## Next feature
+## Workout app integration
 
-After the shared deployment and latest map are verified, add the reviewed equipment/exercise/muscle catalog and the patron muscle selector.
+The versioned API uses the same immutable publication as the visitor map. See the [workout app guide](WORKOUT-API.md) for rendering, equipment IDs, conditional caching, and the restricted service setup. The standalone muscle selector is deferred.

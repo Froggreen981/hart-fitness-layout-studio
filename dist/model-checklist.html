@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#20334d"><title>Hart Gym · Model Verification</title>
+<style>
+:root{--navy:#20334d;--ink:#17263a;--muted:#526279;--line:#d6dfe7;--bg:#f4f6f9;--green:#185f42;--red:#9b3434}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:115px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.38 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button,.choice{touch-action:manipulation}button{cursor:pointer}header{background:var(--navy);color:white;padding:calc(20px + env(safe-area-inset-top)) 16px 18px}header>div{max-width:680px;margin:auto}h1{font-size:24px;margin:0 0 5px;letter-spacing:-.025em}header p{color:#d8e3f0;margin:0;font-size:14px}main{max-width:680px;margin:auto;padding:0 12px 70px}
+.summary{background:#f4f6f9f7;position:sticky;top:0;z-index:9;padding:12px 4px 9px;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.summary-top{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:750}.summary-top span:last-child{color:var(--muted);font-weight:550}.bar{height:7px;background:#d5e1e9;border-radius:9px;overflow:hidden;margin-top:9px}.bar>div{height:100%;background:var(--green);width:0;transition:width .2s}nav{display:flex;gap:8px;overflow-x:auto;padding:13px 0 5px}nav a{white-space:nowrap;text-decoration:none;color:var(--ink);background:white;border:1px solid var(--line);border-radius:24px;padding:9px 12px;font-size:13px;font-weight:700}nav span{color:var(--muted);font-weight:500}.area{padding-top:18px}.area h2{font-size:20px;margin:0 0 13px;display:flex;align-items:baseline;gap:8px}.area h2 small{font-size:12px;color:var(--muted);font-weight:450}
+.card{background:white;border:1px solid var(--line);border-radius:13px;padding:15px;margin:0 0 12px;box-shadow:0 2px 6px #20334d09}.card[data-status=yes]{border-left:5px solid #168059}.card[data-status=no]{border-left:5px solid #c17e36}.card-top{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px}.check-id{color:#687a90;font-weight:700;letter-spacing:.03em}.status{color:#62738a}.card[data-status=yes] .status{font-weight:700;color:#146141}.card[data-status=no] .status{font-weight:700;color:#915315}h3{font-size:19px;line-height:1.23;margin:5px 0 1px;letter-spacing:-.012em}.brand{margin:0 0 12px;color:var(--muted);font-size:14px}.suspect{background:#edf2f7;border-radius:9px;display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:10px 12px;margin:10px 0}.suspect span{font-size:12px;color:var(--muted)}.suspect strong{font-size:21px;word-break:break-all}.no-code{background:#fff3db;color:#75501b;border-radius:9px;margin:10px 0 12px;padding:10px;font-size:14px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:11px 0 0}.choice{display:block;position:relative;min-height:58px;cursor:pointer}.choice input{appearance:none;-webkit-appearance:none;position:absolute;inset:0;width:100%;height:100%;border:2px solid #bbd6c8;border-radius:11px;margin:0;background:#e7f5ed;cursor:pointer}.choice:nth-child(2) input{border-color:#e9c6c1;background:#fdf0ee}.choice span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#195f43;font-weight:800;font-size:19px}.choice:nth-child(2) span{color:#923333}.choice input:checked{background:#186342;border-color:#186342}.choice:nth-child(2) input:checked{background:#9f3939;border-color:#9f3939}.choice input:checked+span{color:white}.choice input:focus-visible{outline:3px solid #247cce;outline-offset:3px}
+.correction{padding:12px;background:#fffaf1;border:1px solid #ebd7b9;border-radius:9px;margin-top:12px}.correction label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}.correction input{display:block;width:100%;border:1px solid #b3c4d2;border-radius:8px;min-height:50px;background:white;padding:10px 12px;text-transform:uppercase;font-size:17px}.correction[data-conditional]{display:none}.card:has(input[type="radio"][value="no"]:checked) .correction[data-conditional]{display:block}.alt{padding:6px 10px;margin:5px 5px 0 0;border-radius:7px;background:#fff;border:1px solid #a5b3c2;color:var(--ink)}.alts{font-size:12px;color:var(--muted);margin-top:9px}
+.tools{background:white;border:1px solid var(--line);border-radius:13px;padding:15px;margin:24px 0}.tools h2{font-size:18px;margin:0 0 5px}.tools p{font-size:13px;color:var(--muted);margin:0 0 12px}.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tools button{border-radius:9px;background:white;border:1px solid #bbcbd9;color:var(--ink);min-height:48px;padding:8px;font-size:13px;font-weight:700}.tools button.primary{background:var(--navy);color:white;border-color:var(--navy)}.tools button:disabled{opacity:.5}.warning{background:#fff4d7;color:#654912;border:1px solid #e7cf93;padding:12px;border-radius:9px;font-size:13px;margin:12px 0}.error{color:#a52323}.fine{font-size:12px;color:var(--muted);margin-top:11px}#import{display:none}footer{font-size:12px;color:var(--muted);text-align:center;margin-top:24px}noscript .warning{display:block}@media(min-width:600px){.card{padding:19px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style></head><body>
+<header><div><h1>Hart Gym: Model Checklist</h1><p>Every machine is listed. Check the model, tap Yes or No, and enter a correction if needed.</p></div></header>
+<main>
+<div class="summary"><div class="summary-top"><span id="progress">0 / 95 checked</span><span id="details">0 Yes · 0 No</span></div><div class="bar" role="progressbar" id="progressbar" aria-valuemin="0" aria-valuemax="95" aria-valuenow="0"><div id="fill"></div></div></div>
+<div id="storage-status" class="warning" hidden>Saving isn't available in this viewer. Your answers will not survive closing this page. Open the checklist in Safari or Chrome as a website, then export a backup before leaving.</div>
+<noscript><div class="warning">This viewer has blocked JavaScript. The Yes/No selections can still be tapped, but progress saving and exporting require opening this page as a website in a browser.</div></noscript>
+<nav aria-label="Jump to area"><a href="#area-0">Dumbbell &amp; selectorized <span>51</span></a><a href="#area-1">Plate-loaded &amp; free weights <span>31</span></a><a href="#area-2">Cable machines <span>4</span></a><a href="#area-3">Squat racks <span>4</span></a><a href="#area-4">Core &amp; functional equipment <span>5</span></a></nav>
+<section class="area" id="area-0"><h2>Dumbbell &amp; selectorized <small>51 entries</small></h2><article class="card" id="item-CHK-001" data-id="CHK-001" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-001</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Adductor</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0620</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0620 match?"><label class="choice"><input type="radio" name="answer-CHK-001" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-001" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-001">Correct model number if No</label><input type="text" id="correct-CHK-001" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Adductor">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="RSL0626">RSL0626</button><button type="button" class="alt" data-alternative="VSL008BP">VSL008BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-002" data-id="CHK-002" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-002</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Abductor</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0621</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0621 match?"><label class="choice"><input type="radio" name="answer-CHK-002" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-002" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-002">Correct model number if No</label><input type="text" id="correct-CHK-002" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Abductor">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="RSL0626">RSL0626</button><button type="button" class="alt" data-alternative="VSL008BP">VSL008BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-003" data-id="CHK-003" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-003</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Adductor</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES809</strong></div><div class="answers" role="radiogroup" aria-label="Does ES809 match?"><label class="choice"><input type="radio" name="answer-CHK-003" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-003" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-003">Correct model number if No</label><input type="text" id="correct-CHK-003" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Adductor">
+
+</div>
+</article><article class="card" id="item-CHK-004" data-id="CHK-004" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-004</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Leg Press</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0602</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0602 match?"><label class="choice"><input type="radio" name="answer-CHK-004" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-004" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-004">Correct model number if No</label><input type="text" id="correct-CHK-004" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Leg Press">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL010BP">VSL010BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-005" data-id="CHK-005" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-005</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Leg Extension</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0605</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0605 match?"><label class="choice"><input type="radio" name="answer-CHK-005" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-005" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-005">Correct model number if No</label><input type="text" id="correct-CHK-005" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Leg Extension">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL005BP">VSL005BP</button><button type="button" class="alt" data-alternative="VSL027BP">VSL027BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-006" data-id="CHK-006" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-006</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Leg Curl</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES803</strong></div><div class="answers" role="radiogroup" aria-label="Does ES803 match?"><label class="choice"><input type="radio" name="answer-CHK-006" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-006" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-006">Correct model number if No</label><input type="text" id="correct-CHK-006" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Leg Curl">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="ES814">ES814</button></div>
+</div>
+</article><article class="card" id="item-CHK-007" data-id="CHK-007" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-007</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Leg Curl</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0619</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0619 match?"><label class="choice"><input type="radio" name="answer-CHK-007" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-007" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-007">Correct model number if No</label><input type="text" id="correct-CHK-007" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Leg Curl">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL007BP">VSL007BP</button><button type="button" class="alt" data-alternative="VSL027BP">VSL027BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-008" data-id="CHK-008" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-008</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Kneeling Leg Curl</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSKC</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSKC match?"><label class="choice"><input type="radio" name="answer-CHK-008" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-008" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-008">Correct model number if No</label><input type="text" id="correct-CHK-008" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Kneeling Leg Curl">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="IL-KLC">IL-KLC</button></div>
+</div>
+</article><article class="card" id="item-CHK-009" data-id="CHK-009" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-009</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Leg Extension</h3><p class="brand">Hammer Strength</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-009">Model number observed</label><input type="text" id="correct-CHK-009" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Leg Extension">
+
+</div>
+</article><article class="card" id="item-CHK-010" data-id="CHK-010" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-010</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>EPIC Selectorized Glute</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES820</strong></div><div class="answers" role="radiogroup" aria-label="Does ES820 match?"><label class="choice"><input type="radio" name="answer-CHK-010" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-010" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-010">Correct model number if No</label><input type="text" id="correct-CHK-010" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for EPIC Selectorized Glute">
+
+</div>
+</article><article class="card" id="item-CHK-011" data-id="CHK-011" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-011</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Prone Leg Curl</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0606</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0606 match?"><label class="choice"><input type="radio" name="answer-CHK-011" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-011" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-011">Correct model number if No</label><input type="text" id="correct-CHK-011" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Prone Leg Curl">
+
+</div>
+</article><article class="card" id="item-CHK-012" data-id="CHK-012" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-012</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Abdominal Crunch</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>VSL014BP</strong></div><div class="answers" role="radiogroup" aria-label="Does VSL014BP match?"><label class="choice"><input type="radio" name="answer-CHK-012" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-012" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-012">Correct model number if No</label><input type="text" id="correct-CHK-012" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Abdominal Crunch">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL028BP">VSL028BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-013" data-id="CHK-013" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-013</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Abdominal Crunch</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSAB</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSAB match?"><label class="choice"><input type="radio" name="answer-CHK-013" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-013" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-013">Correct model number if No</label><input type="text" id="correct-CHK-013" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Abdominal Crunch">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="HS-ABC">HS-ABC</button><button type="button" class="alt" data-alternative="PL-AB">PL-AB</button></div>
+</div>
+</article><article class="card" id="item-CHK-014" data-id="CHK-014" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-014</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>MTS Biceps Curl</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSBC</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSBC match?"><label class="choice"><input type="radio" name="answer-CHK-014" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-014" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-014">Correct model number if No</label><input type="text" id="correct-CHK-014" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for MTS Biceps Curl">
+
+</div>
+</article><article class="card" id="item-CHK-015" data-id="CHK-015" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-015</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>MTS Triceps Extension</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSTE</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSTE match?"><label class="choice"><input type="radio" name="answer-CHK-015" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-015" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-015">Correct model number if No</label><input type="text" id="correct-CHK-015" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for MTS Triceps Extension">
+
+</div>
+</article><article class="card" id="item-CHK-016" data-id="CHK-016" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-016</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Biceps Curl</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0204</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0204 match?"><label class="choice"><input type="radio" name="answer-CHK-016" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-016" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-016">Correct model number if No</label><input type="text" id="correct-CHK-016" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Biceps Curl">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL003BP">VSL003BP</button><button type="button" class="alt" data-alternative="VSL025BP">VSL025BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-017" data-id="CHK-017" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-017</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Triceps Extension</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0208</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0208 match?"><label class="choice"><input type="radio" name="answer-CHK-017" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-017" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-017">Correct model number if No</label><input type="text" id="correct-CHK-017" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Triceps Extension">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL023BP">VSL023BP</button><button type="button" class="alt" data-alternative="VSL025BP">VSL025BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-018" data-id="CHK-018" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-018</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Triceps Extension</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES811</strong></div><div class="answers" role="radiogroup" aria-label="Does ES811 match?"><label class="choice"><input type="radio" name="answer-CHK-018" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-018" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-018">Correct model number if No</label><input type="text" id="correct-CHK-018" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Triceps Extension">
+
+</div>
+</article><article class="card" id="item-CHK-019" data-id="CHK-019" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-019</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Biceps Curl</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES810</strong></div><div class="answers" role="radiogroup" aria-label="Does ES810 match?"><label class="choice"><input type="radio" name="answer-CHK-019" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-019" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-019">Correct model number if No</label><input type="text" id="correct-CHK-019" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Biceps Curl">
+
+</div>
+</article><article class="card" id="item-CHK-020" data-id="CHK-020" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-020</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>MTS V-Squat</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>PL-VSQ</strong></div><div class="answers" role="radiogroup" aria-label="Does PL-VSQ match?"><label class="choice"><input type="radio" name="answer-CHK-020" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-020" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-020">Correct model number if No</label><input type="text" id="correct-CHK-020" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for MTS V-Squat">
+
+</div>
+</article><article class="card" id="item-CHK-021" data-id="CHK-021" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-021</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Pec Fly / Rear Delt</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES806</strong></div><div class="answers" role="radiogroup" aria-label="Does ES806 match?"><label class="choice"><input type="radio" name="answer-CHK-021" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-021" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-021">Correct model number if No</label><input type="text" id="correct-CHK-021" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Pec Fly / Rear Delt">
+
+</div>
+</article><article class="card" id="item-CHK-022" data-id="CHK-022" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-022</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Rear Delt / Pec Fly</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0505</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0505 match?"><label class="choice"><input type="radio" name="answer-CHK-022" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-022" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-022">Correct model number if No</label><input type="text" id="correct-CHK-022" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Rear Delt / Pec Fly">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL015BP">VSL015BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-023" data-id="CHK-023" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-023</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>MTS High Row</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSHR</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSHR match?"><label class="choice"><input type="radio" name="answer-CHK-023" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-023" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-023">Correct model number if No</label><input type="text" id="correct-CHK-023" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for MTS High Row">
+
+</div>
+</article><article class="card" id="item-CHK-024" data-id="CHK-024" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-024</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Seated Row</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES817</strong></div><div class="answers" role="radiogroup" aria-label="Does ES817 match?"><label class="choice"><input type="radio" name="answer-CHK-024" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-024" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-024">Correct model number if No</label><input type="text" id="correct-CHK-024" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Seated Row">
+
+</div>
+</article><article class="card" id="item-CHK-025" data-id="CHK-025" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-025</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Lat Pulldown / High Row</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES802</strong></div><div class="answers" role="radiogroup" aria-label="Does ES802 match?"><label class="choice"><input type="radio" name="answer-CHK-025" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-025" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-025">Correct model number if No</label><input type="text" id="correct-CHK-025" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Lat Pulldown / High Row">
+
+</div>
+</article><article class="card" id="item-CHK-026" data-id="CHK-026" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-026</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>MTS Row</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSRW</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSRW match?"><label class="choice"><input type="radio" name="answer-CHK-026" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-026" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-026">Correct model number if No</label><input type="text" id="correct-CHK-026" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for MTS Row">
+
+</div>
+</article><article class="card" id="item-CHK-027" data-id="CHK-027" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-027</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Front Pulldown</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSFP</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSFP match?"><label class="choice"><input type="radio" name="answer-CHK-027" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-027" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-027">Correct model number if No</label><input type="text" id="correct-CHK-027" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Front Pulldown">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="IL-PD">IL-PD</button></div>
+</div>
+</article><article class="card" id="item-CHK-028" data-id="CHK-028" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-028</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Diverging Lat Pulldown</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0314</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0314 match?"><label class="choice"><input type="radio" name="answer-CHK-028" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-028" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-028">Correct model number if No</label><input type="text" id="correct-CHK-028" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Diverging Lat Pulldown">
+
+</div>
+</article><article class="card" id="item-CHK-029" data-id="CHK-029" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-029</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Back Extension</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0313</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0313 match?"><label class="choice"><input type="radio" name="answer-CHK-029" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-029" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-029">Correct model number if No</label><input type="text" id="correct-CHK-029" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Back Extension">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL011BP">VSL011BP</button><button type="button" class="alt" data-alternative="VSL028BP">VSL028BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-030" data-id="CHK-030" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-030</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Back Extension</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES815</strong></div><div class="answers" role="radiogroup" aria-label="Does ES815 match?"><label class="choice"><input type="radio" name="answer-CHK-030" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-030" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-030">Correct model number if No</label><input type="text" id="correct-CHK-030" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Back Extension">
+
+</div>
+</article><article class="card" id="item-CHK-031" data-id="CHK-031" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-031</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Diverging Seated Row</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0310</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0310 match?"><label class="choice"><input type="radio" name="answer-CHK-031" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-031" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-031">Correct model number if No</label><input type="text" id="correct-CHK-031" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Diverging Seated Row">
+
+</div>
+</article><article class="card" id="item-CHK-032" data-id="CHK-032" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-032</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Shoulder Press</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSSP</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSSP match?"><label class="choice"><input type="radio" name="answer-CHK-032" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-032" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-032">Correct model number if No</label><input type="text" id="correct-CHK-032" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Shoulder Press">
+
+</div>
+</article><article class="card" id="item-CHK-033" data-id="CHK-033" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-033</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Pectoral Fly / Rear Deltoid</h3><p class="brand">Life Fitness</p>
+<div class="suspect"><span>Suspected model</span><strong>OP-FLY</strong></div><div class="answers" role="radiogroup" aria-label="Does OP-FLY match?"><label class="choice"><input type="radio" name="answer-CHK-033" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-033" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-033">Correct model number if No</label><input type="text" id="correct-CHK-033" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Pectoral Fly / Rear Deltoid">
+
+</div>
+</article><article class="card" id="item-CHK-034" data-id="CHK-034" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-034</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Chest Press</h3><p class="brand">Hammer Strength</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-034">Model number observed</label><input type="text" id="correct-CHK-034" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Chest Press">
+
+</div>
+</article><article class="card" id="item-CHK-035" data-id="CHK-035" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-035</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Incline Press</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-IP</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-IP match?"><label class="choice"><input type="radio" name="answer-CHK-035" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-035" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-035">Correct model number if No</label><input type="text" id="correct-CHK-035" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Incline Press">
+
+</div>
+</article><article class="card" id="item-CHK-036" data-id="CHK-036" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-036</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Converging Shoulder Press</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0515</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0515 match?"><label class="choice"><input type="radio" name="answer-CHK-036" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-036" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-036">Correct model number if No</label><input type="text" id="correct-CHK-036" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Converging Shoulder Press">
+
+</div>
+</article><article class="card" id="item-CHK-037" data-id="CHK-037" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-037</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Shoulder Press</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>MTSSP</strong></div><div class="answers" role="radiogroup" aria-label="Does MTSSP match?"><label class="choice"><input type="radio" name="answer-CHK-037" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-037" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-037">Correct model number if No</label><input type="text" id="correct-CHK-037" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Shoulder Press">
+
+</div>
+</article><article class="card" id="item-CHK-038" data-id="CHK-038" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-038</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Shoulder Press</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES807</strong></div><div class="answers" role="radiogroup" aria-label="Does ES807 match?"><label class="choice"><input type="radio" name="answer-CHK-038" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-038" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-038">Correct model number if No</label><input type="text" id="correct-CHK-038" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Shoulder Press">
+
+</div>
+</article><article class="card" id="item-CHK-039" data-id="CHK-039" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-039</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Chest Press</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES800</strong></div><div class="answers" role="radiogroup" aria-label="Does ES800 match?"><label class="choice"><input type="radio" name="answer-CHK-039" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-039" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-039">Correct model number if No</label><input type="text" id="correct-CHK-039" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Chest Press">
+
+</div>
+</article><article class="card" id="item-CHK-040" data-id="CHK-040" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-040</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Converging Chest Press</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0414</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0414 match?"><label class="choice"><input type="radio" name="answer-CHK-040" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-040" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-040">Correct model number if No</label><input type="text" id="correct-CHK-040" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Converging Chest Press">
+
+</div>
+</article><article class="card" id="item-CHK-041" data-id="CHK-041" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-041</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Abdominal Crunch</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES819</strong></div><div class="answers" role="radiogroup" aria-label="Does ES819 match?"><label class="choice"><input type="radio" name="answer-CHK-041" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-041" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-041">Correct model number if No</label><input type="text" id="correct-CHK-041" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Abdominal Crunch">
+
+</div>
+</article><article class="card" id="item-CHK-042" data-id="CHK-042" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-042</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Seated Calf Extension</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0623</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0623 match?"><label class="choice"><input type="radio" name="answer-CHK-042" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-042" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-042">Correct model number if No</label><input type="text" id="correct-CHK-042" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Seated Calf Extension">
+
+</div>
+</article><article class="card" id="item-CHK-043" data-id="CHK-043" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-043</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>V Crunch</h3><p class="brand">Hoist Fitness</p>
+<div class="suspect"><span>Suspected model</span><strong>RS-1601</strong></div><div class="answers" role="radiogroup" aria-label="Does RS-1601 match?"><label class="choice"><input type="radio" name="answer-CHK-043" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-043" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-043">Correct model number if No</label><input type="text" id="correct-CHK-043" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for V Crunch">
+
+</div>
+</article><article class="card" id="item-CHK-044" data-id="CHK-044" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-044</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>V Crunch</h3><p class="brand">Precor</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-044">Model number observed</label><input type="text" id="correct-CHK-044" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for V Crunch">
+
+</div>
+</article><article class="card" id="item-CHK-045" data-id="CHK-045" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-045</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Dip / Chin Assist 320?</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>320</strong></div><div class="answers" role="radiogroup" aria-label="Does 320 match?"><label class="choice"><input type="radio" name="answer-CHK-045" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-045" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-045">Correct model number if No</label><input type="text" id="correct-CHK-045" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Dip / Chin Assist 320?">
+
+</div>
+</article><article class="card" id="item-CHK-046" data-id="CHK-046" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-046</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Dip / Chin Assist</h3><p class="brand">Freemotion</p>
+<div class="suspect"><span>Suspected model</span><strong>ES812</strong></div><div class="answers" role="radiogroup" aria-label="Does ES812 match?"><label class="choice"><input type="radio" name="answer-CHK-046" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-046" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-046">Correct model number if No</label><input type="text" id="correct-CHK-046" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Dip / Chin Assist">
+
+</div>
+</article><article class="card" id="item-CHK-047" data-id="CHK-047" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-047</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Preacher Curl</h3><p class="brand">Hammer Strength · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>PL-BI</strong></div><div class="answers" role="radiogroup" aria-label="Does PL-BI match?"><label class="choice"><input type="radio" name="answer-CHK-047" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-047" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-047">Correct model number if No</label><input type="text" id="correct-CHK-047" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Preacher Curl">
+
+</div>
+</article><article class="card" id="item-CHK-048" data-id="CHK-048" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-048</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Plate Tree</h3><p class="brand">Hoist Fitness · 2 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-048">Model number observed</label><input type="text" id="correct-CHK-048" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Plate Tree">
+
+</div>
+</article><article class="card" id="item-CHK-049" data-id="CHK-049" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-049</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Curl Bar Tree</h3><p class="brand">Hammer Strength · 2 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-049">Model number observed</label><input type="text" id="correct-CHK-049" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Curl Bar Tree">
+
+</div>
+</article><article class="card" id="item-CHK-050" data-id="CHK-050" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-050</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>EZ Bar Rack</h3><p class="brand">Unspecified</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-050">Model number observed</label><input type="text" id="correct-CHK-050" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for EZ Bar Rack">
+
+</div>
+</article><article class="card" id="item-CHK-051" data-id="CHK-051" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-051</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Adjustable weight bench</h3><p class="brand">Hoist Fitness · 20 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-051">Model number observed</label><input type="text" id="correct-CHK-051" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Adjustable weight bench">
+
+</div>
+</article></section><section class="area" id="area-1"><h2>Plate-loaded &amp; free weights <small>31 entries</small></h2><article class="card" id="item-CHK-052" data-id="CHK-052" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-052</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Leg Press</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>PL-LP</strong></div><div class="answers" role="radiogroup" aria-label="Does PL-LP match?"><label class="choice"><input type="radio" name="answer-CHK-052" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-052" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-052">Correct model number if No</label><input type="text" id="correct-CHK-052" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Leg Press">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="HSLLP">HSLLP</button></div>
+</div>
+</article><article class="card" id="item-CHK-053" data-id="CHK-053" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-053</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Leg Press</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>RSL0602</strong></div><div class="answers" role="radiogroup" aria-label="Does RSL0602 match?"><label class="choice"><input type="radio" name="answer-CHK-053" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-053" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-053">Correct model number if No</label><input type="text" id="correct-CHK-053" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Leg Press">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="VSL010BP">VSL010BP</button></div>
+</div>
+</article><article class="card" id="item-CHK-054" data-id="CHK-054" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-054</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Hack Squat</h3><p class="brand">Hoist Fitness · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>CF-3356</strong></div><div class="answers" role="radiogroup" aria-label="Does CF-3356 match?"><label class="choice"><input type="radio" name="answer-CHK-054" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-054" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-054">Correct model number if No</label><input type="text" id="correct-CHK-054" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Hack Squat">
+
+</div>
+</article><article class="card" id="item-CHK-055" data-id="CHK-055" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-055</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Glute Drive</h3><p class="brand">Nautilus · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>NP-L1131</strong></div><div class="answers" role="radiogroup" aria-label="Does NP-L1131 match?"><label class="choice"><input type="radio" name="answer-CHK-055" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-055" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-055">Correct model number if No</label><input type="text" id="correct-CHK-055" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Glute Drive">
+
+</div>
+</article><article class="card" id="item-CHK-056" data-id="CHK-056" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-056</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Glute Drive</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>PL-GLD</strong></div><div class="answers" role="radiogroup" aria-label="Does PL-GLD match?"><label class="choice"><input type="radio" name="answer-CHK-056" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-056" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-056">Correct model number if No</label><input type="text" id="correct-CHK-056" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Glute Drive">
+
+</div>
+</article><article class="card" id="item-CHK-057" data-id="CHK-057" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-057</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Belt Squat</h3><p class="brand">Power Lift · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>71000D</strong></div><div class="answers" role="radiogroup" aria-label="Does 71000D match?"><label class="choice"><input type="radio" name="answer-CHK-057" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-057" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-057">Correct model number if No</label><input type="text" id="correct-CHK-057" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Belt Squat">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="18257A">18257A</button></div>
+</div>
+</article><article class="card" id="item-CHK-058" data-id="CHK-058" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-058</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Pull Over</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>PL-PO</strong></div><div class="answers" role="radiogroup" aria-label="Does PL-PO match?"><label class="choice"><input type="radio" name="answer-CHK-058" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-058" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-058">Correct model number if No</label><input type="text" id="correct-CHK-058" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Pull Over">
+
+</div>
+</article><article class="card" id="item-CHK-059" data-id="CHK-059" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-059</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Plate Tree</h3><p class="brand">Hoist Fitness · 4 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-059">Model number observed</label><input type="text" id="correct-CHK-059" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Plate Tree">
+
+</div>
+</article><article class="card" id="item-CHK-060" data-id="CHK-060" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-060</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Super Fly</h3><p class="brand">Hammer Strength · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>PL-FLY</strong></div><div class="answers" role="radiogroup" aria-label="Does PL-FLY match?"><label class="choice"><input type="radio" name="answer-CHK-060" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-060" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-060">Correct model number if No</label><input type="text" id="correct-CHK-060" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Super Fly">
+
+</div>
+</article><article class="card" id="item-CHK-061" data-id="CHK-061" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-061</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Leg Curl</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-LC</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-LC match?"><label class="choice"><input type="radio" name="answer-CHK-061" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-061" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-061">Correct model number if No</label><input type="text" id="correct-CHK-061" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Leg Curl">
+
+</div>
+</article><article class="card" id="item-CHK-062" data-id="CHK-062" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-062</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Glute Builder (unspecified model)</h3><p class="brand">Glute Builder</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-062">Model number observed</label><input type="text" id="correct-CHK-062" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Glute Builder (unspecified model)">
+
+</div>
+</article><article class="card" id="item-CHK-063" data-id="CHK-063" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-063</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Front Lat Pulldown</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-PD</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-PD match?"><label class="choice"><input type="radio" name="answer-CHK-063" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-063" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-063">Correct model number if No</label><input type="text" id="correct-CHK-063" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Front Lat Pulldown">
+
+</div>
+</article><article class="card" id="item-CHK-064" data-id="CHK-064" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-064</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Horizontal Bench Press</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-HBP</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-HBP match?"><label class="choice"><input type="radio" name="answer-CHK-064" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-064" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-064">Correct model number if No</label><input type="text" id="correct-CHK-064" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Horizontal Bench Press">
+
+</div>
+</article><article class="card" id="item-CHK-065" data-id="CHK-065" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-065</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Super Incline Press</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-FMP</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-FMP match?"><label class="choice"><input type="radio" name="answer-CHK-065" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-065" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-065">Correct model number if No</label><input type="text" id="correct-CHK-065" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Super Incline Press">
+
+</div>
+</article><article class="card" id="item-CHK-066" data-id="CHK-066" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-066</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Leg Extension</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-LE</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-LE match?"><label class="choice"><input type="radio" name="answer-CHK-066" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-066" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-066">Correct model number if No</label><input type="text" id="correct-CHK-066" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Leg Extension">
+
+</div>
+</article><article class="card" id="item-CHK-067" data-id="CHK-067" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-067</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Abdominal Oblique Crunch</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>PL-AB</strong></div><div class="answers" role="radiogroup" aria-label="Does PL-AB match?"><label class="choice"><input type="radio" name="answer-CHK-067" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-067" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-067">Correct model number if No</label><input type="text" id="correct-CHK-067" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Abdominal Oblique Crunch">
+
+</div>
+</article><article class="card" id="item-CHK-068" data-id="CHK-068" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-068</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Wide Pulldown</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-WPD</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-WPD match?"><label class="choice"><input type="radio" name="answer-CHK-068" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-068" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-068">Correct model number if No</label><input type="text" id="correct-CHK-068" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Wide Pulldown">
+
+</div>
+</article><article class="card" id="item-CHK-069" data-id="CHK-069" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-069</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Bench Press</h3><p class="brand">Unspecified</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-BP</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-BP match?"><label class="choice"><input type="radio" name="answer-CHK-069" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-069" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-069">Correct model number if No</label><input type="text" id="correct-CHK-069" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Bench Press">
+
+</div>
+</article><article class="card" id="item-CHK-070" data-id="CHK-070" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-070</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Decline Press</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-DCP</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-DCP match?"><label class="choice"><input type="radio" name="answer-CHK-070" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-070" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-070">Correct model number if No</label><input type="text" id="correct-CHK-070" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Decline Press">
+
+</div>
+</article><article class="card" id="item-CHK-071" data-id="CHK-071" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-071</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Unlabeled equipment outline</h3><p class="brand">Unknown</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-071">Model number observed</label><input type="text" id="correct-CHK-071" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Unlabeled equipment outline">
+
+</div>
+</article><article class="card" id="item-CHK-072" data-id="CHK-072" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-072</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Bench Press</h3><p class="brand">Rogue · 3 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-072">Model number observed</label><input type="text" id="correct-CHK-072" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Bench Press">
+
+</div>
+</article><article class="card" id="item-CHK-073" data-id="CHK-073" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-073</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Fat Pad Bench</h3><p class="brand">Rogue · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>R-MUB2</strong></div><div class="answers" role="radiogroup" aria-label="Does R-MUB2 match?"><label class="choice"><input type="radio" name="answer-CHK-073" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-073" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-073">Correct model number if No</label><input type="text" id="correct-CHK-073" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Fat Pad Bench">
+
+</div>
+</article><article class="card" id="item-CHK-074" data-id="CHK-074" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-074</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>T-Bar Row</h3><p class="brand">Arsenal Strength · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>AR-TBAR</strong></div><div class="answers" role="radiogroup" aria-label="Does AR-TBAR match?"><label class="choice"><input type="radio" name="answer-CHK-074" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-074" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-074">Correct model number if No</label><input type="text" id="correct-CHK-074" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for T-Bar Row">
+
+</div>
+</article><article class="card" id="item-CHK-075" data-id="CHK-075" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-075</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>HIIT Mill X</h3><p class="brand">Unspecified</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-075">Model number observed</label><input type="text" id="correct-CHK-075" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for HIIT Mill X">
+
+</div>
+</article><article class="card" id="item-CHK-076" data-id="CHK-076" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-076</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Row</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-ROW</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-ROW match?"><label class="choice"><input type="radio" name="answer-CHK-076" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-076" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-076">Correct model number if No</label><input type="text" id="correct-CHK-076" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Row">
+
+</div>
+</article><article class="card" id="item-CHK-077" data-id="CHK-077" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-077</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral D.Y. Row</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-DRW</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-DRW match?"><label class="choice"><input type="radio" name="answer-CHK-077" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-077" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-077">Correct model number if No</label><input type="text" id="correct-CHK-077" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral D.Y. Row">
+
+</div>
+</article><article class="card" id="item-CHK-078" data-id="CHK-078" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-078</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral Low Row</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-LR</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-LR match?"><label class="choice"><input type="radio" name="answer-CHK-078" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-078" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-078">Correct model number if No</label><input type="text" id="correct-CHK-078" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral Low Row">
+
+</div>
+</article><article class="card" id="item-CHK-079" data-id="CHK-079" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-079</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Iso-Lateral High Row</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>IL-HR</strong></div><div class="answers" role="radiogroup" aria-label="Does IL-HR match?"><label class="choice"><input type="radio" name="answer-CHK-079" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-079" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-079">Correct model number if No</label><input type="text" id="correct-CHK-079" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Iso-Lateral High Row">
+
+</div>
+</article><article class="card" id="item-CHK-080" data-id="CHK-080" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-080</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Seated Dip</h3><p class="brand">Hammer Strength</p>
+<div class="suspect"><span>Suspected model</span><strong>PL-DIP</strong></div><div class="answers" role="radiogroup" aria-label="Does PL-DIP match?"><label class="choice"><input type="radio" name="answer-CHK-080" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-080" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-080">Correct model number if No</label><input type="text" id="correct-CHK-080" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Seated Dip">
+
+</div>
+</article><article class="card" id="item-CHK-081" data-id="CHK-081" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-081</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Deadlift Platform</h3><p class="brand">Rogue · 8 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>R-DP</strong></div><div class="answers" role="radiogroup" aria-label="Does R-DP match?"><label class="choice"><input type="radio" name="answer-CHK-081" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-081" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-081">Correct model number if No</label><input type="text" id="correct-CHK-081" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Deadlift Platform">
+
+</div>
+</article><article class="card" id="item-CHK-082" data-id="CHK-082" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-082</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Ground Base Multi Squat</h3><p class="brand">Hammer Strength · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>GB-MSQ</strong></div><div class="answers" role="radiogroup" aria-label="Does GB-MSQ match?"><label class="choice"><input type="radio" name="answer-CHK-082" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-082" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-082">Correct model number if No</label><input type="text" id="correct-CHK-082" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Ground Base Multi Squat">
+
+</div>
+</article></section><section class="area" id="area-2"><h2>Cable machines <small>4 entries</small></h2><article class="card" id="item-CHK-083" data-id="CHK-083" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-083</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Dual Adjustable Pulley</h3><p class="brand">Life Fitness · 4 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>OP-DAP</strong></div><div class="answers" role="radiogroup" aria-label="Does OP-DAP match?"><label class="choice"><input type="radio" name="answer-CHK-083" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-083" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-083">Correct model number if No</label><input type="text" id="correct-CHK-083" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Dual Adjustable Pulley">
+<div class="alts">Alternative possibilities: <button type="button" class="alt" data-alternative="CMDAP">CMDAP</button></div>
+</div>
+</article><article class="card" id="item-CHK-084" data-id="CHK-084" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-084</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>FTS Glide</h3><p class="brand">Precor · 3 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>FTS-GLIDE</strong></div><div class="answers" role="radiogroup" aria-label="Does FTS-GLIDE match?"><label class="choice"><input type="radio" name="answer-CHK-084" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-084" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-084">Correct model number if No</label><input type="text" id="correct-CHK-084" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for FTS Glide">
+
+</div>
+</article><article class="card" id="item-CHK-085" data-id="CHK-085" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-085</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Lat Pulldown + Low Row</h3><p class="brand">Precor</p>
+<div class="suspect"><span>Suspected model</span><strong>VSL026BP</strong></div><div class="answers" role="radiogroup" aria-label="Does VSL026BP match?"><label class="choice"><input type="radio" name="answer-CHK-085" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-085" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-085">Correct model number if No</label><input type="text" id="correct-CHK-085" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Lat Pulldown + Low Row">
+
+</div>
+</article><article class="card" id="item-CHK-086" data-id="CHK-086" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-086</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Lat Pulldown + Low Row</h3><p class="brand">Life Fitness</p>
+<div class="suspect"><span>Suspected model</span><strong>OP-LR</strong></div><div class="answers" role="radiogroup" aria-label="Does OP-LR match?"><label class="choice"><input type="radio" name="answer-CHK-086" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-086" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-086">Correct model number if No</label><input type="text" id="correct-CHK-086" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Lat Pulldown + Low Row">
+
+</div>
+</article></section><section class="area" id="area-3"><h2>Squat racks <small>4 entries</small></h2><article class="card" id="item-CHK-087" data-id="CHK-087" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-087</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Double Rack</h3><p class="brand">Hammer Strength · 6 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-087">Model number observed</label><input type="text" id="correct-CHK-087" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Double Rack">
+
+</div>
+</article><article class="card" id="item-CHK-088" data-id="CHK-088" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-088</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Single Squat Rack</h3><p class="brand">Unspecified · 3 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-088">Model number observed</label><input type="text" id="correct-CHK-088" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Single Squat Rack">
+
+</div>
+</article><article class="card" id="item-CHK-089" data-id="CHK-089" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-089</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Squat Rack</h3><p class="brand">TuffStuff</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-089">Model number observed</label><input type="text" id="correct-CHK-089" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Squat Rack">
+
+</div>
+</article><article class="card" id="item-CHK-090" data-id="CHK-090" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-090</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Smith Machine</h3><p class="brand">Precor · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>DPL0802</strong></div><div class="answers" role="radiogroup" aria-label="Does DPL0802 match?"><label class="choice"><input type="radio" name="answer-CHK-090" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-090" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-090">Correct model number if No</label><input type="text" id="correct-CHK-090" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Smith Machine">
+
+</div>
+</article></section><section class="area" id="area-4"><h2>Core &amp; functional equipment <small>5 entries</small></h2><article class="card" id="item-CHK-091" data-id="CHK-091" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-091</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Crunch Thing (unidentified model)</h3><p class="brand">EliteFTS</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-091">Model number observed</label><input type="text" id="correct-CHK-091" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Crunch Thing (unidentified model)">
+
+</div>
+</article><article class="card" id="item-CHK-092" data-id="CHK-092" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-092</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Crunch Thing (unidentified model)</h3><p class="brand">Rogue · 2 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-092">Model number observed</label><input type="text" id="correct-CHK-092" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Crunch Thing (unidentified model)">
+
+</div>
+</article><article class="card" id="item-CHK-093" data-id="CHK-093" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-093</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Stretch Trainer</h3><p class="brand">Precor · 2 machines</p>
+<div class="suspect"><span>Suspected model</span><strong>VBR6240</strong></div><div class="answers" role="radiogroup" aria-label="Does VBR6240 match?"><label class="choice"><input type="radio" name="answer-CHK-093" value="yes"><span>Yes</span></label><label class="choice"><input type="radio" name="answer-CHK-093" value="no"><span>No</span></label></div>
+<div class="correction" data-conditional><label for="correct-CHK-093">Correct model number if No</label><input type="text" id="correct-CHK-093" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Stretch Trainer">
+
+</div>
+</article><article class="card" id="item-CHK-094" data-id="CHK-094" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-094</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Unidentified rectangular equipment</h3><p class="brand">Unknown</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-094">Model number observed</label><input type="text" id="correct-CHK-094" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Unidentified rectangular equipment">
+
+</div>
+</article><article class="card" id="item-CHK-095" data-id="CHK-095" data-status="unchecked">
+<div class="card-top"><span class="check-id">CHK-095</span><span class="status" aria-live="polite">Not checked</span></div>
+<h3>Nordic Trainer (provisional reading)</h3><p class="brand">Rogue · 3 machines</p>
+<p class="no-code">No model number suggested yet</p>
+<div class="correction" ><label for="correct-CHK-095">Model number observed</label><input type="text" id="correct-CHK-095" placeholder="Enter model number" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="Correct model number for Nordic Trainer (provisional reading)">
+
+</div>
+</article></section>
+<section class="tools"><h2>Save your checks</h2><p>Progress saves automatically when browser storage is available. Export a backup at the end of a gym visit.</p><div class="tools-grid"><button id="export" class="primary" type="button">Export CSV</button><button id="backup" type="button">Backup answers</button><button id="restore" type="button">Restore backup</button><button id="reset" type="button">Clear answers</button></div><input id="import" type="file" accept="application/json,.json"><div id="saveinfo" class="fine" aria-live="polite">Not yet saved</div></section>
+<footer>95 verification groups · 153 equipment instances · Hart Fitness Center</footer>
+</main>
+<script>
+'use strict';
+const ITEMS=[{"id":"CHK-001","area":"Dumbbell / selectorized area","name":"Adductor","brand":"Precor","qty":1,"inventory":"HART-0001","codes":["RSL0620","RSL0626","VSL008BP"]},{"id":"CHK-002","area":"Dumbbell / selectorized area","name":"Abductor","brand":"Precor","qty":1,"inventory":"HART-0002","codes":["RSL0621","RSL0626","VSL008BP"]},{"id":"CHK-003","area":"Dumbbell / selectorized area","name":"Adductor","brand":"Freemotion","qty":1,"inventory":"HART-0003","codes":["ES809"]},{"id":"CHK-004","area":"Dumbbell / selectorized area","name":"Leg Press","brand":"Precor","qty":1,"inventory":"HART-0004","codes":["RSL0602","VSL010BP"]},{"id":"CHK-005","area":"Dumbbell / selectorized area","name":"Leg Extension","brand":"Precor","qty":1,"inventory":"HART-0005","codes":["RSL0605","VSL005BP","VSL027BP"]},{"id":"CHK-006","area":"Dumbbell / selectorized area","name":"Leg Curl","brand":"Freemotion","qty":1,"inventory":"HART-0006","codes":["ES803","ES814"]},{"id":"CHK-007","area":"Dumbbell / selectorized area","name":"Leg Curl","brand":"Precor","qty":1,"inventory":"HART-0007","codes":["RSL0619","VSL007BP","VSL027BP"]},{"id":"CHK-008","area":"Dumbbell / selectorized area","name":"Kneeling Leg Curl","brand":"Hammer Strength","qty":1,"inventory":"HART-0008","codes":["MTSKC","IL-KLC"]},{"id":"CHK-009","area":"Dumbbell / selectorized area","name":"Leg Extension","brand":"Hammer Strength","qty":1,"inventory":"HART-0009","codes":[]},{"id":"CHK-010","area":"Dumbbell / selectorized area","name":"EPIC Selectorized Glute","brand":"Freemotion","qty":1,"inventory":"HART-0010","codes":["ES820"]},{"id":"CHK-011","area":"Dumbbell / selectorized area","name":"Prone Leg Curl","brand":"Precor","qty":1,"inventory":"HART-0011","codes":["RSL0606"]},{"id":"CHK-012","area":"Dumbbell / selectorized area","name":"Abdominal Crunch","brand":"Precor","qty":1,"inventory":"HART-0012","codes":["VSL014BP","VSL028BP"]},{"id":"CHK-013","area":"Dumbbell / selectorized area","name":"Abdominal Crunch","brand":"Hammer Strength","qty":1,"inventory":"HART-0013","codes":["MTSAB","HS-ABC","PL-AB"]},{"id":"CHK-014","area":"Dumbbell / selectorized area","name":"MTS Biceps Curl","brand":"Hammer Strength","qty":1,"inventory":"HART-0014","codes":["MTSBC"]},{"id":"CHK-015","area":"Dumbbell / selectorized area","name":"MTS Triceps Extension","brand":"Hammer Strength","qty":1,"inventory":"HART-0015","codes":["MTSTE"]},{"id":"CHK-016","area":"Dumbbell / selectorized area","name":"Biceps Curl","brand":"Precor","qty":1,"inventory":"HART-0016","codes":["RSL0204","VSL003BP","VSL025BP"]},{"id":"CHK-017","area":"Dumbbell / selectorized area","name":"Triceps Extension","brand":"Precor","qty":1,"inventory":"HART-0017","codes":["RSL0208","VSL023BP","VSL025BP"]},{"id":"CHK-018","area":"Dumbbell / selectorized area","name":"Triceps Extension","brand":"Freemotion","qty":1,"inventory":"HART-0018","codes":["ES811"]},{"id":"CHK-019","area":"Dumbbell / selectorized area","name":"Biceps Curl","brand":"Freemotion","qty":1,"inventory":"HART-0019","codes":["ES810"]},{"id":"CHK-020","area":"Dumbbell / selectorized area","name":"MTS V-Squat","brand":"Hammer Strength","qty":1,"inventory":"HART-0020","codes":["PL-VSQ"]},{"id":"CHK-021","area":"Dumbbell / selectorized area","name":"Pec Fly / Rear Delt","brand":"Freemotion","qty":1,"inventory":"HART-0021","codes":["ES806"]},{"id":"CHK-022","area":"Dumbbell / selectorized area","name":"Rear Delt / Pec Fly","brand":"Precor","qty":1,"inventory":"HART-0022","codes":["RSL0505","VSL015BP"]},{"id":"CHK-023","area":"Dumbbell / selectorized area","name":"MTS High Row","brand":"Hammer Strength","qty":1,"inventory":"HART-0023","codes":["MTSHR"]},{"id":"CHK-024","area":"Dumbbell / selectorized area","name":"Seated Row","brand":"Freemotion","qty":1,"inventory":"HART-0024","codes":["ES817"]},{"id":"CHK-025","area":"Dumbbell / selectorized area","name":"Lat Pulldown / High Row","brand":"Freemotion","qty":1,"inventory":"HART-0025","codes":["ES802"]},{"id":"CHK-026","area":"Dumbbell / selectorized area","name":"MTS Row","brand":"Hammer Strength","qty":1,"inventory":"HART-0026","codes":["MTSRW"]},{"id":"CHK-027","area":"Dumbbell / selectorized area","name":"Front Pulldown","brand":"Hammer Strength","qty":1,"inventory":"HART-0027","codes":["MTSFP","IL-PD"]},{"id":"CHK-028","area":"Dumbbell / selectorized area","name":"Diverging Lat Pulldown","brand":"Precor","qty":1,"inventory":"HART-0028","codes":["RSL0314"]},{"id":"CHK-029","area":"Dumbbell / selectorized area","name":"Back Extension","brand":"Precor","qty":1,"inventory":"HART-0029","codes":["RSL0313","VSL011BP","VSL028BP"]},{"id":"CHK-030","area":"Dumbbell / selectorized area","name":"Back Extension","brand":"Freemotion","qty":1,"inventory":"HART-0030","codes":["ES815"]},{"id":"CHK-031","area":"Dumbbell / selectorized area","name":"Diverging Seated Row","brand":"Precor","qty":1,"inventory":"HART-0031","codes":["RSL0310"]},{"id":"CHK-032","area":"Dumbbell / selectorized area","name":"Iso-Lateral Shoulder Press","brand":"Hammer Strength","qty":1,"inventory":"HART-0032","codes":["MTSSP"]},{"id":"CHK-033","area":"Dumbbell / selectorized area","name":"Pectoral Fly / Rear Deltoid","brand":"Life Fitness","qty":1,"inventory":"HART-0033","codes":["OP-FLY"]},{"id":"CHK-034","area":"Dumbbell / selectorized area","name":"Chest Press","brand":"Hammer Strength","qty":1,"inventory":"HART-0034","codes":[]},{"id":"CHK-035","area":"Dumbbell / selectorized area","name":"Incline Press","brand":"Hammer Strength","qty":1,"inventory":"HART-0035","codes":["IL-IP"]},{"id":"CHK-036","area":"Dumbbell / selectorized area","name":"Converging Shoulder Press","brand":"Precor","qty":1,"inventory":"HART-0036","codes":["RSL0515"]},{"id":"CHK-037","area":"Dumbbell / selectorized area","name":"Shoulder Press","brand":"Hammer Strength","qty":1,"inventory":"HART-0037","codes":["MTSSP"]},{"id":"CHK-038","area":"Dumbbell / selectorized area","name":"Shoulder Press","brand":"Freemotion","qty":1,"inventory":"HART-0038","codes":["ES807"]},{"id":"CHK-039","area":"Dumbbell / selectorized area","name":"Chest Press","brand":"Freemotion","qty":1,"inventory":"HART-0039","codes":["ES800"]},{"id":"CHK-040","area":"Dumbbell / selectorized area","name":"Converging Chest Press","brand":"Precor","qty":1,"inventory":"HART-0040","codes":["RSL0414"]},{"id":"CHK-041","area":"Dumbbell / selectorized area","name":"Abdominal Crunch","brand":"Freemotion","qty":1,"inventory":"HART-0041","codes":["ES819"]},{"id":"CHK-042","area":"Dumbbell / selectorized area","name":"Seated Calf Extension","brand":"Precor","qty":1,"inventory":"HART-0042","codes":["RSL0623"]},{"id":"CHK-043","area":"Dumbbell / selectorized area","name":"V Crunch","brand":"Hoist Fitness","qty":1,"inventory":"HART-0043","codes":["RS-1601"]},{"id":"CHK-044","area":"Dumbbell / selectorized area","name":"V Crunch","brand":"Precor","qty":1,"inventory":"HART-0044","codes":[]},{"id":"CHK-045","area":"Dumbbell / selectorized area","name":"Dip / Chin Assist 320?","brand":"Precor","qty":1,"inventory":"HART-0045","codes":["320"]},{"id":"CHK-046","area":"Dumbbell / selectorized area","name":"Dip / Chin Assist","brand":"Freemotion","qty":1,"inventory":"HART-0046","codes":["ES812"]},{"id":"CHK-047","area":"Dumbbell / selectorized area","name":"Preacher Curl","brand":"Hammer Strength","qty":2,"inventory":"HART-0047, HART-0053","codes":["PL-BI"]},{"id":"CHK-048","area":"Dumbbell / selectorized area","name":"Plate Tree","brand":"Hoist Fitness","qty":2,"inventory":"HART-0048, HART-0052","codes":[]},{"id":"CHK-049","area":"Dumbbell / selectorized area","name":"Curl Bar Tree","brand":"Hammer Strength","qty":2,"inventory":"HART-0049, HART-0051","codes":[]},{"id":"CHK-050","area":"Dumbbell / selectorized area","name":"EZ Bar Rack","brand":"Unspecified","qty":1,"inventory":"HART-0050","codes":[]},{"id":"CHK-051","area":"Dumbbell / selectorized area","name":"Adjustable weight bench","brand":"Hoist Fitness","qty":20,"inventory":"HART-0054, HART-0055, HART-0056, HART-0057, HART-0058, HART-0059, HART-0060, HART-0061, HART-0062, HART-0063, HART-0064, HART-0065, HART-0066, HART-0067, HART-0068, HART-0069, HART-0070, HART-0071, HART-0072, HART-0073","codes":[]},{"id":"CHK-052","area":"Plate-loaded / free weights","name":"Leg Press","brand":"Hammer Strength","qty":1,"inventory":"HART-0074","codes":["PL-LP","HSLLP"]},{"id":"CHK-053","area":"Plate-loaded / free weights","name":"Leg Press","brand":"Precor","qty":1,"inventory":"HART-0075","codes":["RSL0602","VSL010BP"]},{"id":"CHK-054","area":"Plate-loaded / free weights","name":"Hack Squat","brand":"Hoist Fitness","qty":2,"inventory":"HART-0076, HART-0077","codes":["CF-3356"]},{"id":"CHK-055","area":"Plate-loaded / free weights","name":"Glute Drive","brand":"Nautilus","qty":2,"inventory":"HART-0078, HART-0079","codes":["NP-L1131"]},{"id":"CHK-056","area":"Plate-loaded / free weights","name":"Glute Drive","brand":"Hammer Strength","qty":1,"inventory":"HART-0080","codes":["PL-GLD"]},{"id":"CHK-057","area":"Plate-loaded / free weights","name":"Belt Squat","brand":"Power Lift","qty":2,"inventory":"HART-0081, HART-0082","codes":["71000D","18257A"]},{"id":"CHK-058","area":"Plate-loaded / free weights","name":"Pull Over","brand":"Hammer Strength","qty":1,"inventory":"HART-0083","codes":["PL-PO"]},{"id":"CHK-059","area":"Plate-loaded / free weights","name":"Plate Tree","brand":"Hoist Fitness","qty":4,"inventory":"HART-0084, HART-0087, HART-0096, HART-0099","codes":[]},{"id":"CHK-060","area":"Plate-loaded / free weights","name":"Super Fly","brand":"Hammer Strength","qty":2,"inventory":"HART-0085, HART-0086","codes":["PL-FLY"]},{"id":"CHK-061","area":"Plate-loaded / free weights","name":"Iso-Lateral Leg Curl","brand":"Hammer Strength","qty":1,"inventory":"HART-0088","codes":["IL-LC"]},{"id":"CHK-062","area":"Plate-loaded / free weights","name":"Glute Builder (unspecified model)","brand":"Glute Builder","qty":1,"inventory":"HART-0089","codes":[]},{"id":"CHK-063","area":"Plate-loaded / free weights","name":"Iso-Lateral Front Lat Pulldown","brand":"Hammer Strength","qty":1,"inventory":"HART-0090","codes":["IL-PD"]},{"id":"CHK-064","area":"Plate-loaded / free weights","name":"Iso-Lateral Horizontal Bench Press","brand":"Hammer Strength","qty":1,"inventory":"HART-0091","codes":["IL-HBP"]},{"id":"CHK-065","area":"Plate-loaded / free weights","name":"Iso-Lateral Super Incline Press","brand":"Hammer Strength","qty":1,"inventory":"HART-0092","codes":["IL-FMP"]},{"id":"CHK-066","area":"Plate-loaded / free weights","name":"Iso-Lateral Leg Extension","brand":"Hammer Strength","qty":1,"inventory":"HART-0093","codes":["IL-LE"]},{"id":"CHK-067","area":"Plate-loaded / free weights","name":"Abdominal Oblique Crunch","brand":"Hammer Strength","qty":1,"inventory":"HART-0094","codes":["PL-AB"]},{"id":"CHK-068","area":"Plate-loaded / free weights","name":"Iso-Lateral Wide Pulldown","brand":"Hammer Strength","qty":1,"inventory":"HART-0095","codes":["IL-WPD"]},{"id":"CHK-069","area":"Plate-loaded / free weights","name":"Iso-Lateral Bench Press","brand":"Unspecified","qty":1,"inventory":"HART-0097","codes":["IL-BP"]},{"id":"CHK-070","area":"Plate-loaded / free weights","name":"Iso-Lateral Decline Press","brand":"Hammer Strength","qty":1,"inventory":"HART-0098","codes":["IL-DCP"]},{"id":"CHK-071","area":"Plate-loaded / free weights","name":"Unlabeled equipment outline","brand":"Unknown","qty":1,"inventory":"HART-0100","codes":[]},{"id":"CHK-072","area":"Plate-loaded / free weights","name":"Bench Press","brand":"Rogue","qty":3,"inventory":"HART-0101, HART-0102, HART-0103","codes":[]},{"id":"CHK-073","area":"Plate-loaded / free weights","name":"Fat Pad Bench","brand":"Rogue","qty":2,"inventory":"HART-0104, HART-0105","codes":["R-MUB2"]},{"id":"CHK-074","area":"Plate-loaded / free weights","name":"T-Bar Row","brand":"Arsenal Strength","qty":2,"inventory":"HART-0106, HART-0107","codes":["AR-TBAR"]},{"id":"CHK-075","area":"Plate-loaded / free weights","name":"HIIT Mill X","brand":"Unspecified","qty":1,"inventory":"HART-0108","codes":[]},{"id":"CHK-076","area":"Plate-loaded / free weights","name":"Iso-Lateral Row","brand":"Hammer Strength","qty":1,"inventory":"HART-0109","codes":["IL-ROW"]},{"id":"CHK-077","area":"Plate-loaded / free weights","name":"Iso-Lateral D.Y. Row","brand":"Hammer Strength","qty":1,"inventory":"HART-0110","codes":["IL-DRW"]},{"id":"CHK-078","area":"Plate-loaded / free weights","name":"Iso-Lateral Low Row","brand":"Hammer Strength","qty":1,"inventory":"HART-0111","codes":["IL-LR"]},{"id":"CHK-079","area":"Plate-loaded / free weights","name":"Iso-Lateral High Row","brand":"Hammer Strength","qty":1,"inventory":"HART-0112","codes":["IL-HR"]},{"id":"CHK-080","area":"Plate-loaded / free weights","name":"Seated Dip","brand":"Hammer Strength","qty":1,"inventory":"HART-0113","codes":["PL-DIP"]},{"id":"CHK-081","area":"Plate-loaded / free weights","name":"Deadlift Platform","brand":"Rogue","qty":8,"inventory":"HART-0114, HART-0115, HART-0116, HART-0117, HART-0118, HART-0119, HART-0120, HART-0121","codes":["R-DP"]},{"id":"CHK-082","area":"Plate-loaded / free weights","name":"Ground Base Multi Squat","brand":"Hammer Strength","qty":2,"inventory":"HART-0122, HART-0123","codes":["GB-MSQ"]},{"id":"CHK-083","area":"Cable area","name":"Dual Adjustable Pulley","brand":"Life Fitness","qty":4,"inventory":"HART-0124, HART-0125, HART-0126, HART-0127","codes":["OP-DAP","CMDAP"]},{"id":"CHK-084","area":"Cable area","name":"FTS Glide","brand":"Precor","qty":3,"inventory":"HART-0128, HART-0129, HART-0130","codes":["FTS-GLIDE"]},{"id":"CHK-085","area":"Cable area","name":"Lat Pulldown + Low Row","brand":"Precor","qty":1,"inventory":"HART-0131","codes":["VSL026BP"]},{"id":"CHK-086","area":"Cable area","name":"Lat Pulldown + Low Row","brand":"Life Fitness","qty":1,"inventory":"HART-0132","codes":["OP-LR"]},{"id":"CHK-087","area":"Squat rack area","name":"Double Rack","brand":"Hammer Strength","qty":6,"inventory":"HART-0133, HART-0134, HART-0135, HART-0136, HART-0137, HART-0138","codes":[]},{"id":"CHK-088","area":"Squat rack area","name":"Single Squat Rack","brand":"Unspecified","qty":3,"inventory":"HART-0139, HART-0140, HART-0141","codes":[]},{"id":"CHK-089","area":"Squat rack area","name":"Squat Rack","brand":"TuffStuff","qty":1,"inventory":"HART-0142","codes":[]},{"id":"CHK-090","area":"Squat rack area","name":"Smith Machine","brand":"Precor","qty":2,"inventory":"HART-0143, HART-0144","codes":["DPL0802"]},{"id":"CHK-091","area":"Functional / core equipment (zone inferred)","name":"Crunch Thing (unidentified model)","brand":"EliteFTS","qty":1,"inventory":"HART-0145","codes":[]},{"id":"CHK-092","area":"Functional / core equipment (zone inferred)","name":"Crunch Thing (unidentified model)","brand":"Rogue","qty":2,"inventory":"HART-0146, HART-0147","codes":[]},{"id":"CHK-093","area":"Functional / core equipment (zone inferred)","name":"Stretch Trainer","brand":"Precor","qty":2,"inventory":"HART-0148, HART-0149","codes":["VBR6240"]},{"id":"CHK-094","area":"Functional / core equipment (zone inferred)","name":"Unidentified rectangular equipment","brand":"Unknown","qty":1,"inventory":"HART-0150","codes":[]},{"id":"CHK-095","area":"Functional / core equipment (zone inferred)","name":"Nordic Trainer (provisional reading)","brand":"Rogue","qty":3,"inventory":"HART-0151, HART-0152, HART-0153","codes":[]}];
+const KEY='hart-model-check-v2';
+const records=Object.create(null);
+const byId=Object.fromEntries(ITEMS.map(i=>[i.id,i]));
+let storageOK=true;
+const storageStatus=document.getElementById('storage-status');
+function showStorageWarning(){storageOK=false;storageStatus.hidden=false;document.getElementById('saveinfo').textContent='Answers are not stored in this viewer. Export before leaving.'}
+try{localStorage.setItem(KEY+':probe','ok');localStorage.removeItem(KEY+':probe');const prior=JSON.parse(localStorage.getItem(KEY)||'{}');if(prior&&typeof prior==='object'){for(const [id,val] of Object.entries(prior)){if(byId[id]&&val&&typeof val==='object')records[id]=val;}}}catch(e){showStorageWarning()}
+function getCard(id){return document.getElementById('item-'+id)}
+function save(){if(storageOK){try{localStorage.setItem(KEY,JSON.stringify(records));document.getElementById('saveinfo').textContent='Saved on this browser at '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}catch(e){showStorageWarning()}}progress()}
+function progress(){let checked=0,yes=0,no=0;for(const x of ITEMS){let a=records[x.id]?.answer;if(a==='yes'){yes++;checked++}else if(a==='no'){no++;checked++}else if(a==='identified'){checked++;no++}}
+ document.getElementById('progress').textContent=checked+' / '+ITEMS.length+' checked';document.getElementById('details').textContent=yes+' Yes · '+no+' No';document.getElementById('fill').style.width=(checked*100/ITEMS.length)+'%';document.getElementById('progressbar').setAttribute('aria-valuenow',checked)}
+function paintCard(id){const card=getCard(id);const item=byId[id],r=records[id]||{},status=r.answer||'unchecked';card.dataset.status=(status==='yes')?'yes':(status==='no'||status==='identified')?'no':'unchecked';card.querySelector('.status').textContent=status==='yes'?'Yes · matches':status==='no'?(r.correct?'No · corrected':'No · needs model'):status==='identified'?(r.correct?'Model recorded':'Needs model'):'Not checked';
+ const yes=card.querySelector('input[type="radio"][value="yes"]'),no=card.querySelector('input[type="radio"][value="no"]');if(yes)yes.checked=status==='yes';if(no)no.checked=status==='no';const input=card.querySelector('input[type="text"]');if(input&&input!==document.activeElement)input.value=r.correct||'';}
+for(const item of ITEMS){const card=getCard(item.id);const radios=card.querySelectorAll('input[type="radio"]');for(const radio of radios){radio.addEventListener('change',()=>{const old=records[item.id]||{};records[item.id]={answer:radio.value,correct:radio.value==='yes'?(item.codes[0]||''):(old.answer==='no'?old.correct||'':''),updated:new Date().toISOString()};paintCard(item.id);save()})}
+ const input=card.querySelector('input[type="text"]');input.addEventListener('input',()=>{const old=records[item.id]||{};const answer=item.codes.length?'no':'identified';records[item.id]={answer,correct:input.value.toUpperCase(),updated:new Date().toISOString()};card.dataset.status='no';card.querySelector('.status').textContent=input.value.trim()?'Model recorded':'Needs model';save()});
+ card.querySelectorAll('[data-alternative]').forEach(b=>b.addEventListener('click',()=>{records[item.id]={answer:'no',correct:b.dataset.alternative,updated:new Date().toISOString()};paintCard(item.id);save()}));paintCard(item.id)}
+function quoted(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
+function csvData(){const rows=[['Check ID','Area','Manufacturer','Equipment','Quantity','Suspected model','Alternative codes','Verified?','Correct model','Inventory IDs','Checked at']];for(const i of ITEMS){const r=records[i.id]||{},a=r.answer||'';rows.push([i.id,i.area,i.brand,i.name,i.qty,i.codes[0]||'',i.codes.slice(1).join(' | '),a==='yes'?'Yes':a==='no'?'No':a==='identified'?'Model entered':'Not checked',r.correct||'',i.inventory,r.updated||''])}return rows.map(r=>r.map(quoted).join(',')).join('\r\n')+'\r\n'}
+function download(filename,data,mime){const blob=new Blob([data],{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}
+const today=()=>new Date().toISOString().slice(0,10);
+document.getElementById('export').addEventListener('click',()=>download('Hart-Model-Checks-'+today()+'.csv',csvData(),'text/csv;charset=utf-8'));
+document.getElementById('backup').addEventListener('click',()=>download('Hart-Model-Backup-'+today()+'.json',JSON.stringify({format:'hart-model-check-v2',records},null,2),'application/json'));
+document.getElementById('restore').addEventListener('click',()=>document.getElementById('import').click());
+document.getElementById('import').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const r=JSON.parse(await f.text());if(r.format!=='hart-model-check-v2'||!r.records||typeof r.records!=='object')throw Error('Wrong backup format');if(!confirm('Replace your current checks with this backup?'))return;for(const k of Object.keys(records))delete records[k];for(const [k,v] of Object.entries(r.records))if(byId[k]&&v&&typeof v==='object')records[k]=v;for(const i of ITEMS)paintCard(i.id);save()}catch(error){alert('Restore failed: '+error.message)}finally{e.target.value=''}});
+document.getElementById('reset').addEventListener('click',()=>{if(!confirm('Clear all 95 checks? Export your answers first.'))return;for(const k of Object.keys(records))delete records[k];for(const i of ITEMS)paintCard(i.id);save()});
+progress();
+</script></body></html>

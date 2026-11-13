@@ -49,6 +49,16 @@ test('adding a model identity preserves geometry and refuses foreign inventory I
   assert.throws(()=>applyCatalogIdentity(item,entry,'HART-0101'),/does not belong/);
   assert.deepEqual(getAvailableInventoryIds(entry,[linked]),['HART-0104','HART-0105','HART-0155']);
 });
+test('duplicate physical IDs are rejected within one layout',()=>{
+  const entry=getCatalogRecord('CHK-073');
+  const template={id:'a',kind:'bench',category:'free',name:'Bench',width:3,length:5,x:1,y:2,rotation:0,buffer:0,locked:false};
+  const item1=applyCatalogIdentity(template,entry,'HART-0104');
+  const item2={...item1,id:'b',x:8};
+  const p={version:2,active:'l',layouts:[{id:'l',name:'Test',room:{width:50,length:50},items:[item1,item2]}]};
+  assert.throws(()=>validateProject(p),/Duplicate physical inventory ID/);
+  item2.inventoryId='';
+  assert.doesNotThrow(()=>validateProject(p));
+});
 test('version 2 persisted project retains catalog metadata in draft and export',()=>{
   const item=applyCatalogIdentity({id:'item1',kind:'bench',category:'free',name:'Bench',width:3,length:5,x:1,y:2,rotation:0,buffer:0,locked:false},getCatalogRecord('CHK-073'),'HART-0104');
   Object.assign(item,{muscleGroups:['pectoralis major'],exercises:['bench press'],capabilities:['barbell']});

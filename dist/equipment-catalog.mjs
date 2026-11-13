@@ -28,12 +28,17 @@ export const equipmentCatalog = [
     ],
     "capabilities": [],
     "dimensionsIn": {
-      "length": 71,
-      "width": 30,
-      "height": 58,
-      "sourceUrl": "https://www.precor.com/en-US/products/RSL0620",
-      "source": "manufacturer-published",
+      "length": 70.87,
+      "width": 29.92,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
       "verifiedAt": "2026-11-13"
+    },
+    "dimensionsCm": {
+      "length": 180,
+      "width": 76,
+      "height": 148
     }
   },
   {
@@ -61,12 +66,17 @@ export const equipmentCatalog = [
     ],
     "capabilities": [],
     "dimensionsIn": {
-      "length": 71,
-      "width": 30,
-      "height": 58,
-      "sourceUrl": "https://www.precor.com/en-US/products/RSL0621",
-      "source": "manufacturer-published",
+      "length": 70.87,
+      "width": 29.92,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
       "verifiedAt": "2026-11-13"
+    },
+    "dimensionsCm": {
+      "length": 180,
+      "width": 76,
+      "height": 148
     }
   },
   {
@@ -105,8 +115,23 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "leg press"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 196,
+      "width": 122,
+      "height": 148
+    },
+    "dimensionsIn": {
+      "length": 77.17,
+      "width": 48.03,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-005",
@@ -126,8 +151,23 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "leg extension"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 155,
+      "width": 127,
+      "height": 148
+    },
+    "dimensionsIn": {
+      "length": 61.02,
+      "width": 50,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-006",
@@ -167,8 +207,23 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "seated leg curl"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 160,
+      "width": 122,
+      "height": 148
+    },
+    "dimensionsIn": {
+      "length": 62.99,
+      "width": 48.03,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-008",
@@ -242,8 +297,23 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "prone leg curl"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 155,
+      "width": 122,
+      "height": 148
+    },
+    "dimensionsIn": {
+      "length": 61.02,
+      "width": 48.03,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-012",
@@ -361,12 +431,17 @@ export const equipmentCatalog = [
     ],
     "capabilities": [],
     "dimensionsIn": {
-      "length": 48,
-      "width": 43,
-      "height": 58,
-      "sourceUrl": "https://www.precor.com/en-US/products/RSL0204",
-      "source": "manufacturer-published",
+      "length": 48.03,
+      "width": 43.31,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/catalog/Precor-2020-Catalog-NLD.pdf",
+      "source": "manufacturer-catalog-converted",
       "verifiedAt": "2026-11-13"
+    },
+    "dimensionsCm": {
+      "length": 122,
+      "width": 110,
+      "height": 148
     }
   },
   {
@@ -394,12 +469,17 @@ export const equipmentCatalog = [
     ],
     "capabilities": [],
     "dimensionsIn": {
-      "length": 48,
-      "width": 43,
-      "height": 58,
-      "sourceUrl": "https://www.precor.com/en-US/products/RSL0208",
-      "source": "manufacturer-published",
+      "length": 48.03,
+      "width": 43.31,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/catalog/Precor-2020-Catalog-NLD.pdf",
+      "source": "manufacturer-catalog-converted",
       "verifiedAt": "2026-11-13"
+    },
+    "dimensionsCm": {
+      "length": 122,
+      "width": 110,
+      "height": 148
     }
   },
   {
@@ -495,8 +575,24 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "rear delt",
+      "pec fly"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 142,
+      "width": 97,
+      "height": 214
+    },
+    "dimensionsIn": {
+      "length": 55.91,
+      "width": 38.19,
+      "height": 84.25,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-023",
@@ -610,8 +706,23 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "diverging lat pulldown"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 146,
+      "width": 126,
+      "height": 206
+    },
+    "dimensionsIn": {
+      "length": 57.48,
+      "width": 49.61,
+      "height": 81.1,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-029",
@@ -636,12 +747,17 @@ export const equipmentCatalog = [
     ],
     "capabilities": [],
     "dimensionsIn": {
-      "length": 48,
-      "width": 49,
-      "height": 58,
-      "sourceUrl": "https://www.precor.com/en-US/products/RSL0313",
-      "source": "manufacturer-published",
+      "length": 48.03,
+      "width": 48.82,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
       "verifiedAt": "2026-11-13"
+    },
+    "dimensionsCm": {
+      "length": 122,
+      "width": 124,
+      "height": 148
     }
   },
   {
@@ -679,8 +795,23 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "diverging seated row"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 160,
+      "width": 139,
+      "height": 148
+    },
+    "dimensionsIn": {
+      "length": 62.99,
+      "width": 54.72,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-032",
@@ -780,12 +911,17 @@ export const equipmentCatalog = [
     ],
     "capabilities": [],
     "dimensionsIn": {
-      "length": 61,
-      "width": 59,
-      "height": 60,
-      "sourceUrl": "https://www.precor.com/en-US/products/RSL0515",
-      "source": "manufacturer-published",
+      "length": 61.02,
+      "width": 59.06,
+      "height": 59.84,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
       "verifiedAt": "2026-11-13"
+    },
+    "dimensionsCm": {
+      "length": 155,
+      "width": 150,
+      "height": 152
     }
   },
   {
@@ -869,12 +1005,17 @@ export const equipmentCatalog = [
     ],
     "capabilities": [],
     "dimensionsIn": {
-      "length": 73,
-      "width": 50,
-      "height": 73,
-      "sourceUrl": "https://www.precor.com/en-US/products/RSL0414",
-      "source": "manufacturer-published",
+      "length": 72.83,
+      "width": 49.61,
+      "height": 72.83,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
       "verifiedAt": "2026-11-13"
+    },
+    "dimensionsCm": {
+      "length": 185,
+      "width": 126,
+      "height": 185
     }
   },
   {
@@ -924,8 +1065,23 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "seated calf extension"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 135,
+      "width": 112,
+      "height": 148
+    },
+    "dimensionsIn": {
+      "length": 53.15,
+      "width": 44.09,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-043",
@@ -1147,8 +1303,23 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "leg press"
+    ],
+    "capabilities": [],
+    "dimensionsCm": {
+      "length": 196,
+      "width": 122,
+      "height": 148
+    },
+    "dimensionsIn": {
+      "length": 77.17,
+      "width": 48.03,
+      "height": 58.27,
+      "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+      "source": "manufacturer-catalog-converted",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-054",

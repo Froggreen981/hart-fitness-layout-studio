@@ -1,4 +1,5 @@
 import {SharedEditor,bindSharedEditor} from './shared-client.mjs';
+import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity} from './equipment-catalog.mjs';
 import {STORAGE_ID,isEquipment,storagePose,storeEquipment,migrateStorage,storageView} from './storage.mjs';
 import {localPoint,resizeArea,areaFromWorldPoints,printTiles} from './editor.mjs';
 import {gymSketch} from './sketch.mjs';
@@ -56,10 +57,44 @@ out+=areaOverlays();$('board').innerHTML=out;renderStats(issues);}
 function renderStats(issues){const l=layout(),eq=l.items.filter(i=>!i.storedIn&&!['obstacle','area'].includes(i.category));$('roomArea').textContent=l.room.estimated?`~${fmt(Math.round(roomArea(l.room)/50)*50)} sq ft estimated floor area`:`${fmt(roomArea(l.room))} sq ft total floor area`;$('equipmentCount').textContent=eq.length;const coverage=l.items.filter(i=>!i.storedIn&&i.category!=='area').reduce((s,i)=>s+i.width*i.length,0)/roomArea(l.room)*100;$('occupiedArea').textContent=Math.round(coverage)+'%';$('occupiedArea').title='Sum of footprint areas divided by room area. Overlaps are counted twice; this is not usable floor area.';const flagged=[...issues].filter(([,v])=>v.length);$('conflictCount').textContent=flagged.length;$('reviewBadge').textContent=flagged.length?'REVIEW':'CLEAR';$('reviewBadge').style.color=flagged.length?'#a3834d':'#7c9566';$('reviewList').innerHTML=flagged.length?flagged.slice(0,8).map(([id,v])=>`<button class="review-item" data-review="${esc(id)}">${esc(l.items.find(i=>i.id===id).name)}<small>${esc([...new Set(v)].join(' · '))}</small></button>`).join('')+(flagged.length>8?`<p class="small muted">${flagged.length-8} more items to review</p>`:''):'<div class="review-good"><strong>✓ Footprints look clear</strong>No overlaps or out-of-room footprints in this arrangement.</div>';
 const base=project.layouts[0];if(base.id===l.id){$('moveCount').textContent='Baseline';$('moveCaption').textContent='save a copy to compare';}else{const original=new Map(base.items.map(i=>[i.id,i]));let moved=0;for(const i of l.items){const b=original.get(i.id);if(!b||Math.abs(b.x-i.x)>.01||Math.abs(b.y-i.y)>.01||b.rotation!==i.rotation||b.width!==i.width||b.length!==i.length||b.storedIn!==i.storedIn)moved++;original.delete(i.id);}moved+=original.size;$('moveCount').textContent=moved+' changed';$('moveCaption').textContent='vs. '+base.name;$('moveCount').title='New, removed, moved, rotated, or resized items compared with the first saved layout.';}}
 function bufferEditor(items){const buffers=items.map(getBuffers),common=side=>buffers.every(b=>b[side]===buffers[0][side])?buffers[0][side]:'';return `<section class="buffer-editor"><div class="section-row"><h3>Planning buffers</h3><span>FEET</span></div><p class="buffer-help">Front follows the F arrow on the footprint. Buffers rotate with each object.</p><div class="uniform-buffer"><label>Same on all sides<input id="uniformBuffer" type="number" min="0" max="20" step="any" placeholder="e.g. 2"></label><button data-action="uniform-buffer">Apply all sides</button></div><div class="buffer-grid">${SIDES.map(side=>`<label>${({front:'Front',rear:'Back',left:'Left side',right:'Right side'})[side]} · ft<input data-buffer="${side}" aria-label="${({front:'Front',rear:'Back',left:'Left side',right:'Right side'})[side]} buffer in feet" type="number" min="0" max="20" step="any" value="${common(side)}" placeholder="Mixed"></label>`).join('')}</div><button class="primary apply-buffers" data-action="apply-buffers">Apply buffers to ${items.length===1?'this object':items.length+' objects'}</button><p class="buffer-help">${items.length>1?'Blank fields keep each object’s current value. ':''}Buffers can change while position is locked. Checks flag walls and other footprints; buffers may overlap.</p></section>`;}
+
+function catalogOptions(selected='') {
+  let html='',last='';
+  for (const e of equipmentCatalog) {
+    if (e.area!==last) {
+      if(last) html+='</optgroup>';
+      html+='<optgroup label="'+esc(e.area)+'">';
+      last=e.area;
+    }
+    html+='<option value="'+esc(e.id)+'" '+(e.id===selected?'selected':'')+'>'+esc(e.manufacturer+' · '+e.name+(e.modelNumber?' · '+e.modelNumber:''))+'</option>';
+  }
+  return html+(last?'</optgroup>':'');
+}
+function catalogEditor(i) {
+  if(!isEquipment(i)) return '';
+  const e=getCatalogRecord(i.catalogId);
+  const fields=[
+    ['manufacturer','Manufacturer',i.manufacturer||''],
+    ['modelNumber','Model number',i.modelNumber||''],
+  ];
+  const other=layout().items.filter(x=>x.id!==i.id);
+  const ids=e?e.inventoryIds.filter(id=>id===i.inventoryId||!other.some(x=>x.inventoryId===id)):[];
+  const statusOptions=['verified','probable','reported','corrected','unidentified'].map(status=>'<option value="'+status+'" '+(status===(i.modelStatus||'unidentified')?'selected':'')+'>'+status[0].toUpperCase()+status.slice(1)+'</option>').join('');
+  return '<details class="catalog-editor" '+(e?'open':'')+'><summary>Equipment model & exercise data</summary>'+
+    '<p class="small muted">Link a record from the Hart equipment survey. Model identity does not change footprint dimensions or physical position.</p>'+
+    '<label>Survey equipment group<select id="linkedCatalogPick"><option value="">Choose equipment group</option>'+catalogOptions(i.catalogId||'')+'</select></label>'+
+    '<button type="button" data-action="link-catalog">Apply model and manufacturer</button>'+
+    (e?'<label>Unique gym equipment ID<select data-catalog-field="inventoryId"><option value="">Not assigned</option>'+ids.map(id=>'<option value="'+esc(id)+'" '+(i.inventoryId===id?'selected':'')+'>'+esc(id)+'</option>').join('')+'</select></label><p class="small muted">'+esc(e.quantity+' actual unit(s); catalog match '+e.modelStatus+'.')+'</p>':'')+
+    fields.map(([prop,label,value])=>'<label>'+label+'<input data-catalog-field="'+prop+'" maxlength="100" value="'+esc(value)+'"></label>').join('')+
+    '<label>Identification confidence<select data-catalog-field="modelStatus">'+statusOptions+'</select></label>'+
+    [['muscleGroups','Target muscles'],['exercises','Exercises'],['capabilities','Capabilities']].map(([prop,label])=>'<label>'+label+' (comma separated)<input data-catalog-field="'+prop+'" maxlength="600" value="'+esc((i[prop]||[]).join(', '))+'" placeholder="Add reviewed information"></label>').join('')+
+    '<p class="small muted">Exercise metadata is editable but not populated from guesses. Confirm specific manufacturer specifications before publishing.</p></details>';
+}
+
 let inspectorSelectionKey='';
 function renderInspector(){const key=[...selection].sort().join('|');if(key!==inspectorSelectionKey){document.querySelector('.inspector').scrollTop=0;inspectorSelectionKey=key;}const items=selectedItems(),i=item();updateSelectionUI();if(!items.length||!i){$('inspectorContent').innerHTML='<div class="empty-inspector"><span>⌖</span><strong>Make it your space.</strong><p>Select an object to edit it. Shift-click more objects, or turn on Select multiple, to apply buffers together.</p></div>';return;}
 if(items.length>1){const locked=items.filter(o=>o.locked).length;$('inspectorContent').innerHTML=`<div class="selected-heading"><h2>${items.length} objects selected</h2></div><p class="selection-description">${items.filter(o=>!['obstacle','area'].includes(o.category)).length} equipment · ${items.filter(o=>o.category==='obstacle').length} obstacles · ${items.filter(o=>o.category==='area').length} areas${locked?' · '+locked+' position-locked':''}</p><ul class="selected-names">${items.slice(0,4).map(o=>`<li>${esc(o.name)}</li>`).join('')}${items.length>4?`<li>and ${items.length-4} more</li>`:''}</ul>${locked?`<button class="unlock-button" data-action="unlock">Unlock ${locked} selected position${locked===1?'':'s'}</button>`:''}${rotationEditor()}${items.some(i=>i.category!=='area')?bufferEditor(items.filter(i=>i.category!=='area')):''}`;return;}
-const disabled=i.locked?'disabled':'';$('inspectorContent').innerHTML=`<div class="selected-heading"><h2>${i.category==='area'?'Selected area':i.category==='obstacle'?'Fixed obstacle':'Selected footprint'}</h2><span class="category-tag">${i.category==='free'?'Free weights':i.category}</span></div>${i.locked?'<div class="lock-notice"><strong>Position and size are locked</strong><p>Unlock to place or resize this object.</p><button class="unlock-button" data-action="unlock">Unlock to edit</button></div>':i.category==='obstacle'?'<p class="obstacle-hint">Move and size this obstacle, then lock its position when placed.</p>':''}<label class="lock-label"><input data-prop="locked" type="checkbox" ${i.locked?'checked':''}> Lock position & dimensions</label><label>${i.category==='area'?'Area':i.category==='obstacle'?'Obstacle':'Equipment'} name<input data-prop="name" value="${esc(i.name)}" maxlength="80"></label><div class="field-pair"><label>Width · ft<input data-prop="width" type="number" value="${i.width}" min=".01" max="100" step="any" ${disabled}></label><label>Length · ft<input data-prop="length" type="number" value="${i.length}" min=".01" max="100" step="any" ${disabled}></label></div><div class="field-pair"><label>${i.storedIn?'Storage X':'X position'} · ft<input data-prop="x" type="number" value="${fmtRaw(i.storedIn?i.storageX:i.x)}" min="-1000" max="1000" step="any" ${disabled}></label><label>${i.storedIn?'Storage Y':'Y position'} · ft<input data-prop="y" type="number" value="${fmtRaw(i.storedIn?i.storageY:i.y)}" min="-1000" max="1000" step="any" ${disabled}></label></div><div class="inspector-actions"><button data-action="rotate" ${disabled}>↻ Rotate ${fmt(i.rotation)}°</button><button data-action="duplicate">Duplicate</button><button data-action="delete" class="danger" aria-label="Delete selected footprint" title="Delete">×</button></div>${rotationEditor(i)}${i.category==='area'?areaEditor(i):bufferEditor(items)}${i.category!=='area'&&i.category!=='obstacle'?'<button class="save-template" data-action="save-template">＋ Save to Equipment Library</button>':''}`;}
+const disabled=i.locked?'disabled':'';$('inspectorContent').innerHTML=`<div class="selected-heading"><h2>${i.category==='area'?'Selected area':i.category==='obstacle'?'Fixed obstacle':'Selected footprint'}</h2><span class="category-tag">${i.category==='free'?'Free weights':i.category}</span></div>${i.locked?'<div class="lock-notice"><strong>Position and size are locked</strong><p>Unlock to place or resize this object.</p><button class="unlock-button" data-action="unlock">Unlock to edit</button></div>':i.category==='obstacle'?'<p class="obstacle-hint">Move and size this obstacle, then lock its position when placed.</p>':''}<label class="lock-label"><input data-prop="locked" type="checkbox" ${i.locked?'checked':''}> Lock position & dimensions</label><label>${i.category==='area'?'Area':i.category==='obstacle'?'Obstacle':'Equipment'} name<input data-prop="name" value="${esc(i.name)}" maxlength="80"></label><div class="field-pair"><label>Width · ft<input data-prop="width" type="number" value="${i.width}" min=".01" max="100" step="any" ${disabled}></label><label>Length · ft<input data-prop="length" type="number" value="${i.length}" min=".01" max="100" step="any" ${disabled}></label></div><div class="field-pair"><label>${i.storedIn?'Storage X':'X position'} · ft<input data-prop="x" type="number" value="${fmtRaw(i.storedIn?i.storageX:i.x)}" min="-1000" max="1000" step="any" ${disabled}></label><label>${i.storedIn?'Storage Y':'Y position'} · ft<input data-prop="y" type="number" value="${fmtRaw(i.storedIn?i.storageY:i.y)}" min="-1000" max="1000" step="any" ${disabled}></label></div><div class="inspector-actions"><button data-action="rotate" ${disabled}>↻ Rotate ${fmt(i.rotation)}°</button><button data-action="duplicate">Duplicate</button><button data-action="delete" class="danger" aria-label="Delete selected footprint" title="Delete">×</button></div>${rotationEditor(i)}${i.category==='area'?areaEditor(i):bufferEditor(items)}${i.category!=='area'&&i.category!=='obstacle'?'<button class="save-template" data-action="save-template">＋ Save to Equipment Library</button>':''}${catalogEditor(i)}`;}
 function applyBufferFields(uniform=false){const items=selectedItems().filter(i=>i.category!=='area');if(!items.length)return;let patch={};if(uniform){const el=$('uniformBuffer');if(el.value.trim()===''||!el.checkValidity()){toast('Enter a buffer between 0 and 20 ft.');return;}patch=Object.fromEntries(SIDES.map(side=>[side,Number(el.value)]));}else{for(const el of $('inspectorContent').querySelectorAll('[data-buffer]')){if(el.value.trim()==='')continue;if(!el.checkValidity()){toast('Each buffer must be between 0 and 20 ft.');return;}patch[el.dataset.buffer]=Number(el.value);}}
 if(!Object.keys(patch).length){toast('Enter a buffer to apply.');return;}change(()=>items.forEach(i=>setBuffers(i,patch)));toast(`Buffers applied to ${items.length} object${items.length===1?'':'s'}.`);}
 const fmtRaw=n=>Number(n.toFixed(2));
@@ -71,9 +106,70 @@ function remove(){if(!selection.size)return;change(()=>{for(const i of layout().
 function duplicate(){const items=selectedItems();if(!items.length)return;change(()=>{const copies=items.map(i=>({...JSON.parse(JSON.stringify(i)),id:uid(),name:i.name+' copy',x:i.x+1,y:i.y+1,locked:false}));for(const i of copies)if(i.storedIn){delete i.storageX;delete i.storageY;storeEquipment(layout().items,i);}layout().items.push(...copies);selection=new Set(copies.map(i=>i.id));selected=copies.at(-1).id;});}
 $('equipmentLibrary').addEventListener('click',e=>{const el=e.target.closest('[data-template]');if(el){const t=[...templates,...project.library].find(t=>(t.id||t.kind)===el.dataset.template);if(t)add(t);};});
 document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderLibrary();});
+
+function updateCatalogPicker() {
+  const e=getCatalogRecord($('catalogPick').value),note=$('catalogSummary');
+  if(!e){note.textContent='Choose a model.';$('catalogInventoryPick').innerHTML='';return;}
+  const available=getAvailableInventoryIds(e,layout().items);
+  note.textContent=e.manufacturer+' · '+(e.modelNumber||'Model unidentified')+' · '+e.modelStatus+'. '+available.length+' unassigned ID(s).';
+  $('catalogInventoryPick').innerHTML=available.map(id=>'<option value="'+esc(id)+'">'+esc(id)+'</option>').join('');
+  $('catalogCreateBtn').disabled=!available.length;
+  const example=layout().items.find(i=>i.catalogId===e.id);
+  $('catalogWidth').value=example?example.width:'';
+  $('catalogLength').value=example?example.length:'';
+  const name=e.name.toLowerCase();
+  $('catalogCategory').value=/bench|rack|platform|bar tree|plate tree/.test(name)?'free':'strength';
+}
+$('catalogAddBtn').onclick=()=>{
+  $('catalogPick').innerHTML='<option value="">Choose equipment</option>'+catalogOptions();
+  $('catalogPick').value='';$('catalogInventoryPick').innerHTML='';
+  $('catalogWidth').value='';$('catalogLength').value='';
+  $('catalogError').textContent='';
+  $('catalogCreateBtn').disabled=true;
+  $('catalogDialog').showModal();
+};
+$('catalogPick').onchange=updateCatalogPicker;
+$('catalogCancel').onclick=()=>$('catalogDialog').close();
+$('catalogCreateBtn').onclick=()=>{
+  const entry=getCatalogRecord($('catalogPick').value);
+  const inventoryId=$('catalogInventoryPick').value;
+  const width=Number($('catalogWidth').value),length=Number($('catalogLength').value);
+  if(!entry||!inventoryId||!getAvailableInventoryIds(entry,layout().items).includes(inventoryId)){
+    $('catalogError').textContent='Choose an unused equipment ID.';return;
+  }
+  if(!$('catalogWidth').value||!$('catalogLength').value||!Number.isFinite(width)||!Number.isFinite(length)||width<=0||length<=0||width>100||length>100){
+    $('catalogError').textContent='Enter actual physical width and length, in feet (up to 100 ft).';return;
+  }
+  const kind=/bench/.test(entry.name.toLowerCase())?'bench':/rack|platform|tree/.test(entry.name.toLowerCase())?'rack':/pulley|cable|fts glide/.test(entry.name.toLowerCase())?'cable':'custom';
+  const base={name:entry.name,kind,category:$('catalogCategory').value,width,length,rotation:0};
+  const identity=applyCatalogIdentity(base,entry,inventoryId);
+  $('catalogDialog').close();
+  add(identity);
+};
 $('customBtn').onclick=()=>add({kind:'custom',name:'Custom equipment',category:'strength',width:3,length:3});$('obstacleBtn').onclick=()=>add({kind:'column',name:'Fixed obstacle',category:'obstacle',width:2,length:2});
+$('inspectorContent').addEventListener('change',e=>{
+ const p=e.target.dataset.catalogField, i=item();if(!p||!i)return;
+ const raw=e.target.value.trim();
+ let val=['muscleGroups','exercises','capabilities'].includes(p)?raw.split(/[,;\n]/).map(v=>v.trim()).filter(Boolean):raw;
+ if(Array.isArray(val) && (val.length>20||val.some(v=>v.length>80))){toast('Limit each field to 20 short entries.');renderInspector();return;}
+ if(p==='inventoryId'){
+   const entry=getCatalogRecord(i.catalogId);
+   if(val && (!entry?.inventoryIds.includes(val)||layout().items.some(x=>x.id!==i.id&&x.inventoryId===val))){
+     toast('Choose an unused ID belonging to the linked equipment group.');renderInspector();return;
+   }
+ }
+ if(!Array.isArray(val)&&val.length>100){toast('Maximum 100 characters.');renderInspector();return;}
+ change(()=>i[p]=val);
+});
 $('inspectorContent').addEventListener('change',e=>{const p=e.target.dataset.prop,i=item();if(!p||!i)return;let value=p==='locked'?e.target.checked:p==='name'?e.target.value.trim():Number(e.target.value);if((p==='name'&&!value)||(typeof value==='number'&&(!Number.isFinite(value)||!e.target.checkValidity()))){toast('Enter a value within the shown limits.');renderInspector();return;}if(p==='rotation'){change(()=>rotateItem(i,value));}else change(()=>i[i.storedIn&&p==='x'?'storageX':i.storedIn&&p==='y'?'storageY':p]=value);});
-$('inspectorContent').addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='rotate')rotate();if(action==='apply-angle'){const el=$('selectionAngle');if(el.value.trim()===''||!el.checkValidity()){toast('Enter a valid angle.');return;}change(()=>selectedItems().filter(i=>!i.locked).forEach(i=>rotateItem(i,Number(el.value))));}if(action==='save-template'){const i=item();if(!i)return;if(project.library.length>=300){toast('The library limit is 300 saved templates.');return;}change(()=>{project.library.push({id:uid(),name:i.name,kind:i.kind,category:i.category,width:i.width,length:i.length,rotation:i.rotation,buffers:getBuffers(i),buffer:i.buffer});});filter='all';renderLibrary();toast('Saved to Equipment Library. Tap its card to add another.');}if(action==='duplicate')duplicate();if(action==='delete')remove();if(action==='unlock'){change(()=>selectedItems().forEach(i=>i.locked=false));toast('Position unlocked. Drag or edit the dimensions.');}if(action==='apply-buffers')applyBufferFields();if(action==='uniform-buffer')applyBufferFields(true);});
+$('inspectorContent').addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='link-catalog'){
+  const current=item(),entry=getCatalogRecord($('linkedCatalogPick')?.value);
+  if(!current||!entry){toast('Choose a catalog model first.');return;}
+  const priorId=entry.inventoryIds.includes(current.inventoryId)?current.inventoryId:'';
+  const freeId=priorId&&!layout().items.some(x=>x.id!==current.id&&x.inventoryId===priorId)?priorId:'';
+  change(()=>Object.assign(current,applyCatalogIdentity(current,entry,freeId)));
+  toast('Model linked. Existing footprint and coordinates unchanged.');
+}if(action==='rotate')rotate();if(action==='apply-angle'){const el=$('selectionAngle');if(el.value.trim()===''||!el.checkValidity()){toast('Enter a valid angle.');return;}change(()=>selectedItems().filter(i=>!i.locked).forEach(i=>rotateItem(i,Number(el.value))));}if(action==='save-template'){const i=item();if(!i)return;if(project.library.length>=300){toast('The library limit is 300 saved templates.');return;}change(()=>{project.library.push({id:uid(),name:i.name,kind:i.kind,category:i.category,width:i.width,length:i.length,rotation:i.rotation,buffers:getBuffers(i),buffer:i.buffer});});filter='all';renderLibrary();toast('Saved to Equipment Library. Tap its card to add another.');}if(action==='duplicate')duplicate();if(action==='delete')remove();if(action==='unlock'){change(()=>selectedItems().forEach(i=>i.locked=false));toast('Position unlocked. Drag or edit the dimensions.');}if(action==='apply-buffers')applyBufferFields();if(action==='uniform-buffer')applyBufferFields(true);});
 $('reviewList').addEventListener('click',e=>{const el=e.target.closest('[data-review]');if(el){selectOnly(el.dataset.review);renderInspector();renderBoard();}});
 $('layoutList').addEventListener('click',e=>{const el=e.target.closest('[data-layout]');if(el)selectLayout(el.dataset.layout);});$('layoutSelect').onchange=e=>selectLayout(e.target.value);
 for(const [id,key] of [['roomWidth','width'],['roomLength','length']])$(id).onchange=e=>{const val=Number(e.target.value);if(!Number.isFinite(val)||val<5||val>500){toast('Room dimensions must be between 5 and 500 ft.');render();return;}let room;try{room=resizeRoom(layout().room,key,val);}catch(err){toast(err.message);render();return;}change(()=>layout().room=room);};

@@ -20,9 +20,21 @@ export const equipmentCatalog = [
       "VSL008BP"
     ],
     "notes": "",
-    "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "muscleGroups": [
+      "hip adductors"
+    ],
+    "exercises": [
+      "hip adduction"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 71,
+      "width": 30,
+      "height": 58,
+      "sourceUrl": "https://www.precor.com/en-US/products/RSL0620",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-002",
@@ -41,9 +53,21 @@ export const equipmentCatalog = [
       "VSL008BP"
     ],
     "notes": "",
-    "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "muscleGroups": [
+      "hip abductors"
+    ],
+    "exercises": [
+      "hip abduction"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 71,
+      "width": 30,
+      "height": 58,
+      "sourceUrl": "https://www.precor.com/en-US/products/RSL0621",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-003",
@@ -277,9 +301,21 @@ export const equipmentCatalog = [
       "MTSBC"
     ],
     "notes": "",
-    "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "muscleGroups": [
+      "biceps"
+    ],
+    "exercises": [
+      "biceps curl"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 38,
+      "width": 58,
+      "height": 59,
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-biceps-curl",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-015",
@@ -317,9 +353,21 @@ export const equipmentCatalog = [
       "VSL025BP"
     ],
     "notes": "",
-    "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "muscleGroups": [
+      "biceps"
+    ],
+    "exercises": [
+      "biceps curl"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 48,
+      "width": 43,
+      "height": 58,
+      "sourceUrl": "https://www.precor.com/en-US/products/RSL0204",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-017",
@@ -338,9 +386,21 @@ export const equipmentCatalog = [
       "VSL025BP"
     ],
     "notes": "",
-    "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "muscleGroups": [
+      "triceps"
+    ],
+    "exercises": [
+      "triceps extension"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 48,
+      "width": 43,
+      "height": 58,
+      "sourceUrl": "https://www.precor.com/en-US/products/RSL0208",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-018",
@@ -571,8 +631,18 @@ export const equipmentCatalog = [
     ],
     "notes": "",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "back extension"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 48,
+      "width": 49,
+      "height": 58,
+      "sourceUrl": "https://www.precor.com/en-US/products/RSL0313",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-030",
@@ -701,9 +771,22 @@ export const equipmentCatalog = [
       "RSL0515"
     ],
     "notes": "",
-    "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "muscleGroups": [
+      "deltoids",
+      "upper pectorals"
+    ],
+    "exercises": [
+      "shoulder press"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 61,
+      "width": 59,
+      "height": 60,
+      "sourceUrl": "https://www.precor.com/en-US/products/RSL0515",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-037",
@@ -777,9 +860,22 @@ export const equipmentCatalog = [
       "RSL0414"
     ],
     "notes": "",
-    "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "muscleGroups": [
+      "pectorals",
+      "triceps"
+    ],
+    "exercises": [
+      "chest press"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 73,
+      "width": 50,
+      "height": 73,
+      "sourceUrl": "https://www.precor.com/en-US/products/RSL0414",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-041",
@@ -796,9 +892,21 @@ export const equipmentCatalog = [
       "ES819"
     ],
     "notes": "",
-    "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "muscleGroups": [
+      "abdominals"
+    ],
+    "exercises": [
+      "abdominal crunch"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 47.4,
+      "width": 40.5,
+      "height": 57.8,
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2020/07/ES819-Abdominal-Crunch.pdf",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-042",
@@ -1402,8 +1510,18 @@ export const equipmentCatalog = [
     "modelCandidates": [],
     "notes": "Three standard bench pads; all seven Rogue benches share this frame model.",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "barbell bench press"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 53.5,
+      "width": 49.5,
+      "height": 57.75,
+      "sourceUrl": "https://www.roguefitness.com/rogue-monster-lite-competition-bench",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-073",
@@ -1424,8 +1542,18 @@ export const equipmentCatalog = [
     ],
     "notes": "Four Thompson Fat Pads on Rogue Monster Lite Competition Bench frames. Four total (original inventory recorded two).",
     "muscleGroups": [],
-    "exercises": [],
-    "capabilities": []
+    "exercises": [
+      "barbell bench press"
+    ],
+    "capabilities": [],
+    "dimensionsIn": {
+      "length": 53.5,
+      "width": 49.5,
+      "height": 57.75,
+      "sourceUrl": "https://www.roguefitness.com/rogue-monster-lite-competition-bench",
+      "source": "manufacturer-published",
+      "verifiedAt": "2026-11-13"
+    }
   },
   {
     "id": "CHK-074",
@@ -1885,6 +2013,9 @@ export function applyCatalogIdentity(item, entry, inventoryId = '') {
     manufacturer: entry.manufacturer,
     modelNumber: entry.modelNumber || '',
     modelStatus: entry.modelStatus,
-    // Dimensions and coordinates remain untouched until someone measures or verifies them.
+    muscleGroups: Array.isArray(item.muscleGroups)&&item.muscleGroups.length?[...item.muscleGroups]:[...entry.muscleGroups],
+    exercises: Array.isArray(item.exercises)&&item.exercises.length?[...item.exercises]:[...entry.exercises],
+    capabilities: Array.isArray(item.capabilities)&&item.capabilities.length?[...item.capabilities]:[...entry.capabilities],
+    // Dimensions and coordinates remain untouched when linking an existing item.
   };
 }

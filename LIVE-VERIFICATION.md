@@ -24,6 +24,17 @@ The staff workspace is live at https://gym.huffworkshop.com/workspace.html with 
 6. Verify archive, duplicate, rename, history restore and recovery behave as documented. Restore appends history. Archiving a draft must not remove its existing publication.
 7. The Site currently retains its custom visitor audience, so the map requires an allowed visitor account. Opening it to anonymous patrons is a separate Site audience decision, after staff access and publishing have passed these checks.
 
+
+## Equipment catalog verification (new)
+
+1. Open a **test draft** from Shared layouts and choose **Add from Hart inventory**. Select one known machine and verify its suggested manufacturer, model number, and available physical ID. Select the intended destination, enter the actual width and length in feet, and add it.
+2. Confirm the equipment ID is unavailable for a second new item in the same draft, and available again after the first item is deleted.
+3. Select an existing equipment footprint and use **Equipment model & exercise data** to link a catalog model. Verify that its X/Y, rotation, width and length do not change and that edited muscle/exercise/capabilities fields persist after reopening from another staff session.
+4. Confirm **probable** model numbers are not presented as on-site verified. Confirm the changed Rogue bench totals (3 standard + 4 Thompson Fat Pad) and that unknown model entries remain unverified.
+5. Do not publish the inventory as the official gym layout until all equipment footprints and positions on the proposed layout are physically checked.
+
+These are new manual QA steps. Automated checks have passed but this end-to-end hosted workflow is not yet confirmed from a real staff device.
+
 ## Merge gate
 
 Record the two verified identities/roles without passwords or session data, the verified draft revision/publication ID, browser findings and passing CI. Only then merge PR #1. The muscle selector stays deferred.

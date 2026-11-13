@@ -88,7 +88,8 @@ function catalogEditor(i) {
     fields.map(([prop,label,value])=>'<label>'+label+'<input data-catalog-field="'+prop+'" maxlength="100" value="'+esc(value)+'"></label>').join('')+
     '<label>Identification confidence<select data-catalog-field="modelStatus">'+statusOptions+'</select></label>'+
     [['muscleGroups','Target muscles'],['exercises','Exercises'],['capabilities','Capabilities']].map(([prop,label])=>'<label>'+label+' (comma separated)<input data-catalog-field="'+prop+'" maxlength="600" value="'+esc((i[prop]||[]).join(', '))+'" placeholder="Add reviewed information"></label>').join('')+
-    '<p class="small muted">Exercise metadata is editable but not populated from guesses. Confirm specific manufacturer specifications before publishing.</p></details>';
+    (e?.dimensionsIn?'<p class="small muted">Manufacturer footprint: '+esc(e.dimensionsIn.length+' × '+e.dimensionsIn.width+' in (L × W)')+'. <a target="_blank" rel="noopener noreferrer" href="'+esc(e.dimensionsIn.sourceUrl)+'">Official specifications</a>. This does not change the selected footprint.</p>':'')+
+    '<p class="small muted">Exercise metadata can be refined as sources are verified.</p></details>';
 }
 
 let inspectorSelectionKey='';
@@ -115,8 +116,10 @@ function updateCatalogPicker() {
   $('catalogInventoryPick').innerHTML=available.map(id=>'<option value="'+esc(id)+'">'+esc(id)+'</option>').join('');
   $('catalogCreateBtn').disabled=!available.length;
   const example=layout().items.find(i=>i.catalogId===e.id);
-  $('catalogWidth').value=example?example.width:'';
-  $('catalogLength').value=example?example.length:'';
+  const dims=e.dimensionsIn;
+  $('catalogWidth').value=example?example.width:dims?Number((dims.width/12).toFixed(3)):'';
+  $('catalogLength').value=example?example.length:dims?Number((dims.length/12).toFixed(3)):'';
+  $('catalogDimensionNote').textContent=example?'Dimensions copied from another item in this draft. Confirm them before publishing.':dims?'Manufacturer model dimensions: '+dims.length+' × '+dims.width+' in (L × W). These are not an on-site measurement; change them if necessary.':'No sourced dimensions for this model yet. Enter actual measurements in feet.';
   const name=e.name.toLowerCase();
   $('catalogCategory').value=/bench|rack|platform|bar tree|plate tree/.test(name)?'free':'strength';
 }

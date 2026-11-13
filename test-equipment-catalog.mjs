@@ -21,6 +21,17 @@ test('latest gym walk-through corrections are retained without guessing',()=>{
   assert.equal(getCatalogRecord('CHK-091').modelStatus,'unidentified');
   assert.equal(getCatalogRecord('CHK-094').modelNumber,null);
 });
+test('manufacturer spec footprints use original inch units and keep room geometry independent',()=>{
+  const b=getCatalogRecord('CHK-014');
+  assert.deepEqual([b.dimensionsIn.length,b.dimensionsIn.width,b.dimensionsIn.height],[38,58,59]);
+  assert.ok(b.dimensionsIn.sourceUrl.startsWith('https://www.lifefitness.com/'));
+  assert.deepEqual([getCatalogRecord('CHK-072').dimensionsIn.length,getCatalogRecord('CHK-073').dimensionsIn.length],[53.5,53.5]);
+  const item={id:'foo',name:'Machine',category:'strength',kind:'custom',x:5,y:8,width:2,length:3,rotation:0,buffer:0,locked:false};
+  const linked=applyCatalogIdentity(item,b,'HART-0014');
+  assert.deepEqual([linked.width,linked.length,linked.x,linked.y],[2,3,5,8]);
+  assert.deepEqual(linked.muscleGroups,['biceps']);
+  assert.deepEqual(linked.exercises,['biceps curl']);
+});
 test('unknown model numbers are assumed probable, not silently verified',()=>{
   assert.equal(getCatalogRecord('CHK-028').modelStatus,'probable');
   assert.equal(getCatalogRecord('CHK-028').modelNumber,'RSL0314');

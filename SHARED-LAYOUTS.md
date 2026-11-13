@@ -44,6 +44,19 @@ The existing `.openai/hosting.json` now declares `d1: "DB"` and preserves the Si
 
 The current deployment, account checks, and release gate are tracked in [LIVE-VERIFICATION.md](LIVE-VERIFICATION.md). Verify the manager in their own session and publish a physically checked arrangement before merging PR #1 or starting the muscle selector.
 
+
+## Real equipment catalog and draft editing (November 2026)
+
+The Hart equipment survey is reconciled into `dist/equipment-catalog.mjs`: **95 equipment groups / 155 individually numbered equipment entries**. Seven Rogue Monster Lite Competition Benches are represented, including four Thompson Fat Pads. The later Rogue Abram GHD 2.0 and Floor Glute identifications and tentative TuffStuff PPF-800 are included. A tentative model remains explicitly `probable`; a missing or non-model note does not become a verified manufacturer model.
+
+In the floor planner, use **Add from Hart inventory** to pick a model and unused physical inventory ID. The operator must enter a footprint width and length in **feet**. No default or guessed dimensions are applied. The existing gym floor/storage destination picker is honored. The addition affects the opened draft only.
+
+For an existing footprint, select it and open **Equipment model & exercise data** in Details to link a catalog group, assign an available physical ID, and edit manufacturer, model number, verification status, target muscles, exercises and capabilities. Linking a model preserves its existing position, rotation, dimensions, and buffers.
+
+The catalog is a **staging/reference dataset**, not a published gym map. Manufacturer dimensions and exercise metadata require source checking before population. The source of truth for actual gym location remains a physically checked published arrangement. No automatic import or publication of the 155 entries occurs.
+
+`test-equipment-catalog.mjs` verifies quantity/ID uniqueness, bench corrections, probability handling, geometry preservation, duplicate-ID availability, and v2 persistence. Shared layout regression tests and Worker packaging continue to run in CI.
+
 ## API
 
 | Route | Access and behavior |

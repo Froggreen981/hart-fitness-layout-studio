@@ -2169,6 +2169,17 @@ export function getAvailableInventoryIds(entry, placedItems = []) {
   return entry.inventoryIds.filter(id => !assigned.has(id));
 }
 
+export function findCatalogRecords({query='',sourcedOnly=false,availableOnly=false}={},placedItems=[]){
+  const terms=query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return equipmentCatalog.filter(entry=>{
+    if(sourcedOnly&&!entry.dimensionsIn)return false;
+    if(availableOnly&&!getAvailableInventoryIds(entry,placedItems).length)return false;
+    const text=[entry.id,entry.area,entry.name,entry.manufacturer,entry.modelNumber,
+      ...entry.inventoryIds,...entry.muscleGroups,...entry.exercises,...entry.capabilities].join(' ').toLowerCase();
+    return terms.every(term=>text.includes(term));
+  });
+}
+
 export function applyCatalogIdentity(item, entry, inventoryId = '') {
   if (!entry || !item || !['strength', 'free', 'cardio'].includes(item.category)) {
     throw new Error('Choose an equipment footprint and a valid catalog entry.');

@@ -184,3 +184,26 @@ test('local fixture publication requires confirmation and stays unchanged after 
   await expect.poll(async()=>(await read(request,layout.id)).layout.items[0].x).toBe(25);
   expect(await current(request)).toEqual(published);
 });
+
+test('inventory search filters physical IDs, exercise terms and available sourced models without losing measurements',async({page,request})=>{
+  const assigned=applyCatalogIdentity({...bench(),category:'strength'},getCatalogRecord('CHK-014'),'HART-0014');
+  const layout=await draft(request,[assigned]);await open(page,layout.id);
+  await page.locator('#catalogAddBtn').click();
+  await page.locator('#catalogSearch').fill('HART-0014');
+  await expect(page.locator('#catalogPick option')).toHaveCount(2);
+  await page.locator('#catalogPick').selectOption('CHK-014');
+  await expect(page.locator('#catalogCreateBtn')).toBeDisabled();
+  await page.locator('#catalogAvailable').check();
+  await expect(page.locator('#catalogPick option')).toHaveCount(1);
+  await expect(page.locator('#catalogWidth')).toBeEmpty();
+  await page.locator('#catalogAvailable').uncheck();await page.locator('#catalogSourced').check();
+  await page.locator('#catalogSearch').fill('biceps');
+  await page.locator('#catalogPick').selectOption('CHK-016');
+  await page.locator('#catalogWidth').fill('4.75');
+  await page.locator('#catalogSearch').fill('biceps Precor');
+  await expect(page.locator('#catalogPick')).toHaveValue('CHK-016');
+  await expect(page.locator('#catalogWidth')).toHaveValue('4.75');
+  await page.locator('#catalogCreateBtn').click();
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items.length).toBe(2);
+  expect((await read(request,layout.id)).layout.items[1]).toMatchObject({catalogId:'CHK-016',inventoryId:'HART-0016',width:4.75});
+});

@@ -1,5 +1,5 @@
 import {SharedEditor,bindSharedEditor} from './shared-client.mjs';
-import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity} from './equipment-catalog.mjs';
+import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity,findCatalogRecords} from './equipment-catalog.mjs';
 import {STORAGE_ID,isEquipment,storagePose,storeEquipment,migrateStorage,storageView} from './storage.mjs';
 import {localPoint,resizeArea,areaFromWorldPoints,printTiles} from './editor.mjs';
 import {gymSketch} from './sketch.mjs';
@@ -58,9 +58,9 @@ function renderStats(issues){const l=layout(),eq=l.items.filter(i=>!i.storedIn&&
 const base=project.layouts[0];if(base.id===l.id){$('moveCount').textContent='Baseline';$('moveCaption').textContent='save a copy to compare';}else{const original=new Map(base.items.map(i=>[i.id,i]));let moved=0;for(const i of l.items){const b=original.get(i.id);if(!b||Math.abs(b.x-i.x)>.01||Math.abs(b.y-i.y)>.01||b.rotation!==i.rotation||b.width!==i.width||b.length!==i.length||b.storedIn!==i.storedIn)moved++;original.delete(i.id);}moved+=original.size;$('moveCount').textContent=moved+' changed';$('moveCaption').textContent='vs. '+base.name;$('moveCount').title='New, removed, moved, rotated, or resized items compared with the first saved layout.';}}
 function bufferEditor(items){const buffers=items.map(getBuffers),common=side=>buffers.every(b=>b[side]===buffers[0][side])?buffers[0][side]:'';return `<section class="buffer-editor"><div class="section-row"><h3>Planning buffers</h3><span>FEET</span></div><p class="buffer-help">Front follows the F arrow on the footprint. Buffers rotate with each object.</p><div class="uniform-buffer"><label>Same on all sides<input id="uniformBuffer" type="number" min="0" max="20" step="any" placeholder="e.g. 2"></label><button data-action="uniform-buffer">Apply all sides</button></div><div class="buffer-grid">${SIDES.map(side=>`<label>${({front:'Front',rear:'Back',left:'Left side',right:'Right side'})[side]} · ft<input data-buffer="${side}" aria-label="${({front:'Front',rear:'Back',left:'Left side',right:'Right side'})[side]} buffer in feet" type="number" min="0" max="20" step="any" value="${common(side)}" placeholder="Mixed"></label>`).join('')}</div><button class="primary apply-buffers" data-action="apply-buffers">Apply buffers to ${items.length===1?'this object':items.length+' objects'}</button><p class="buffer-help">${items.length>1?'Blank fields keep each object’s current value. ':''}Buffers can change while position is locked. Checks flag walls and other footprints; buffers may overlap.</p></section>`;}
 
-function catalogOptions(selected='') {
+function catalogOptions(selected='',entries=equipmentCatalog) {
   let html='',last='';
-  for (const e of equipmentCatalog) {
+  for (const e of entries) {
     if (e.area!==last) {
       if(last) html+='</optgroup>';
       html+='<optgroup label="'+esc(e.area)+'">';
@@ -131,9 +131,23 @@ function updateCatalogPicker() {
   const name=e.name.toLowerCase();
   $('catalogCategory').value=/bench|rack|platform|bar tree|plate tree/.test(name)?'free':'strength';
 }
+function filterCatalogPicker(){
+  const selected=$('catalogPick').value;
+  const entries=findCatalogRecords({query:$('catalogSearch').value,sourcedOnly:$('catalogSourced').checked,availableOnly:$('catalogAvailable').checked},layout().items);
+  $('catalogPick').innerHTML='<option value="">'+(entries.length?'Choose equipment':'No matching equipment')+'</option>'+catalogOptions(selected,entries);
+  $('catalogPick').value=entries.some(entry=>entry.id===selected)?selected:'';
+  const units=entries.reduce((sum,entry)=>sum+getAvailableInventoryIds(entry,layout().items).length,0);
+  $('catalogFilterStatus').textContent=entries.length+' model group(s) · '+units+' unassigned physical unit(s)';
+  // Keep operator-entered dimensions when the selected model remains in the results.
+  if($('catalogPick').value!==selected)updateCatalogPicker();
+}
+$('catalogSearch').oninput=filterCatalogPicker;
+$('catalogSourced').onchange=filterCatalogPicker;
+$('catalogAvailable').onchange=filterCatalogPicker;
 $('catalogAddBtn').onclick=()=>{
-  $('catalogPick').innerHTML='<option value="">Choose equipment</option>'+catalogOptions();
   $('catalogPick').value='';$('catalogInventoryPick').innerHTML='';
+  $('catalogSearch').value='';$('catalogSourced').checked=false;$('catalogAvailable').checked=false;
+  filterCatalogPicker();
   $('catalogWidth').value='';$('catalogLength').value='';
   updateCatalogPicker();
   $('catalogDialog').showModal();

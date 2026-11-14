@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity} from './dist/equipment-catalog.mjs';
+import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity,findCatalogRecords} from './dist/equipment-catalog.mjs';
 import {validateProject} from './dist/model.mjs';
 
 test('all surveyed inventory records remain stable and individually identifiable',()=>{
@@ -100,4 +100,15 @@ test('all sourced manufacturer footprints retain positive dimensions and dated H
     assert.match(d.verifiedAt,/^\d{4}-\d{2}-\d{2}$/,id);
     assert.match(d.source,/^manufacturer-/,id);
   }
+});
+
+test('staff catalog search combines physical/model IDs, exercise terms, sourced dimensions and draft availability',()=>{
+  assert.deepEqual(findCatalogRecords({query:'hart-0014'}).map(entry=>entry.id),['CHK-014']);
+  assert.deepEqual(findCatalogRecords({query:'biceps precor',sourcedOnly:true}).map(entry=>entry.id),['CHK-016']);
+  const assigned=[{catalogId:'CHK-014',inventoryId:'HART-0014',storedIn:'@storage'}];
+  assert.deepEqual(findCatalogRecords({query:'MTSBC',availableOnly:true},assigned),[]);
+  assert.equal(findCatalogRecords({query:'MTSBC'},assigned)[0].id,'CHK-014');
+  assert.deepEqual(findCatalogRecords({query:'CHK-094',sourcedOnly:true}),[]);
+  assert.equal(findCatalogRecords({query:'CHK-094'})[0].modelStatus,'unidentified');
+  assert.equal(equipmentCatalog.length,95);
 });

@@ -17,7 +17,7 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 - [ ] Continue source-backed dimension/exercise research for unknown models; confirm matches and measurements on site.
 - [ ] Define reviewed exercise-to-equipment mappings with the workout app; distinguish layout-instance IDs from surveyed physical inventory IDs.
 - [x] Add broader browser coverage for storage, printing, touch interaction and keyboard accessibility.
-- [ ] Add staff inventory search by physical/model ID, exercise metadata, source availability and unassigned units.
+- [x] Add staff inventory search by physical/model ID, exercise metadata, source availability and unassigned units.
 
 ## Release blockers (not local development blockers)
 

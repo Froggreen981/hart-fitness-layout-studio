@@ -2184,9 +2184,9 @@ export function applyCatalogIdentity(item, entry, inventoryId = '') {
     manufacturer: entry.manufacturer,
     modelNumber: entry.modelNumber || '',
     modelStatus: entry.modelStatus,
-    muscleGroups: Array.isArray(item.muscleGroups)&&item.muscleGroups.length?[...item.muscleGroups]:[...entry.muscleGroups],
-    exercises: Array.isArray(item.exercises)&&item.exercises.length?[...item.exercises]:[...entry.exercises],
-    capabilities: Array.isArray(item.capabilities)&&item.capabilities.length?[...item.capabilities]:[...entry.capabilities],
+    muscleGroups: item.catalogId===entry.id&&Array.isArray(item.muscleGroups)?[...item.muscleGroups]:[...entry.muscleGroups],
+    exercises: item.catalogId===entry.id&&Array.isArray(item.exercises)?[...item.exercises]:[...entry.exercises],
+    capabilities: item.catalogId===entry.id&&Array.isArray(item.capabilities)?[...item.capabilities]:[...entry.capabilities],
     // Dimensions and coordinates remain untouched when linking an existing item.
   };
 }

@@ -4,7 +4,7 @@ const root=resolve('.'),staticRoot=resolve('dist'),assets={};
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg'};
 async function collect(directory){for(const entry of await readdir(directory,{withFileTypes:true})){const path=resolve(directory,entry.name);if(entry.isDirectory()){if(!['server','.openai'].includes(entry.name))await collect(path);}else assets['/'+relative(staticRoot,path).replaceAll('\\','/')]=[types[extname(path)]||'application/octet-stream',(await readFile(path)).toString('base64')];}}
 await collect(staticRoot);
-const workerModules=['dist/model.mjs','worker/workout-api.mjs','worker/service.mjs'];
+const workerModules=['dist/equipment-catalog.mjs','dist/model.mjs','worker/workout-api.mjs','worker/service.mjs'];
 const sources=await Promise.all(workerModules.map(path=>readFile(path,'utf8')));
 const bundled=sources.map(source=>source.replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'')).join('\n');
 const output=bundled+'\nconst ASSETS='+JSON.stringify(assets)+`;

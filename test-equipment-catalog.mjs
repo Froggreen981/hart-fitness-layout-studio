@@ -68,3 +68,36 @@ test('version 2 persisted project retains catalog metadata in draft and export',
   assert.deepEqual(saved.layouts[0].items[0].exercises,['bench press']);
   assert.throws(()=>validateProject({...p,layouts:[{...p.layouts[0],items:[{...item,muscleGroups:'chest'}]}]}),/Invalid equipment exercise metadata/);
 });
+
+test('model changes reset old exercises while reapplying the same model preserves reviewed edits',()=>{
+  const bench=applyCatalogIdentity({category:'free',width:3,length:5,x:12,y:15,rotation:90},getCatalogRecord('CHK-073'),'HART-0104');
+  bench.exercises=['reviewed bench exercise'];
+  assert.deepEqual(applyCatalogIdentity(bench,getCatalogRecord('CHK-073'),'HART-0104').exercises,bench.exercises);
+  const curl=applyCatalogIdentity(bench,getCatalogRecord('CHK-014'),'HART-0014');
+  assert.deepEqual(curl.exercises,['biceps curl']);
+  assert.deepEqual(curl.muscleGroups,['biceps']);
+  assert.deepEqual([curl.width,curl.length,curl.x,curl.y,curl.rotation],[3,5,12,15,90]);
+});
+
+test('imports enforce model-to-unit membership and validate template metadata',()=>{
+  const item=applyCatalogIdentity({id:'item1',kind:'bench',category:'free',name:'Bench',width:3,length:5,x:1,y:2,rotation:0,buffer:0,locked:false},getCatalogRecord('CHK-073'),'HART-0104');
+  const project=patch=>({version:2,active:'layout',layouts:[{id:'layout',name:'Draft',room:{width:50,length:50},items:[{...item,...patch}]}]});
+  for(const patch of [{catalogId:'CHK-999'},{inventoryId:'HART-0014'},{catalogId:undefined},{exercises:[' ']}]){
+    assert.throws(()=>validateProject(project(patch)),/catalog|inventory|metadata/i);
+  }
+  const template={...item,inventoryId:''};
+  assert.doesNotThrow(()=>validateProject({...project({}),library:[template]}));
+  assert.throws(()=>validateProject({...project({}),library:[item]}),/template/);
+  assert.throws(()=>validateProject({...project({}),library:[{...template,exercises:{notes:'invalid'}}]}),/exercise metadata/);
+});
+
+test('all sourced manufacturer footprints retain positive dimensions and dated HTTPS provenance',()=>{
+  const sourced=equipmentCatalog.filter(entry=>entry.dimensionsIn);
+  assert.ok(sourced.length>=11);
+  for(const {id,dimensionsIn:d} of sourced){
+    assert.ok([d.width,d.length,d.height].every(n=>Number.isFinite(n)&&n>0),id);
+    assert.equal(new URL(d.sourceUrl).protocol,'https:',id);
+    assert.match(d.verifiedAt,/^\d{4}-\d{2}-\d{2}$/,id);
+    assert.match(d.source,/^manufacturer-/,id);
+  }
+});

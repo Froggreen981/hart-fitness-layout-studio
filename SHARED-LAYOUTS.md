@@ -59,6 +59,8 @@ The catalog is a **staging/reference dataset**, not a published gym map. Some ma
 
 `test-equipment-catalog.mjs` verifies quantity/ID uniqueness, bench corrections, probability handling, geometry preservation, duplicate-ID availability, and v2 persistence. Shared layout regression tests and Worker packaging continue to run in CI.
 
+The server validates that physical inventory IDs belong to their linked catalog group, including JSON imports; templates cannot claim a physical unit. Reapplying the same model retains reviewed exercise edits, while changing models resets exercise defaults to the new model. The inventory picker links the dated manufacturer specifications when available. Publishing intentionally shares catalog identity and the muscle/exercise/capability fields with the map and protected workout API, frozen with that publication; internal notes, templates and storage remain private.
+
 ## API
 
 | Route | Access and behavior |

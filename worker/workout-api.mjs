@@ -2,7 +2,7 @@ import {itemPoints,roomPoints,size,wallPolygons} from '../dist/model.mjs';
 
 const WORKOUT_API_VERSION = 1;
 // Bump the representation revision if an existing publication renders differently.
-const WORKOUT_ETAG_REVISION = 1;
+const WORKOUT_ETAG_REVISION = 2;
 
 function workoutResponse(request, status, body, headers = {}) {
   return new Response(request.method === 'HEAD' || status === 304 ? null : JSON.stringify(body), {
@@ -49,7 +49,11 @@ function workoutEquipment(item) {
   return {
     id, name: workoutName(item.name), category, kind, x, y, width, length, rotation,
     status: status === 'out-of-service' ? 'out-of-service' : 'available',
-    footprint: itemPoints(item)
+    footprint: itemPoints(item),
+    ...Object.fromEntries(['catalogId','inventoryId','manufacturer','modelNumber','modelStatus']
+      .filter(key => typeof item[key] === 'string' && item[key].length > 0).map(key => [key,item[key]])),
+    ...Object.fromEntries(['muscleGroups','exercises','capabilities']
+      .filter(key => Array.isArray(item[key])).map(key => [key,[...item[key]]]))
   };
 }
 

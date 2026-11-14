@@ -5,6 +5,7 @@ import {api} from './worker/service.mjs';
 import {sqliteDB} from './scripts/sqlite-db.mjs';
 import {buildingPlan} from './dist/building-plan.mjs';
 import {itemPoints,roomPoints,wallPolygons} from './dist/model.mjs';
+import {applyCatalogIdentity,getCatalogRecord} from './dist/equipment-catalog.mjs';
 
 const layoutPath = '/api/v1/layout';
 const equipmentPath = '/api/v1/equipment';
@@ -210,4 +211,31 @@ test('v1 storage errors return a redacted JSON response', async t => {
   assert.deepEqual(await response.json(), {
     apiVersion: 1, error: {code: 'publication_unavailable', message: 'The published layout could not be read.'}
   });
+});
+
+test('published inventory and exercise metadata stay tied to their snapshot and separate from instance IDs',async t=>{
+  const {auth,call,staffCall}=setup(t);
+  const unit=applyCatalogIdentity(machine('instance-curl'),getCatalogRecord('CHK-014'),'HART-0014');
+  unit.notes='PRIVATE staff notes';
+  const layout={id:'catalog-draft',name:'Catalog fixture',room:{width:50,length:50},items:[unit]};
+  await staffCall('/api/drafts','POST',{layout,library:[]});
+  await publish(staffCall,layout.id,1,null,'catalog-publication');
+  const before=await (await call(equipmentPath,{headers:auth})).json();
+  const published=before.equipment[0];
+  assert.equal(published.id,'instance-curl');
+  assert.equal(published.inventoryId,'HART-0014');
+  assert.equal(published.catalogId,'CHK-014');
+  assert.equal(published.modelStatus,'verified');
+  assert.deepEqual(published.exercises,['biceps curl']);
+  assert.deepEqual(published.muscleGroups,['biceps']);
+  assert.doesNotMatch(JSON.stringify(before),/PRIVATE|notes|locked|buffer/);
+  const draft=await staffCall('/api/drafts/'+layout.id);
+  draft.layout.items[0].exercises=['reviewed variation'];
+  await staffCall('/api/drafts/'+layout.id,'PUT',{...draft,expectedRevision:1});
+  assert.deepEqual(await (await call(equipmentPath,{headers:auth})).json(),before);
+  await publish(staffCall,layout.id,2,'catalog-publication','catalog-publication-next');
+  const after=await (await call(equipmentPath,{headers:auth})).json();
+  assert.deepEqual(after.equipment[0].exercises,['reviewed variation']);
+  assert.equal(after.equipment[0].inventoryId,published.inventoryId);
+  assert.equal(after.equipment[0].id,published.id);
 });

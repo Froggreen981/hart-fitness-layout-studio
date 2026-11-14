@@ -110,7 +110,13 @@ document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.da
 
 function updateCatalogPicker() {
   const e=getCatalogRecord($('catalogPick').value),note=$('catalogSummary');
-  if(!e){note.textContent='Choose a model.';$('catalogInventoryPick').innerHTML='';return;}
+  $('catalogError').textContent='';
+  $('catalogDimensionSource').hidden=true;$('catalogDimensionSource').removeAttribute('href');
+  if(!e){
+    note.textContent='Choose a model.';$('catalogInventoryPick').innerHTML='';
+    $('catalogCreateBtn').disabled=true;$('catalogWidth').value='';$('catalogLength').value='';
+    $('catalogDimensionNote').textContent='';$('catalogExerciseNote').textContent='';return;
+  }
   const available=getAvailableInventoryIds(e,layout().items);
   note.textContent=e.manufacturer+' · '+(e.modelNumber||'Model unidentified')+' · '+e.modelStatus+'. '+available.length+' unassigned ID(s).';
   $('catalogInventoryPick').innerHTML=available.map(id=>'<option value="'+esc(id)+'">'+esc(id)+'</option>').join('');
@@ -120,6 +126,8 @@ function updateCatalogPicker() {
   $('catalogWidth').value=example?example.width:dims?Number((dims.width/12).toFixed(3)):'';
   $('catalogLength').value=example?example.length:dims?Number((dims.length/12).toFixed(3)):'';
   $('catalogDimensionNote').textContent=example?'Dimensions copied from another item in this draft. Confirm them before publishing.':dims?'Manufacturer model dimensions: '+dims.length+' × '+dims.width+' in (L × W). These are not an on-site measurement; change them if necessary.':'No sourced dimensions for this model yet. Enter actual measurements in feet.';
+  if(dims){$('catalogDimensionSource').href=dims.sourceUrl;$('catalogDimensionSource').hidden=false;}
+  $('catalogExerciseNote').textContent=e.exercises.length?'Catalog exercises: '+e.exercises.join(', ')+'. Confirm the model match before using these for workout planning.':'Exercise metadata has not been reviewed for this model.';
   const name=e.name.toLowerCase();
   $('catalogCategory').value=/bench|rack|platform|bar tree|plate tree/.test(name)?'free':'strength';
 }
@@ -127,8 +135,7 @@ $('catalogAddBtn').onclick=()=>{
   $('catalogPick').innerHTML='<option value="">Choose equipment</option>'+catalogOptions();
   $('catalogPick').value='';$('catalogInventoryPick').innerHTML='';
   $('catalogWidth').value='';$('catalogLength').value='';
-  $('catalogError').textContent='';
-  $('catalogCreateBtn').disabled=true;
+  updateCatalogPicker();
   $('catalogDialog').showModal();
 };
 $('catalogPick').onchange=updateCatalogPicker;

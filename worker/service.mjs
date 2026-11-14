@@ -44,6 +44,10 @@ export function publicLayout(layout){
     ...(['allowed','keep-clear'].includes(i.placement)?{placement:i.placement}:{}),
     ...(i.label?{label:take(i.label,['x','y','rotation'])}:{}),
     name:typeof i.publicName==='string'&&i.publicName.trim()?i.publicName:i.name,
+    ...( ['cardio','strength','free'].includes(i.category) ? {
+      ...take(i,['catalogId','inventoryId','manufacturer','modelNumber','modelStatus']),
+      ...Object.fromEntries(['muscleGroups','exercises','capabilities'].filter(key=>Array.isArray(i[key])).map(key=>[key,[...i[key]]]))
+    } : {}),
     status:i.status==='out-of-service'?'out-of-service':'available'
   }));
   return {name:layout.name,room,items};

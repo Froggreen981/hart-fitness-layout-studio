@@ -1,4 +1,5 @@
 import {validateProject} from '../dist/model.mjs';
+import {workoutApi} from './workout-api.mjs';
 const MAX_BYTES=6*1024*1024;
 const idOK=v=>typeof v==='string'&&/^[a-zA-Z0-9_.-]{1,120}$/.test(v);
 const json=(value,status=200,extra={})=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...extra}});
@@ -29,10 +30,23 @@ function documentFor(layout,library=[]){
 }
 const take=(o,keys)=>Object.fromEntries(keys.filter(k=>o[k]!==undefined).map(k=>[k,o[k]]));
 export function publicLayout(layout){
-  const room=take(layout.room,['width','length','shape','innerWidth','upperLength','boundary','points','outline','vertices']);
+  const room=take(layout.room,['width','length','shape']);
+  for(const key of ['innerWidth','upperLength'])if(Number.isFinite(layout.room[key]))room[key]=layout.room[key];
+  for(const key of ['boundary','points','outline','vertices']){
+    const points=layout.room[key];
+    if(Array.isArray(points)&&points.every(pair=>Array.isArray(pair)&&pair.length===2&&pair.every(Number.isFinite)))room[key]=points;
+  }
   if(layout.room.walls)room.walls=layout.room.walls.map(w=>({...take(w,['name','type','x1','x2','y1','y2','thickness']),...(w.projections?{projections:w.projections.map(p=>take(p,['x1','x2','y1','y2','thickness']))}:{})}));
   if(layout.room.zones)room.zones=layout.room.zones.map(z=>take(z,['name','x','y','angle']));
-  return {name:layout.name,room,items:layout.items.filter(i=>!i.storedIn).map(i=>({...take(i,['id','kind','category','x','y','width','length','rotation','color','placement','vertices','label']),name:i.publicName||i.name,status:i.status==='out-of-service'?'out-of-service':'available'}))};
+  const items=layout.items.filter(i=>!i.storedIn&&!(i.category==='area'&&i.storage)).map(i=>({
+    ...take(i,['id','kind','category','x','y','width','length','rotation','vertices']),
+    ...(typeof i.color==='string'&&/^#[0-9a-f]{6}$/i.test(i.color)?{color:i.color}:{}),
+    ...(['allowed','keep-clear'].includes(i.placement)?{placement:i.placement}:{}),
+    ...(i.label?{label:take(i.label,['x','y','rotation'])}:{}),
+    name:typeof i.publicName==='string'&&i.publicName.trim()?i.publicName:i.name,
+    status:i.status==='out-of-service'?'out-of-service':'available'
+  }));
+  return {name:layout.name,room,items};
 }
 async function identity(request,env){
   const email=normalizeEmail(request.headers.get('oai-authenticated-user-email'));
@@ -51,6 +65,12 @@ const operationId=v=>{if(!idOK(v))fail(400,'A request identifier is required.');
 const expectedCurrent=v=>{if(v!==null&&!idOK(v))fail(400,'The current publication must be specified.');return v||'';};
 const draftResult=row=>({...JSON.parse(row.document_json),revision:row.revision,archived:!!row.archived,updatedAt:row.updated_at});
 const pubMeta=row=>row?{id:row.id,sourceDraftId:row.source_draft_id,sourceRevision:row.source_revision,restoredFrom:row.restored_from,previousId:row.previous_id,publishedAt:row.published_at}:null;
+async function publicationResult(db,id,matches,inserted=false){
+  const row=await stmt(db,'SELECT * FROM gym_publications WHERE id = ?',id).first();
+  if(!row)return null;
+  if(!matches(row))fail(409,'This request identifier was already used.');
+  return json({current:pubMeta(row)},inserted?201:200);
+}
 async function getDraft(db,id){const row=await stmt(db,'SELECT * FROM gym_drafts WHERE id = ?',id).first();if(!row)fail(404,'Layout not found.');return row;}
 async function current(db){return db.prepare('SELECT * FROM gym_publications ORDER BY sequence DESC LIMIT 1').first();}
 function sameOrigin(request){
@@ -60,6 +80,7 @@ function sameOrigin(request){
 export async function api(request,env){
  try{
   const url=new URL(request.url),path=url.pathname.replace(/\/$/,'');
+  if(path==='/api/v1'||path.startsWith('/api/v1/'))return workoutApi(request,env,path.slice('/api/v1/'.length));
   if(!env.DB)fail(503,'Shared storage is not connected. Browser layouts remain available in the original planner.');
   if(request.method==='GET'&&path==='/api/current'){
     const row=await current(env.DB);
@@ -136,16 +157,18 @@ export async function api(request,env){
       canPublish(user);const p=await body(request);expectRevision(p.expectedRevision);
       if(p.confirmActual!==true)fail(400,'Confirm that this arrangement matches the physical gym.');
       const requestId=operationId(p.requestId),previous=expectedCurrent(p.expectedCurrentId);
-      const old=await stmt(env.DB,'SELECT * FROM gym_publications WHERE id = ?',requestId).first();
-      if(old){if(old.source_draft_id!==id||old.source_revision!==p.expectedRevision||old.previous_id!==(previous||null))fail(409,'This request identifier was already used.');return json({current:pubMeta(old)});}
+      const matches=row=>row.restored_from===null&&row.source_draft_id===id&&row.source_revision===p.expectedRevision&&row.previous_id===(previous||null);
+      const prior=await publicationResult(env.DB,requestId,matches);
+      if(prior)return prior;
       if(row.revision!==p.expectedRevision)fail(409,'The draft changed. Reload before publishing.');
       const doc=JSON.parse(row.document_json);
       const result=await stmt(env.DB,`INSERT OR IGNORE INTO gym_publications(id,source_draft_id,source_revision,previous_id,document_json,public_json,published_at,published_by)
         SELECT ?,id,revision,?,document_json,?,?,? FROM gym_drafts
         WHERE id=? AND revision=? AND archived=0 AND COALESCE((SELECT id FROM gym_publications ORDER BY sequence DESC LIMIT 1),'')=?`,
         requestId,previous||null,JSON.stringify(publicLayout(doc.layout)),new Date().toISOString(),user.email,id,p.expectedRevision,previous).run();
-      if(!result.meta.changes)fail(409,'The draft or current gym changed. Reload and review before publishing.');
-      return json({current:pubMeta(await stmt(env.DB,'SELECT * FROM gym_publications WHERE id = ?',requestId).first())},201);
+      const response=await publicationResult(env.DB,requestId,matches,!!result.meta.changes);
+      if(!response)fail(409,'The draft or current gym changed. Reload and review before publishing.');
+      return response;
     }
   }
   if(path==='/api/history'&&request.method==='GET'){
@@ -158,14 +181,16 @@ export async function api(request,env){
     canPublish(user);const p=await body(request);if(p.confirmActual!==true)fail(400,'Confirm that this historical layout matches the physical gym.');
     const requestId=operationId(p.requestId),previous=expectedCurrent(p.expectedCurrentId);
     const selected=await stmt(env.DB,'SELECT * FROM gym_publications WHERE id = ?',restore[1]).first();if(!selected)fail(404,'Publication not found.');
-    const old=await stmt(env.DB,'SELECT * FROM gym_publications WHERE id = ?',requestId).first();
-    if(old){if(old.restored_from!==restore[1]||old.previous_id!==(previous||null))fail(409,'This request identifier was already used.');return json({current:pubMeta(old)});}
-    const result=await stmt(env.DB,`INSERT INTO gym_publications(id,source_draft_id,source_revision,restored_from,previous_id,document_json,public_json,published_at,published_by)
+    const matches=row=>row.restored_from===restore[1]&&row.previous_id===(previous||null);
+    const prior=await publicationResult(env.DB,requestId,matches);
+    if(prior)return prior;
+    const result=await stmt(env.DB,`INSERT OR IGNORE INTO gym_publications(id,source_draft_id,source_revision,restored_from,previous_id,document_json,public_json,published_at,published_by)
       SELECT ?,source_draft_id,source_revision,?, ?,document_json,public_json,?,? FROM gym_publications
       WHERE id=? AND COALESCE((SELECT id FROM gym_publications ORDER BY sequence DESC LIMIT 1),'')=?`,
       requestId,restore[1],previous||null,new Date().toISOString(),user.email,restore[1],previous).run();
-    if(!result.meta.changes)fail(409,'The current gym changed. Reload before restoring.');
-    return json({current:pubMeta(await stmt(env.DB,'SELECT * FROM gym_publications WHERE id = ?',requestId).first())},201);
+    const response=await publicationResult(env.DB,requestId,matches,!!result.meta.changes);
+    if(!response)fail(409,'The current gym changed. Reload before restoring.');
+    return response;
   }
   fail(404,'Endpoint not found.');
  }catch(e){if(e instanceof HttpError)return json({error:e.message,...e.details},e.status);console.error('Gym API failure',e.message);return json({error:'Shared storage could not complete this request. Your browser recovery copy is retained.'},500);}

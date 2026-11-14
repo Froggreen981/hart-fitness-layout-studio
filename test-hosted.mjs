@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {createHash,randomBytes} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {sqliteDB} from './scripts/sqlite-db.mjs';
 import {api} from './worker/service.mjs';
@@ -41,5 +42,14 @@ test('deployable Worker serves all entrypoints and excludes local test identity 
   }
   const anon=await worker.fetch(new Request('https://gym.example/api/drafts'),{DB});assert.equal(anon.status,401);
   const publicResponse=await worker.fetch(new Request('https://gym.example/api/current'),{DB});assert.deepEqual(await publicResponse.json(),{current:null});
+  const workout=new Request('https://gym.example/api/v1/layout');
+  assert.equal((await worker.fetch(workout,{DB})).status,503);
+  const token=randomBytes(32).toString('base64url');
+  const env={DB,WORKOUT_API_TOKEN_SHA256:createHash('sha256').update(token).digest('hex')};
+  assert.equal((await worker.fetch(workout,env)).status,401);
+  const authorized=new Request(workout,{headers:{Authorization:'Bearer '+token}});
+  const empty=await worker.fetch(authorized,env);
+  assert.equal(empty.status,404);
+  assert.equal((await empty.json()).error.code,'no_publication');
  }finally{DB.close();}
 });

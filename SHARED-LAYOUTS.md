@@ -1,0 +1,94 @@
+# Shared layouts implementation
+
+For current branch authority, deployment provenance and verification limits, see [DEVELOPMENT-STATUS.md](DEVELOPMENT-STATUS.md). GitHub is the source of truth; ChatGPT Sites remains the existing deployment target.
+
+## Implemented
+
+- Shared draft listing with pagination, duplication, renaming, archiving and restore.
+- Per-layout database saves with optimistic revision checks.
+- Separate current-gym publications, immutable history, and restoration by appending a new publication.
+- Atomic publish checks against both the draft revision and the current publication.
+- A read-only current map using the same geometry functions as the planner.
+- Import of browser version 1 and 2 exports as new drafts. Existing server layouts are preserved.
+- Permanent equipment item IDs preserved in duplicates and imports.
+- Per-editor recovery copies, explicit recovery as separate drafts, and safe retries after a lost response.
+- Staff editor/publisher roles and an owner-managed email allowlist.
+- Public map refresh on focus and every 60 seconds while the page is visible.
+- A dependency-free Worker build with all static assets embedded.
+
+## Run locally
+
+Use Node.js 24 or later.
+
+```powershell
+node --test test-*.mjs
+node scripts/build-worker.mjs
+node scripts/dev-server.mjs
+```
+
+Open http://127.0.0.1:4173/ for Shared layouts.
+
+The development server uses a persistent local SQLite database at .gym-dev.sqlite and a local test identity, owner@example.test. It binds only to loopback. Its test identity code is excluded from the Worker build. Do not expose the development server publicly.
+
+The browser planner remains at index.html. Import browser layouts or a JSON export from the original planner to populate shared drafts. Do not publish a sample arrangement as the actual gym.
+
+## Source reconciliation and hosting
+
+The latest Sites source was recovered from the existing Site's source repository at commit `45b73a0902e3c7174f8eac16b3992964014d94e5` (saved version 10). Its `dist/building-plan.mjs`, fixtures, geometry, editing controls and building-plan regression tests are integrated into this branch. The preserved plan has a square lower-right exterior, the wider lower CrossFit opening, blocked man door, full-wall projections and three half walls with their returns. The spinning area remains excluded. No floor geometry was recreated from memory.
+
+The shared editor keeps the latest planner controls. It does not auto-add reference arrangements to an opened shared draft. Existing browser layouts and storage are retained under `gym-layout-studio-v1`; importing creates separate shared drafts. The original Sites source commit and saved version remain recoverable. The former 100-layout validation and reference-install caps are removed; paginated listings and request byte limits bound individual operations without capping the number of experimental drafts.
+
+The existing `.openai/hosting.json` now declares `d1: "DB"` and preserves the Site identity. The build emits `dist/server/index.js`, embeds static assets and excludes local test-identity code. The initial schema is generated from `db/schema.ts` into `drizzle/0000_shared_layouts.sql` with its journal and snapshot. Sites applies the migration before uploading the Worker. Local tests use that same SQL through `scripts/sqlite-db.mjs`. No schema is created by production request handlers.
+
+`STAFF_OWNER_EMAIL` is configured through the Site runtime settings as a secret using the verified Site owner. Its value is never stored in source. The Site keeps its existing custom audience and domain. The API trusts only identity headers injected by Sites dispatch. Do not deploy this Worker to a standalone public endpoint that accepts arbitrary client identity headers. A move to a different host requires verified authentication at that host.
+
+## Release verification
+
+The current deployment, account checks, and release gate are tracked in [LIVE-VERIFICATION.md](LIVE-VERIFICATION.md). Verify the manager in their own session and publish a physically checked arrangement before merging PR #1 or starting the muscle selector.
+
+
+## Real equipment catalog and draft editing (November 2026)
+
+The Hart equipment survey is reconciled into `dist/equipment-catalog.mjs`: **95 equipment groups / 155 individually numbered equipment entries**. Seven Rogue Monster Lite Competition Benches are represented, including four Thompson Fat Pads. The later Rogue Abram GHD 2.0 and Floor Glute identifications and tentative TuffStuff PPF-800 are included. A tentative model remains explicitly `probable`; a missing or non-model note does not become a verified manufacturer model.
+
+In the floor planner, use **Add from Hart inventory** to pick a model and unused physical inventory ID. Footprint width and length are in **feet**. The picker copies dimensions from an existing item of the same model in the draft, or suggests sourced manufacturer dimensions converted from inches; otherwise the fields remain empty. These suggestions are not on-site measurements and must be confirmed before publication. The existing gym floor/storage destination picker is honored. The addition affects the opened draft only.
+
+Use **Find equipment** to narrow the inventory by name, manufacturer, model/group/physical ID, or existing exercise/muscle metadata. **Sourced dimensions only** and **Unassigned units only** further filter the list; assignments in storage also count. The result summary counts model groups and currently unassigned physical units. Filtering keeps manually entered dimensions if the selected model remains visible and clears the selection safely when it no longer matches. Search does not certify model matches or exercise compatibility.
+
+For an existing footprint, select it and open **Equipment model & exercise data** in Details to link a catalog group, assign an available physical ID, and edit manufacturer, model number, verification status, target muscles, exercises and capabilities. Linking a model preserves its existing position, rotation, dimensions, and buffers.
+
+The catalog is a **staging/reference dataset**, not a published gym map. Some manufacturer dimensions and exercise fields now have source links; remaining entries still require source checking. Confirm model matches and physical measurements before publication. The source of truth for actual gym location remains a physically checked published arrangement. No automatic import or publication of the 155 entries occurs.
+
+`test-equipment-catalog.mjs` verifies quantity/ID uniqueness, bench corrections, probability handling, geometry preservation, duplicate-ID availability, and v2 persistence. Shared layout regression tests and Worker packaging continue to run in CI.
+
+The server validates that physical inventory IDs belong to their linked catalog group, including JSON imports; templates cannot claim a physical unit. Reapplying the same model retains reviewed exercise edits, while changing models resets exercise defaults to the new model. The inventory picker links the dated manufacturer specifications when available. Publishing intentionally shares catalog identity and the muscle/exercise/capability fields with the map and protected workout API, frozen with that publication; internal notes, templates and storage remain private.
+
+## API
+
+| Route | Access and behavior |
+| --- | --- |
+| GET /api/current | Current public snapshot only; no staff notes, stored equipment, or draft metadata. |
+| GET /api/session | Authorized staff identity and role. |
+| GET /api/drafts | Staff-only bounded page of draft metadata. |
+| POST /api/drafts | Create a draft, preserving physical equipment IDs. |
+| GET /api/drafts/:id | Full staff draft and saved revision. |
+| PUT /api/drafts/:id | Save only when expectedRevision matches. |
+| POST /api/drafts/:id/archive | Reversible archive/restore with revision checks. |
+| POST /api/drafts/:id/publish | Publisher access, physical-state confirmation, draft and current checks. |
+| POST /api/drafts/from-current | Full private planning copy of the current publication. |
+| POST /api/import | Non-destructive, idempotent import as new drafts. |
+| GET /api/history | Staff-only publication history. |
+| POST /api/history/:id/restore | Append a new current publication from history. |
+| GET/POST/DELETE /api/staff | Owner-only staff permission management. |
+
+## Verification
+
+The existing geometry, editing, printing-region, storage and import regression checks are retained. New integration tests execute the API against real SQLite, including staff authorization, concurrent saves/publications, recovery, idempotency, history and imports beyond 100 layouts. Client tests exercise the actual editor save queue, separate recovery copies, offline recovery and lost-response retries.
+
+The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, packaged Worker entrypoint routing, and anonymous staff rejection. All 37 test files/subtests pass at `c10f05c`, including the existing inline regression assertions. Packaged Worker tests do not establish hosted verification.
+
+The deployed browser and D1 checks are recorded in the release checklist.
+
+## Next feature
+
+After the shared deployment and latest map are verified, add the reviewed equipment/exercise/muscle catalog and the patron muscle selector.

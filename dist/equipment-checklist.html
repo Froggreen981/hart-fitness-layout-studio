@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#20334d"><title>Hart Gym · Model Verification</title><link rel="stylesheet" href="model-checklist.css"></head><body>
+<header><div><h1>Hart Gym: Model Checklist</h1><p>Check the catalog model against the equipment label. Record Yes, No, or Can’t find.</p><p><a href="workspace.html">Shared layouts</a> · <a href="index.html">Browser planner</a></p></div></header>
+<main>
+<div class="summary"><div class="summary-top"><span id="progress">0 / 95 checked</span><span id="details">0 Yes · 0 No · 0 Can’t find</span></div><div class="bar" role="progressbar" aria-label="Equipment model checks" id="progressbar" aria-valuemin="0" aria-valuemax="95" aria-valuenow="0"><div id="fill"></div></div></div>
+<p class="fine">95 model groups · 155 physical units. Group observations stay on this browser. They do not update catalog confidence, shared drafts, or the published map. Export a backup before changing browsers or domains.</p>
+<div id="storage-status" class="warning" role="status" hidden></div><p id="notice" role="status" aria-live="polite"></p>
+<div class="search-tools"><label>Find equipment<input type="search" id="search" placeholder="Name, model, CHK or HART ID"></label><label>Area<select id="area-filter"></select></label><label class="unchecked"><input type="checkbox" id="unchecked"> Unchecked only</label></div>
+<noscript><p class="warning">JavaScript is required to load the shared equipment catalog and save checklist answers.</p></noscript>
+<p id="no-results" hidden>No equipment matches these filters.</p><div id="areas"></div>
+<section class="tools"><h2>Back up your checks</h2><p>CSV is for review. JSON retains progress for restoring on another browser. Existing v2 backups remain supported.</p><div class="tools-grid"><button id="export" class="primary">Export CSV</button><button id="backup">Download JSON backup</button><button id="restore">Restore JSON backup</button><button id="reset">Clear checks</button></div><input type="file" id="import" accept=".json,application/json"><p id="saveinfo" class="fine">Progress stays on this browser.</p></section>
+</main><script type="module" src="model-checklist-page.mjs"></script></body></html>

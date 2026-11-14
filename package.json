@@ -1,0 +1,23 @@
+{
+  "name": "hart-fitness-layout-studio",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "build": "node scripts/build-worker.mjs",
+    "test": "node --test test-*.mjs",
+    "db:generate": "drizzle-kit generate",
+    "test:browser": "playwright test",
+    "release:check": "node scripts/release-contract.mjs",
+    "test:browser:worker": "node scripts/run-worker-browser-tests.mjs",
+    "release:prepare": "node scripts/prepare-release.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2"
+  }
+}

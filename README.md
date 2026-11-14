@@ -1,18 +1,14 @@
 # Hart Fitness Center Layout Studio
 
-A static, dependency-free floor planner for the BYU-Idaho Hart Fitness Center.
+A floor planner and shared staff layout workspace for the BYU-Idaho Hart Fitness Center.
 
-**Live planner:** https://froggreen981.github.io/hart-fitness-layout-studio/
-
-**Source:** https://github.com/Froggreen981/hart-fitness-layout-studio
-
-Moving from the original site? Export JSON there, then Import on the live planner to transfer your saved layouts, templates, and storage inventory.
+GitHub is the authoritative source repository; continue development on `codex/shared-gym-layouts`. ChatGPT Sites is the existing shared application's deployment target. See [Development status](DEVELOPMENT-STATUS.md) for verified branch differences, deployment provenance and reconciliation gates.
 
 ## Editing
 
-- Set rectangular or L-shaped room dimensions in feet. Edit full-wall and half-wall endpoints and thickness under Walls & half walls. Changing room size does not rescale existing objects.
+- Set rectangular, L-shaped, or traced room dimensions in feet. Edit full-wall and half-wall endpoints and thickness under Walls & half walls. Changing room size does not rescale existing objects.
 - The equipment library appears first in the sidebar. Add equipment, obstacles, or areas. Room and wall fields are available only through Facility setup, leaving the everyday workspace uncluttered. Machine drawings use the same SVG icons as the library. Unlock a fixed obstacle before moving or resizing it.
-- Drag to move; arrow keys nudge; R rotates 90 degrees. Details accepts any numeric angle. X/Y describe the rotated bounding box. Rotation preserves the center.
+- Drag to move; arrow keys nudge; R rotates 90 degrees. Enter or Space activates a focused equipment shape on either map. Details accepts any numeric angle. X/Y describe the rotated bounding box. Rotation preserves the center.
 - Shift/Ctrl/Cmd-click or Select multiple changes the selection. Dragging a selected member moves unlocked selected objects together. Apply planning buffers to all selected physical objects using independent front, back, left, and right values. The F arrow marks the front.
 - Select an area to see eight edge and corner resize handles. Edit contour enables draggable polygon corners and local-coordinate fields. Insert or remove corners with the row buttons. Self-crossing contours are rejected. Contour resizing scales its normalized vertices. Cardio has an optional Hart sketch contour preset; adjust the resulting vertices to measured wall positions.
 - Move label enables independent label dragging. Label X/Y and rotation fields position and rotate the name within the area. Labels draw above equipment. Center label resets label placement.
@@ -44,21 +40,43 @@ Collision checks include rotated footprints, directional buffers, angled walls, 
 
 ## Development and verification
 
-Serve `dist/` over HTTP. No installation or build is required. Hosting is configured through `.github/workflows/pages.yml`.
+Use Node.js 24 (`.nvmrc`). The shared workspace needs the local API/SQLite server; serving `dist/` alone runs only the browser planner. Install the lockfile dependencies when missing. Sites hosting is configured in `.openai/hosting.json`.
 
 ```sh
-node --check dist/app.js
-node --test test-model.mjs test-sketch.mjs test-areas.mjs test-editor.mjs test-storage.mjs
+npm ci
+npm test
+npm run build
+npm run dev
 ```
+
+Run automated browser checks with `npm run test:browser`. They use Playwright on desktop and mobile Chromium, a loopback-only test server and a new disposable SQLite database for each run. They never use production D1 or the normal `.gym-dev.sqlite`. An installed `/usr/bin/chromium` is used when available; otherwise run `npx playwright install chromium` first. `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` can select another local Chromium binary. Failures retain screenshots/traces under ignored `test-results/`. The Shared layout verification workflow runs the same browser suite in CI.
+
+`npm run test:browser:worker` runs the same suite against the actual packaged Worker, using a separate local test transport and disposable database. CI verifies both targets. `npm run release:check` protects the existing Sites identity and unchanged version-13 schema/migrations/geometry. From a clean, normally pushed development branch, `npm run release:prepare` runs all checks and creates a hashed local candidate plus provenance under `build/releases/<commit>/`; it never pushes to Sites or deploys. Follow [RELEASE-PLAN.md](RELEASE-PLAN.md) for the remaining backup, authentication, source-sync, authorization and publishing steps.
 
 Browser QA covers area edge resizing, contour controls and Hart preset, independent label rotation, storage and return, layout deletion across reload, and full-map/cropped tiled print previews with equipment legends. Existing geometry, imports, locks, buffers, and template persistence have regression coverage.
 
+Automated browser coverage currently includes equipment/catalog edits, source-linked dimensions, metadata persistence in a separate session, duplicate/template inventory IDs, model-link geometry preservation, two-staff save conflicts, offline recovery, editor publish denial, immutable local fixture publications, phone checklist backup/restore, storage transfers, custom tiled printing, touch selection and keyboard activation/nudging. Real staff-device and hosted verification remain required by `LIVE-VERIFICATION.md`.
+
 ## Appearance
 
-Full walls are black; half walls are grey. Fixed obstacles use a full footprint outline and diagonal hatching in both the editor and print output. The header displays the Viking artwork from BYU-Idaho's October 9, 2026 newsroom announcement, with a separate dumbbell underneath. Asset source: https://www.byui.edu/newsroom/announcements/byu-idaho-brings-back-the-viking-introducing-thor-to-a-new-generation
+Full walls are black; half walls are gray. Fixed obstacles use a full footprint outline and diagonal hatching in both the editor and print output. The header displays the Viking artwork from BYU-Idaho's October 9, 2026 newsroom announcement, with a separate dumbbell underneath. Asset source: https://www.byui.edu/newsroom/announcements/byu-idaho-brings-back-the-viking-introducing-thor-to-a-new-generation
 
 ## GitHub hosting
 
-GitHub Pages is active through `.github/workflows/pages.yml`. It tests the application and publishes only `dist/` on successful pushes to `main`. See [GitHub Pages deployment and layout transfer](GITHUB-PAGES.md) for migration instructions. The original site remains available for exporting browser-saved projects. No user layout exports or browser storage are included in this repository.
+A GitHub Pages workflow is prepared in `.github/workflows/pages.yml`. It tests the application and publishes only `dist/` on successful pushes to `main`. See [GitHub Pages deployment and layout transfer](GITHUB-PAGES.md) for setup and migration. Repository creation and initial Pages activation require GitHub account access; a prepared workflow alone does not mean the site is live there.
 
 Fixed objects are excluded from keep-clear equipment warnings regardless of their lock state. They continue to participate in physical footprint, wall, and buffer conflict checks. Locked exercise equipment remains equipment and is still checked against keep-clear areas.
+
+## Hart building plan
+
+The February 2024 lower-level plan supplies an estimated 155 by 155 ft main footprint with an attached CrossFit room, about 180 by 155 ft overall. The lower-right exterior meets at a square corner. Only the three half walls marked by Jackson are physical: the lobby top, the lobby right, and the diagonal between the walkway and Cardio. Other area divisions are dashed boundaries, not collision walls. There is no curved exterior cutout or named spinning area.
+
+The Hart building plan arrangement installs once. The corrected facility geometry updates existing building-plan arrangements on load and import, preserving layout identities, equipment positions and sizes, storage, templates, and custom area contours. Untouched generated Cardio and Cable contours lose the old arc; moved labels retain their positions. Earlier memory-sketch layouts remain intact. Facility setup can apply its footprint to the selected arrangement without rescaling objects. For a traced room, changing width or length scales the boundary and interior wall positions only. The printed 1,261 sq ft CrossFit annotation cross-checks the estimated scale; the resized PDF's nominal print scale is not treated as an exact measurement.
+
+The CrossFit entry follows the larger opening below the hinged man door on the engineering drawing. The man door is treated as blocked; the main opening is approximately 10 ft wide at Y 37–47 ft on the current estimated scale. The correction updates the CrossFit wall segments and adds the short wall projections and half-wall returns visible in the drawing. Projection dimensions and locations use the same estimated scale. They render with their parent wall color and participate in footprint and buffer checks. Saved wall measurements, area contours, equipment and storage are retained.
+
+## Shared staff layouts
+
+The **Model checklist** link in Shared layouts opens `equipment-checklist.html`, the phone survey recovered from `main` and rebuilt around the shared 95-group / 155-unit catalog. Existing `hart-model-check-v2` browser progress and JSON backups remain compatible. Use Yes, No or Can’t find, enter corrections, filter by area/name/model/physical ID, and export CSV or JSON. An observation remains separate from catalog confidence and shared drafts; it never changes the published map. Checks whose reference model changed are flagged for rechecking. Browser saves stay on the current origin; use JSON backup/restore to transfer between domains or devices.
+
+The hosted Worker adds `workspace.html` for persistent staff drafts and `map.html` for the published read-only gym map. The original browser planner remains at `index.html`. See [SHARED-LAYOUTS.md](SHARED-LAYOUTS.md) for deployment, permissions, source provenance and the remaining live verification steps. GitHub Pages serves the browser planner only; the shared API requires the hosted Worker and D1.

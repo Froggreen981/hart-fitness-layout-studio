@@ -1,0 +1,32 @@
+name: Shared layout verification
+on:
+  pull_request:
+  push:
+    branches: ['codex/shared-gym-layouts']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run release:check
+      - run: node --check dist/app.js
+      - run: node --check worker/service.mjs
+      - run: node --test test-*.mjs
+      - run: node scripts/build-worker.mjs
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - run: npm run test:browser:worker
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-test-results
+          path: test-results/
+          retention-days: 7
+

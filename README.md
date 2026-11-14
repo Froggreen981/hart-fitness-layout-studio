@@ -1,6 +1,8 @@
 # Hart Fitness Center Layout Studio
 
-A static, dependency-free floor planner for the BYU-Idaho Hart Fitness Center.
+A floor planner and shared staff layout workspace for the BYU-Idaho Hart Fitness Center.
+
+GitHub is the authoritative source repository; continue development on `codex/shared-gym-layouts`. ChatGPT Sites is the existing shared application's deployment target. See [Development status](DEVELOPMENT-STATUS.md) for verified branch differences, deployment provenance and reconciliation gates.
 
 ## Editing
 
@@ -38,11 +40,13 @@ Collision checks include rotated footprints, directional buffers, angled walls, 
 
 ## Development and verification
 
-Serve `dist/` over HTTP. No installation or build is required. Sites hosting is configured in `.openai/hosting.json`.
+Use Node.js 24 (`.nvmrc`). The shared workspace needs the local API/SQLite server; serving `dist/` alone runs only the browser planner. Install the lockfile dependencies when missing. Sites hosting is configured in `.openai/hosting.json`.
 
 ```sh
-node --check dist/app.js
-node --test test-model.mjs test-sketch.mjs test-areas.mjs test-editor.mjs test-storage.mjs test-building-plan.mjs
+npm ci
+npm test
+npm run build
+npm run dev
 ```
 
 Browser QA covers area edge resizing, contour controls and Hart preset, independent label rotation, storage and return, layout deletion across reload, and full-map/cropped tiled print previews with equipment legends. Existing geometry, imports, locks, buffers, and template persistence have regression coverage.

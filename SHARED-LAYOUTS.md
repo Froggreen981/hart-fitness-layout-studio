@@ -1,5 +1,7 @@
 # Shared layouts implementation
 
+For current branch authority, deployment provenance and verification limits, see [DEVELOPMENT-STATUS.md](DEVELOPMENT-STATUS.md). GitHub is the source of truth; ChatGPT Sites remains the existing deployment target.
+
 ## Implemented
 
 - Shared draft listing with pagination, duplication, renaming, archiving and restore.
@@ -49,11 +51,11 @@ The current deployment, account checks, and release gate are tracked in [LIVE-VE
 
 The Hart equipment survey is reconciled into `dist/equipment-catalog.mjs`: **95 equipment groups / 155 individually numbered equipment entries**. Seven Rogue Monster Lite Competition Benches are represented, including four Thompson Fat Pads. The later Rogue Abram GHD 2.0 and Floor Glute identifications and tentative TuffStuff PPF-800 are included. A tentative model remains explicitly `probable`; a missing or non-model note does not become a verified manufacturer model.
 
-In the floor planner, use **Add from Hart inventory** to pick a model and unused physical inventory ID. The operator must enter a footprint width and length in **feet**. No default or guessed dimensions are applied. The existing gym floor/storage destination picker is honored. The addition affects the opened draft only.
+In the floor planner, use **Add from Hart inventory** to pick a model and unused physical inventory ID. Footprint width and length are in **feet**. The picker copies dimensions from an existing item of the same model in the draft, or suggests sourced manufacturer dimensions converted from inches; otherwise the fields remain empty. These suggestions are not on-site measurements and must be confirmed before publication. The existing gym floor/storage destination picker is honored. The addition affects the opened draft only.
 
 For an existing footprint, select it and open **Equipment model & exercise data** in Details to link a catalog group, assign an available physical ID, and edit manufacturer, model number, verification status, target muscles, exercises and capabilities. Linking a model preserves its existing position, rotation, dimensions, and buffers.
 
-The catalog is a **staging/reference dataset**, not a published gym map. Manufacturer dimensions and exercise metadata require source checking before population. The source of truth for actual gym location remains a physically checked published arrangement. No automatic import or publication of the 155 entries occurs.
+The catalog is a **staging/reference dataset**, not a published gym map. Some manufacturer dimensions and exercise fields now have source links; remaining entries still require source checking. Confirm model matches and physical measurements before publication. The source of truth for actual gym location remains a physically checked published arrangement. No automatic import or publication of the 155 entries occurs.
 
 `test-equipment-catalog.mjs` verifies quantity/ID uniqueness, bench corrections, probability handling, geometry preservation, duplicate-ID availability, and v2 persistence. Shared layout regression tests and Worker packaging continue to run in CI.
 
@@ -79,7 +81,7 @@ The catalog is a **staging/reference dataset**, not a published gym map. Manufac
 
 The existing geometry, editing, printing-region, storage and import regression checks are retained. New integration tests execute the API against real SQLite, including staff authorization, concurrent saves/publications, recovery, idempotency, history and imports beyond 100 layouts. Client tests exercise the actual editor save queue, separate recovery copies, offline recovery and lost-response retries.
 
-The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, deployed entrypoint routing, and anonymous staff rejection. All 30 test files/subtests pass, including the existing inline regression assertions.
+The generated Worker is parsed as ESM and its fetch entry point is verified during the build. Additional integration checks verify the latest Hart plan through shared save/publish, safe projection filtering, unchanged publications after draft edits, packaged Worker entrypoint routing, and anonymous staff rejection. All 37 test files/subtests pass at `c10f05c`, including the existing inline regression assertions. Packaged Worker tests do not establish hosted verification.
 
 The deployed browser and D1 checks are recorded in the release checklist.
 

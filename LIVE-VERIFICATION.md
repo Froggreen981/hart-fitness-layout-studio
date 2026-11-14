@@ -2,9 +2,11 @@
 
 The staff workspace is live at https://gym.huffworkshop.com/workspace.html with its custom visitor audience. Source changes are tracked in PR #1 in Froggreen981/hart-fitness-layout-studio. The current gym map awaits a verified equipment arrangement.
 
+Reconciliation update (November 13, 2026): see [DEVELOPMENT-STATUS.md](DEVELOPMENT-STATUS.md). Sites confirms deployed version 13; newer catalog commits are not verified as deployed. Current D1 inspection confirms an editor role and zero publications. The current Site access response lists only the owner and zero external visitors, so the historical manager visitor-grant claim below requires re-verification. No hosted staff browser checks were repeated during this review.
+
 ## Owner and manager setup
 
-1. The owner session, the manager's **Edit drafts** role, and the manager's Site visitor grant are confirmed. Application staff permission and Site visitor permission are separate.
+1. Prior verification recorded the owner session, the manager's **Edit drafts** role, and the manager's Site visitor grant. Re-verify the visitor grant against the current access discrepancy above. Application staff permission and Site visitor permission are separate.
 2. Have the manager open the workspace in their own signed-in browser. Confirm they can open drafts and that the workspace omits publishing and owner staff controls.
 
 ## Real layout and persistence
@@ -27,7 +29,7 @@ The staff workspace is live at https://gym.huffworkshop.com/workspace.html with 
 
 ## Equipment catalog verification (new)
 
-1. Open a **test draft** from Shared layouts and choose **Add from Hart inventory**. Select one known machine and verify its suggested manufacturer, model number, and available physical ID. Select the intended destination, enter the actual width and length in feet, and add it.
+1. After the catalog source is available in an authorized hosted test environment, open a **test draft** from Shared layouts and choose **Add from Hart inventory**. Select one known machine and verify its suggested manufacturer, model number, and available physical ID. Check any copied or source-linked suggested dimensions against the actual footprint in feet, select the intended destination, and add it.
 2. Confirm the equipment ID is unavailable for a second new item in the same draft, and available again after the first item is deleted.
 3. Select an existing equipment footprint and use **Equipment model & exercise data** to link a catalog model. Verify that its X/Y, rotation, width and length do not change and that edited muscle/exercise/capabilities fields persist after reopening from another staff session.
 4. Confirm **probable** model numbers are not presented as on-site verified. Confirm the changed Rogue bench totals (3 standard + 4 Thompson Fat Pad) and that unknown model entries remain unverified.
@@ -41,7 +43,7 @@ Record the two verified identities/roles without passwords or session data, the 
 
 ## Completed automated/hosted checks
 
-- 30 Node test files/subtests pass, including the existing inline geometry, editing, storage, import and print-region assertions.
+- 37 Node test files/subtests pass at `c10f05c` (previously 30 before catalog additions), including the existing inline geometry, editing, storage, import and print-region assertions.
 - Tests cover two staff roles, recoverable stale saves, SQLite persistence, simultaneous publication conflicts, immutable history, imports beyond 100 drafts, the latest Hart geometry and deployable Worker entrypoints.
 - Shared-editor regression tests cover undo while a save is in flight and retry after a lost response while a newer edit is pending.
 - Deployed D1 has the four expected tables.

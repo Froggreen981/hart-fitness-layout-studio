@@ -11,7 +11,7 @@ test('phone checklist retains existing progress and uses the shared catalog quan
   await page.addInitScript(({key})=>localStorage.setItem(key,JSON.stringify({
     'CHK-001':{answer:'yes',correct:'RSL0620',updated:'2026-11-13T12:00:00Z'}
   })),{key});
-  await page.goto('/model-checklist.html');
+  await page.goto('/equipment-checklist.html');
   await expect(page.locator('.card')).toHaveCount(95);
   await expect(page.locator('#progress')).toHaveText('1 / 95 checked');
   await expect(page.locator('#item-CHK-073')).toContainText('4 unit(s)');
@@ -31,7 +31,7 @@ test('phone checklist retains existing progress and uses the shared catalog quan
 });
 
 test('answers survive reload and JSON/CSV exports restore without touching shared layouts',async({page})=>{
-  await page.goto('/model-checklist.html');
+  await page.goto('/equipment-checklist.html');
   await page.locator('#item-CHK-094').getByRole('radio',{name:'Can’t find',exact:true}).check();
   await page.reload();await expect(page.locator('#progress')).toHaveText('1 / 95 checked');
   const backupWait=page.waitForEvent('download');await page.locator('#backup').click();
@@ -52,7 +52,7 @@ test('old model observations are preserved and flagged when the catalog referenc
   await page.addInitScript(({key})=>localStorage.setItem(key,JSON.stringify({
     'CHK-001':{answer:'yes',correct:'OLDER-MODEL',updated:'2026-11-01T12:00:00Z'}
   })),{key});
-  await page.goto('/model-checklist.html');
+  await page.goto('/equipment-checklist.html');
   await expect(page.locator('#item-CHK-001 .reference-change')).toContainText('catalog model changed');
   expect((await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key))['CHK-001'].correct).toBe('OLDER-MODEL');
   await page.locator('#item-CHK-001').getByRole('radio',{name:'No',exact:true}).check();
@@ -61,7 +61,7 @@ test('old model observations are preserved and flagged when the catalog referenc
 
 test('blocked browser storage warns and still permits checks and backup export',async({page})=>{
   await page.addInitScript(()=>{Storage.prototype.setItem=function(){throw new Error('Test storage disabled');};});
-  await page.goto('/model-checklist.html');
+  await page.goto('/equipment-checklist.html');
   await expect(page.locator('#storage-status')).toBeVisible();
   await page.locator('#item-CHK-001').getByRole('radio',{name:'Yes',exact:true}).check();
   await expect(page.locator('#progress')).toHaveText('1 / 95 checked');

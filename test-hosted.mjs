@@ -37,7 +37,7 @@ test('deployable Worker serves all entrypoints and excludes local test identity 
  const worker=(await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'))).default;
  const DB=sqliteDB();
  try{
-  for(const path of ['/','/index.html','/workspace.html','/map.html','/building-plan.mjs','/patron-map.mjs','/model-checklist.html','/model-checklist.mjs','/model-checklist-page.mjs','/model-checklist.css']){
+  for(const path of ['/','/index.html','/workspace.html','/map.html','/building-plan.mjs','/patron-map.mjs','/equipment-checklist.html','/model-checklist.mjs','/model-checklist-page.mjs','/model-checklist.css']){
    assert.equal((await worker.fetch(new Request('https://gym.example'+path),{DB})).status,200,path);
   }
   const anon=await worker.fetch(new Request('https://gym.example/api/drafts'),{DB});assert.equal(anon.status,401);

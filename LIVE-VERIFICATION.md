@@ -6,6 +6,8 @@ Reconciliation update (November 13, 2026): see [DEVELOPMENT-STATUS.md](DEVELOPME
 
 Subsequent local development now passes **55 Node tests and 32 Playwright desktop/mobile checks**, including browser save/reload, multi-staff conflict recovery, offline recovery, publication protections, checklist backup/restore, staff catalog search, storage, tiled printing and keyboard/touch editing against disposable SQLite. Workout-branch code is reconciled and the API remains disabled without its separate credential. These checks do not verify the hosted version, real staff identities or the gym's physical arrangement.
 
+Release preparation extends this to **60 Node tests and 36 browser checks on each of the source server and packaged Worker**. The saved version-13 source was read and its complete tree matched GitHub `5f6db7a`; schema/migration/identity hashes remain unchanged. [RELEASE-PLAN.md](RELEASE-PLAN.md) separates an authorized software update from the first real gym publication. Deploying planner/catalog code may retain an empty current map and disabled workout API; do not publish a sample arrangement to complete a software smoke check.
+
 ## Owner and manager setup
 
 1. Prior verification recorded the owner session, the manager's **Edit drafts** role, and the manager's Site visitor grant. Re-verify the visitor grant against the current access discrepancy above. Application staff permission and Site visitor permission are separate.

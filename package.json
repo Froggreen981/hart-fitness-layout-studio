@@ -11,7 +11,9 @@
     "test": "node --test test-*.mjs",
     "db:generate": "drizzle-kit generate",
     "test:browser": "playwright test",
-    "release:check": "node scripts/release-contract.mjs"
+    "release:check": "node scripts/release-contract.mjs",
+    "test:browser:worker": "node scripts/run-worker-browser-tests.mjs",
+    "release:prepare": "node scripts/prepare-release.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

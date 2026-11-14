@@ -10,6 +10,7 @@ export default defineConfig({
   timeout:30_000,
   expect:{timeout:8_000},
   reporter:process.env.CI?'github':'list',
+  outputDir:process.env.GYM_BROWSER_TARGET==='worker'?'test-results/worker':'test-results/source',
   use:{
     baseURL:'http://127.0.0.1:4189',
     trace:'retain-on-failure',
@@ -22,7 +23,7 @@ export default defineConfig({
     {name:'mobile-chromium',use:{...devices['Pixel 7']}}
   ],
   webServer:{
-    command:'node scripts/browser-test-server.mjs',
+    command:process.env.GYM_BROWSER_TARGET==='worker'?'node scripts/worker-test-server.mjs':'node scripts/browser-test-server.mjs',
     env:{PORT:'4189'},
     url:'http://127.0.0.1:4189/workspace.html',
     reuseExistingServer:false,

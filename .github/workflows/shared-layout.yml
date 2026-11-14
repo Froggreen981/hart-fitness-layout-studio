@@ -15,12 +15,14 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - run: npm run release:check
       - run: node --check dist/app.js
       - run: node --check worker/service.mjs
       - run: node --test test-*.mjs
       - run: node scripts/build-worker.mjs
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - run: npm run test:browser:worker
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

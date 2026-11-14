@@ -21,9 +21,14 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 
 ## Release blockers (not local development blockers)
 
+- [x] Compare the exact saved Sites source tree with GitHub; pin unchanged identity, D1 schema/migrations and geometry for this code update.
+- [x] Add old-database preservation regressions, safe Worker asset packaging, local release candidates and tests against the packaged Worker.
+- [x] Document the exact existing-Site source synchronization, version save, deployment, read-only smoke checks and code rollback in `RELEASE-PLAN.md`.
+
 - [ ] Resolve manager Site visitor-access discrepancy and verify their independent signed-in session and editor-only controls.
-- [ ] Permit direct hosted verification or obtain authorized source artifacts to compare Sites version 13 against the reviewed GitHub tree.
-- [ ] Confirm a supported backup and release/rollback process before any production migration or deployment.
+- [ ] Permit direct hosted owner/manager verification; source comparison is now verified through the read-only Sites clone.
+- [ ] Obtain a supported full D1 backup/restore point and confirm the applied migration ledger; bounded data views are not a full backup.
+- [ ] Make the official Sites source workflow helper available in the deployment environment, refresh the exact candidate/remote HEAD, and obtain production deployment authorization.
 - [ ] Verify the workout backend's Site gateway and separate API credential path in an authorized restricted environment; keep integration disabled until then.
 - [ ] Physically check equipment arrangement, then deliberately publish and verify the first current map under the staff workflow. Later draft edits must not change that snapshot.
 - [ ] Complete `LIVE-VERIFICATION.md` before considering PR #1 merge or the patron muscle selector.

@@ -8,8 +8,8 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 - [x] Establish repository instructions and this backlog.
 - [x] Reconcile workout-branch recovery, public-map, publication retry and redaction fixes; integrate its disabled-by-default read-only API without changing production configuration.
 - [x] Make equipment identifiers and reviewed model/exercise data useful across the editor and published integration; preserve geometry, source provenance and private-field filtering.
-- [ ] Add Playwright coverage for catalog editing, unique physical IDs, shared persistence/reload, multiple staff sessions, conflict recovery and publishing restrictions using disposable SQLite.
-- [ ] Fix defects found by automated tests and record final validation.
+- [x] Add Playwright coverage for catalog editing, unique physical IDs, shared persistence/reload, multiple staff sessions, conflict recovery and publishing restrictions using disposable SQLite.
+- [x] Fix model-switch metadata and physical-ID validation defects; record passing automated validation.
 
 ## Follow-up development
 

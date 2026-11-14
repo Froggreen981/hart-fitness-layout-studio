@@ -12,3 +12,6 @@ build/
 
 dist/server/
 dist/.openai/
+
+playwright-report/
+test-results/

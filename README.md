@@ -49,7 +49,11 @@ npm run build
 npm run dev
 ```
 
+Run automated browser checks with `npm run test:browser`. They use Playwright on desktop and mobile Chromium, a loopback-only test server and a new disposable SQLite database for each run. They never use production D1 or the normal `.gym-dev.sqlite`. An installed `/usr/bin/chromium` is used when available; otherwise run `npx playwright install chromium` first. `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` can select another local Chromium binary. Failures retain screenshots/traces under ignored `test-results/`. The Shared layout verification workflow runs the same browser suite in CI.
+
 Browser QA covers area edge resizing, contour controls and Hart preset, independent label rotation, storage and return, layout deletion across reload, and full-map/cropped tiled print previews with equipment legends. Existing geometry, imports, locks, buffers, and template persistence have regression coverage.
+
+Automated browser coverage currently includes equipment/catalog edits, source-linked dimensions, metadata persistence in a separate session, duplicate/template inventory IDs, model-link geometry preservation, two-staff save conflicts, offline recovery, editor publish denial, and immutable local fixture publications. Real staff-device and hosted verification remain required by `LIVE-VERIFICATION.md`.
 
 ## Appearance
 

@@ -9,9 +9,11 @@
     "dev": "node scripts/dev-server.mjs",
     "build": "node scripts/build-worker.mjs",
     "test": "node --test test-*.mjs",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "test:browser": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2"
   }

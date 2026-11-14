@@ -4,6 +4,8 @@ The staff workspace is live at https://gym.huffworkshop.com/workspace.html with 
 
 Reconciliation update (November 13, 2026): see [DEVELOPMENT-STATUS.md](DEVELOPMENT-STATUS.md). Sites confirms deployed version 13; newer catalog commits are not verified as deployed. Current D1 inspection confirms an editor role and zero publications. The current Site access response lists only the owner and zero external visitors, so the historical manager visitor-grant claim below requires re-verification. No hosted staff browser checks were repeated during this review.
 
+Subsequent local development now passes **50 Node tests and 14 Playwright desktop/mobile checks**, including real browser save/reload, multi-staff conflict recovery, offline recovery and publication protections against disposable SQLite. Workout-branch code is reconciled and the API remains disabled without its separate credential. These checks do not verify the hosted version, real staff identities or the gym's physical arrangement.
+
 ## Owner and manager setup
 
 1. Prior verification recorded the owner session, the manager's **Edit drafts** role, and the manager's Site visitor grant. Re-verify the visitor grant against the current access discrepancy above. Application staff permission and Site visitor permission are separate.

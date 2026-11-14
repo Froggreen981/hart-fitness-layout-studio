@@ -201,7 +201,13 @@ $('board').addEventListener('pointermove',e=>{if(!drag||drag.pointer!==e.pointer
 function endDrag(e){if(!drag||drag.pointer!==e.pointerId)return;if(drag.started){undo.push(drag.original);if(undo.length>60)undo.shift();redo=[];persist();}drag=null;render();}
 $('board').addEventListener('pointerup',endDrag);$('board').addEventListener('pointercancel',e=>{if(!drag||drag.pointer!==e.pointerId)return;project=JSON.parse(drag.original);drag=null;render();});
 document.addEventListener('keydown',e=>{if(e.target.isContentEditable||e.target.closest('[role="textbox"]')||['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)||document.querySelector('dialog[open]'))return;const mod=e.ctrlKey||e.metaKey;if(mod&&e.key.toLowerCase()==='z'){e.preventDefault();history(!e.shiftKey);return;}if(e.key==='Escape'){selectOnly(null);renderInspector();renderBoard();return;}if(!selection.size)return;if(e.key.toLowerCase()==='r'&&!mod){e.preventDefault();rotate();return;}if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();remove();return;}if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){const moving=selectedItems().filter(i=>!i.locked);if(!moving.length)return;e.preventDefault();const d=e.shiftKey?2:$('snapToggle').checked?.5:.1;change(()=>{for(const i of moving){const x=i.storedIn?'storageX':'x',y=i.storedIn?'storageY':'y';if(e.key==='ArrowLeft')i[x]-=d;if(e.key==='ArrowRight')i[x]+=d;if(e.key==='ArrowUp')i[y]-=d;if(e.key==='ArrowDown')i[y]+=d;i[x]=fmtRaw(i[x]);i[y]=fmtRaw(i[y]);}});}});
-$('board').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const id=e.target.closest('[data-id]')?.dataset.id;if(!id)return;e.preventDefault();if(e.shiftKey||e.ctrlKey||e.metaKey||$('multiToggle').checked)toggleSelected(id);else selectOnly(id);renderInspector();renderBoard();$('board').focus({preventScroll:true});});
+$('board').addEventListener('keydown',e=>{
+ if(!['Enter',' '].includes(e.key)||e.repeat)return;
+ const id=e.target.closest('[data-id]')?.dataset.id;if(!id)return;
+ e.preventDefault();
+ if(e.shiftKey||e.ctrlKey||e.metaKey||$('multiToggle').checked)toggleSelected(id);else selectOnly(id);
+ renderInspector();renderBoard();renderStorage();renderInventory();$('board').focus({preventScroll:true});
+});
 $('board').addEventListener('focusin',e=>{const id=e.target.closest('[data-id]')?.dataset.id;if(id&&id!==selected&&!$('multiToggle').checked&&!e.shiftKey){selectOnly(id);renderInspector();}});
 render();if(addedSketch||areasMigrated||updatedBuildingPlan||addedBuildingPlan)persist();if(!storageAvailable)$('saveStatus').textContent='Export to keep your work';
 
@@ -279,7 +285,13 @@ $('storageBoard').addEventListener('pointerdown',e=>{if(e.button!==0)return;cons
 $('storageBoard').addEventListener('pointermove',e=>{if(!storageDrag||storageDrag.pointer!==e.pointerId)return;const p=storagePoint(e),snap=n=>$('snapToggle').checked?Math.round(n*2)/2:n;let dx=snap(p.x-storageDrag.start.x),dy=snap(p.y-storageDrag.start.y);dx=Math.max(-Math.min(...storageDrag.moving.map(i=>i.x)),dx);dy=Math.max(-Math.min(...storageDrag.moving.map(i=>i.y)),dy);for(const old of storageDrag.moving){const i=layout().items.find(i=>i.id===old.id);i.storageX=fmtRaw(Math.min(9999,old.x+dx));i.storageY=fmtRaw(Math.min(9999,old.y+dy));}if(dx||dy)storageDrag.started=true;renderStorage();});
 function endStorageDrag(e){if(!storageDrag||storageDrag.pointer!==e.pointerId)return;if(e.type==='pointercancel')project=JSON.parse(storageDrag.original);else if(storageDrag.started){undo.push(storageDrag.original);if(undo.length>60)undo.shift();redo=[];persist();}storageDrag=null;render();}
 $('storageBoard').addEventListener('pointerup',endStorageDrag);$('storageBoard').addEventListener('pointercancel',endStorageDrag);
-$('storageBoard').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const id=e.target.closest('[data-storage-id]')?.dataset.storageId;if(!id)return;e.preventDefault();selectOnly(id);renderInspector();renderBoard();renderStorage();renderInventory();});
+$('storageBoard').addEventListener('keydown',e=>{
+ if(!['Enter',' '].includes(e.key)||e.repeat)return;
+ const id=e.target.closest('[data-storage-id]')?.dataset.storageId;if(!id)return;
+ e.preventDefault();
+ if(e.shiftKey||e.ctrlKey||e.metaKey||$('multiToggle').checked)toggleSelected(id);else selectOnly(id);
+ renderInspector();renderBoard();renderStorage();renderInventory();$('storageBoard').focus({preventScroll:true});
+});
 // Keep the second map and equipment list current after pointer-only selection changes.
 $('board').addEventListener('pointerup',()=>{renderStorage();renderInventory();});
 $('areasList').addEventListener('click',()=>{renderStorage();renderInventory();});

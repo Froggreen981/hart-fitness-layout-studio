@@ -8,7 +8,7 @@ GitHub is the authoritative source repository; continue development on `codex/sh
 
 - Set rectangular, L-shaped, or traced room dimensions in feet. Edit full-wall and half-wall endpoints and thickness under Walls & half walls. Changing room size does not rescale existing objects.
 - The equipment library appears first in the sidebar. Add equipment, obstacles, or areas. Room and wall fields are available only through Facility setup, leaving the everyday workspace uncluttered. Machine drawings use the same SVG icons as the library. Unlock a fixed obstacle before moving or resizing it.
-- Drag to move; arrow keys nudge; R rotates 90 degrees. Details accepts any numeric angle. X/Y describe the rotated bounding box. Rotation preserves the center.
+- Drag to move; arrow keys nudge; R rotates 90 degrees. Enter or Space activates a focused equipment shape on either map. Details accepts any numeric angle. X/Y describe the rotated bounding box. Rotation preserves the center.
 - Shift/Ctrl/Cmd-click or Select multiple changes the selection. Dragging a selected member moves unlocked selected objects together. Apply planning buffers to all selected physical objects using independent front, back, left, and right values. The F arrow marks the front.
 - Select an area to see eight edge and corner resize handles. Edit contour enables draggable polygon corners and local-coordinate fields. Insert or remove corners with the row buttons. Self-crossing contours are rejected. Contour resizing scales its normalized vertices. Cardio has an optional Hart sketch contour preset; adjust the resulting vertices to measured wall positions.
 - Move label enables independent label dragging. Label X/Y and rotation fields position and rotate the name within the area. Labels draw above equipment. Center label resets label placement.
@@ -53,7 +53,7 @@ Run automated browser checks with `npm run test:browser`. They use Playwright on
 
 Browser QA covers area edge resizing, contour controls and Hart preset, independent label rotation, storage and return, layout deletion across reload, and full-map/cropped tiled print previews with equipment legends. Existing geometry, imports, locks, buffers, and template persistence have regression coverage.
 
-Automated browser coverage currently includes equipment/catalog edits, source-linked dimensions, metadata persistence in a separate session, duplicate/template inventory IDs, model-link geometry preservation, two-staff save conflicts, offline recovery, editor publish denial, and immutable local fixture publications. Real staff-device and hosted verification remain required by `LIVE-VERIFICATION.md`.
+Automated browser coverage currently includes equipment/catalog edits, source-linked dimensions, metadata persistence in a separate session, duplicate/template inventory IDs, model-link geometry preservation, two-staff save conflicts, offline recovery, editor publish denial, immutable local fixture publications, phone checklist backup/restore, storage transfers, custom tiled printing, touch selection and keyboard activation/nudging. Real staff-device and hosted verification remain required by `LIVE-VERIFICATION.md`.
 
 ## Appearance
 

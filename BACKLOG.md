@@ -13,7 +13,7 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 
 ## Follow-up development
 
-- [ ] Port the useful phone model-verification checklist from `main`, preserving browser progress and reconciling it with the catalog.
+- [x] Port the useful phone model-verification checklist from `main`, preserving browser progress and reconciling it with the catalog.
 - [ ] Continue source-backed dimension/exercise research for unknown models; confirm matches and measurements on site.
 - [ ] Define reviewed exercise-to-equipment mappings with the workout app; distinguish layout-instance IDs from surveyed physical inventory IDs.
 - [ ] Add broader browser coverage for storage, printing, touch interaction and accessibility.

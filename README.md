@@ -75,4 +75,6 @@ The CrossFit entry follows the larger opening below the hinged man door on the e
 
 ## Shared staff layouts
 
+The **Model checklist** link in Shared layouts opens `model-checklist.html`, the phone survey recovered from `main` and rebuilt around the shared 95-group / 155-unit catalog. Existing `hart-model-check-v2` browser progress and JSON backups remain compatible. Use Yes, No or Can’t find, enter corrections, filter by area/name/model/physical ID, and export CSV or JSON. An observation remains separate from catalog confidence and shared drafts; it never changes the published map. Checks whose reference model changed are flagged for rechecking. Browser saves stay on the current origin; use JSON backup/restore to transfer between domains or devices.
+
 The hosted Worker adds `workspace.html` for persistent staff drafts and `map.html` for the published read-only gym map. The original browser planner remains at `index.html`. See [SHARED-LAYOUTS.md](SHARED-LAYOUTS.md) for deployment, permissions, source provenance and the remaining live verification steps. GitHub Pages serves the browser planner only; the shared API requires the hosted Worker and D1.

@@ -9,7 +9,7 @@ Verified November 13, 2026 (America/Denver). This records reconciliation finding
 - Develop in GitHub; retain Sites source as deployment provenance. A later release must package the reviewed GitHub tree for the same Site and record both GitHub and Sites commit/version identifiers. GitHub pushes do not establish Sites synchronization.
 - The checkout started clean on `work` at `73d3dbe`; that branch is preserved. The active shared branch tracks its origin branch. Origin fetch configuration now includes all three reviewed branches. Node **24.22.1**, npm **11.9.0**, lockfile dependencies, drizzle-kit **0.31.10** and drizzle-orm **0.45.2** are available. `.nvmrc` selects Node 24.
 
-## Committed versions and tests
+## Reconciliation baseline: committed versions and tests
 
 All refs were freshly fetched. Tests used the commits below in separate checkouts.
 
@@ -51,4 +51,9 @@ npm run build
 npm run dev             # http://127.0.0.1:4173/
 ```
 
-The dev server uses separate local SQLite `.gym-dev.sqlite` (override with `GYM_DEV_DB`) and a loopback-only test identity. A disposable-database HTTP smoke check passed for all three pages, geometry/catalog assets, local owner access, anonymous staff rejection and empty local drafts/current. The check server was stopped and its disposable database removed. Never expose the dev server publicly. Build outputs/local databases are ignored. No production migrations were generated/applied. These documentation and Node-pin changes are local and uncommitted. Safe work now includes bounded reconciliation reviews; production writes, deployment, merges and removal of older implementations remain deferred.
+The dev server uses separate local SQLite `.gym-dev.sqlite` (override with `GYM_DEV_DB`) and a loopback-only test identity. A disposable-database HTTP smoke check passed for all three pages, geometry/catalog assets, local owner access, anonymous staff rejection and empty local drafts/current. The check server was stopped and its disposable database removed. Never expose the dev server publicly. Build outputs/local databases are ignored. No production migrations were generated/applied. Production writes, deployment, merges and removal of older implementations remain deferred.
+
+## Development progress
+
+- `88b6785`: reviewed and committed the five environment/documentation files after all 37 Node tests and the Worker build passed.
+- Added `AGENTS.md` and `BACKLOG.md` to guide incremental local implementation. The branch comparison above remains the original reconciliation snapshot; new progress is recorded here.

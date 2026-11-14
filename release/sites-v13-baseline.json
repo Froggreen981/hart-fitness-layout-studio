@@ -1,0 +1,20 @@
+{
+  "project_id": "appgprj_6ae42d870d0481918f92cb6a7697a4d6",
+  "d1_binding": "DB",
+  "sites_version": 13,
+  "sites_commit": "c6920abd0815145bb956dacc364331cacb463695",
+  "github_equivalent_commit": "5f6db7a285d7b0f28be9a183f4ab73607895da23",
+  "source_tree": "68036a3c8094ab0cec8048c0f92040eadd23e7c6",
+  "sql_files": [
+    "0000_shared_layouts.sql"
+  ],
+  "unchanged_files": {
+    ".openai/hosting.json": "06db1461945426c1d99589e2a3d6a80cae729c873ad38b542dae1095dff7f6cd",
+    "db/schema.ts": "293659e05eadc4bfca1d9539695f9ffe7cb101338649b60507750ddd3b140f0f",
+    "drizzle.config.ts": "8f0b0441ef2d967c839418715a2cbb051c0338dc156d989895c03ccbc81d4cf6",
+    "drizzle/0000_shared_layouts.sql": "4da5fa958973d9446ba05fde5452f115053d292248a32c7b019051ce6badc6e2",
+    "drizzle/meta/_journal.json": "48da5dfa4cf9907f57af41f5423268ebbcb08a0e15768a373abc15ff02273fa5",
+    "drizzle/meta/0000_snapshot.json": "8e000f7da4970356b3a9bb5ee7fc5203b357ae8297fd3ba37e42e660436c7238",
+    "dist/building-plan.mjs": "f40aba14041bedd52f437185c1c7f7ccc4af31065bb5657e77814ec41de28b84"
+  }
+}

@@ -10,7 +10,8 @@
     "build": "node scripts/build-worker.mjs",
     "test": "node --test test-*.mjs",
     "db:generate": "drizzle-kit generate",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "release:check": "node scripts/release-contract.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

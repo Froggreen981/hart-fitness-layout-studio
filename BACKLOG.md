@@ -37,6 +37,6 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 
 - [x] Re-run the exact remote baseline on Node 24, review both PRs/current CI and refresh read-only Sites version/domain/audience metadata.
 - [x] Add read-only candidate preflight, archive/provenance verification, atomic local preparation and a remote-head recheck after tests.
-- [ ] Deliver versioned workout response schemas, synthetic fixtures, safe backend cache client and consumer contract harness.
-- [ ] Close publication-corruption gaps in GET/HEAD/conditional API behavior.
+- [x] Deliver versioned workout response schemas, synthetic fixtures, safe backend cache client and consumer contract harness.
+- [x] Close publication-corruption gaps in GET/HEAD/conditional API behavior.
 - [ ] Improve survey outstanding-work visibility and protect observations against accidental loss.

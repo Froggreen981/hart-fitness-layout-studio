@@ -14,10 +14,13 @@
     "release:check": "node scripts/release-contract.mjs",
     "test:browser:worker": "node scripts/run-worker-browser-tests.mjs",
     "release:prepare": "node scripts/prepare-release.mjs",
-    "release:preflight": "node scripts/release-preflight.mjs"
+    "release:preflight": "node scripts/release-preflight.mjs",
+    "test:consumer": "node --test test-workout-consumer.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2"
   }

@@ -2,6 +2,10 @@
 
 This API gives the workout app the same published arrangement shown on the current gym map. The workout app owns workout generation and exercise mappings. The routes are read-only and use the existing publication database. Fixture examples below are invented for integration testing.
 
+## Consumer integration package
+
+The versioned [integration handoff](integration/workout-v1/README.md) includes JSON Schema 2020-12 contracts (revision 1.0.0), six fictional response fixtures, a tested backend cache client, rendering/identity/stale-workout guidance and a separately reviewed exercise-mapping exchange. Run `npm run test:consumer` without production credentials. Prefer that client over adapting the short illustrative snippet below; it adds isolated caches, contract validation, bounded reads/timeouts, concurrent-call coalescing and safe errors.
+
 ## Requests
 
 | Method and path | Response |
@@ -20,7 +24,7 @@ The current Sites visitor policy still gates the hostname. If Sites supplies sup
 
 Both endpoints return `apiVersion: 1` and a `publication` object with the opaque `id` and ISO 8601 `publishedAt` timestamp. A new publish or history restore creates a new ID, even if the arrangement matches an older snapshot. Draft edits leave the current ID and data unchanged. Compare IDs for equality and use the timestamp for display.
 
-Store the last successful body and `ETag` per endpoint, per authorized client context. Revalidate using `If-None-Match` on later calls. A `304` has no body and means reuse the cached body. A `200` replaces it. The layout and catalog have different ETags. If you use both and their publication IDs differ, refresh or use the equipment included in the layout response. Responses use `Cache-Control: private, no-cache`, so a private cache may store them and must revalidate before reuse. Revalidation still requires authorization.
+Store the last successful body and `ETag` per endpoint, per authorized client context. Revalidate using `If-None-Match` on later calls. A `304` has no body and means reuse the cached body. The stored publication is parsed and validated before either HEAD success or a conditional `304`; unreadable data returns `500 publication_unavailable` without an ETag. A `200` replaces it. The layout and catalog have different ETags. If you use both and their publication IDs differ, refresh or use the equipment included in the layout response. Responses use `Cache-Control: private, no-cache`, so a private cache may store them and must revalidate before reuse. Revalidation still requires authorization.
 
 | HTTP status | JSON error code | Meaning |
 | --- | --- | --- |

@@ -1,0 +1,140 @@
+{
+  "apiVersion": 1,
+  "publication": {
+    "id": "fictional-empty-publication",
+    "publishedAt": "2026-01-01T18:00:00.000Z"
+  },
+  "layout": {
+    "name": "Fictional integration room",
+    "room": {
+      "width": 40,
+      "length": 30,
+      "boundary": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          40,
+          30
+        ],
+        [
+          0,
+          30
+        ]
+      ],
+      "walls": [
+        {
+          "name": "Fictional half wall",
+          "type": "half",
+          "footprints": [
+            [
+              [
+                5,
+                5.25
+              ],
+              [
+                10,
+                5.25
+              ],
+              [
+                10,
+                4.75
+              ],
+              [
+                5,
+                4.75
+              ]
+            ],
+            [
+              [
+                9.75,
+                5
+              ],
+              [
+                9.75,
+                8
+              ],
+              [
+                10.25,
+                8
+              ],
+              [
+                10.25,
+                5
+              ]
+            ]
+          ]
+        }
+      ],
+      "zones": [
+        {
+          "name": "Fictional label",
+          "x": 3,
+          "y": 3,
+          "angle": 0
+        }
+      ]
+    },
+    "areas": [
+      {
+        "id": "fictional-area",
+        "name": "Fictional training area",
+        "footprint": [
+          [
+            11,
+            18
+          ],
+          [
+            22,
+            18
+          ],
+          [
+            22,
+            28
+          ],
+          [
+            11,
+            28
+          ]
+        ],
+        "color": "#20334d",
+        "placement": "allowed",
+        "label": {
+          "x": 16.5,
+          "y": 23,
+          "rotation": 0
+        }
+      }
+    ],
+    "obstacles": [
+      {
+        "id": "fictional-column",
+        "name": "Fictional column",
+        "footprint": [
+          [
+            30,
+            20
+          ],
+          [
+            31,
+            20
+          ],
+          [
+            31,
+            21
+          ],
+          [
+            30,
+            21
+          ]
+        ]
+      }
+    ],
+    "equipment": []
+  }
+}

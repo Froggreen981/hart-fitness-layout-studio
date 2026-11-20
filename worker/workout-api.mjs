@@ -1,4 +1,4 @@
-import {itemPoints,roomPoints,size,wallPolygons} from '../dist/model.mjs';
+import {itemPoints,roomPoints,size,wallPolygons,validateRoomGeometry} from '../dist/model.mjs';
 
 const WORKOUT_API_VERSION = 1;
 // Bump the representation revision if an existing publication renders differently.
@@ -42,6 +42,42 @@ function workoutEtagMatches(header, tag) {
 function workoutName(name) {
   if (typeof name !== 'string') throw new Error('Invalid published name');
   return name;
+}
+
+function validateWorkoutPublication(row, layout) {
+  // Validate the stored snapshot without consulting today's catalog or rewriting it.
+  // An older publication may omit every catalog field or reference a retired model.
+  if (typeof row.id !== 'string' || !row.id || typeof row.published_at !== 'string' ||
+      !Number.isFinite(Date.parse(row.published_at)) || !layout || typeof layout.name !== 'string' ||
+      !layout.room || ![layout.room.width,layout.room.length].every(value => Number.isFinite(value) && value > 0) ||
+      !Array.isArray(layout.items)) throw Error('Invalid publication');
+  validateRoomGeometry(layout.room);
+  const ids = new Set();
+  for (const item of layout.items) {
+    if (!item || typeof item.id !== 'string' || ids.has(item.id) || typeof item.name !== 'string' ||
+        !['cardio','strength','free','obstacle','area'].includes(item.category) ||
+        !['treadmill','elliptical','bike','rack','bench','cable','column','custom','area'].includes(item.kind) ||
+        ![item.x,item.y,item.width,item.length,item.rotation].every(Number.isFinite) ||
+        item.width <= 0 || item.length <= 0 || item.rotation < 0 || item.rotation >= 360 ||
+        item.status !== undefined && !['available','out-of-service'].includes(item.status)) throw Error('Invalid published item');
+    ids.add(item.id);
+    if (item.category === 'area') {
+      if (typeof item.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(item.color) ||
+          !['allowed','keep-clear'].includes(item.placement) ||
+          item.label !== undefined && (!item.label || ![item.label.x,item.label.y,item.label.rotation].every(Number.isFinite)))
+        throw Error('Invalid published area');
+      if (item.vertices !== undefined && (!Array.isArray(item.vertices) || item.vertices.length < 3 ||
+          !item.vertices.every(point => Array.isArray(point) && point.length === 2 && point.every(Number.isFinite))))
+        throw Error('Invalid area footprint');
+    }
+    for (const key of ['catalogId','inventoryId','manufacturer','modelNumber','modelStatus'])
+      if (item[key] !== undefined && typeof item[key] !== 'string') throw Error('Invalid published metadata');
+    if (item.modelStatus !== undefined && !['verified','probable','reported','corrected','unidentified'].includes(item.modelStatus))
+      throw Error('Invalid published model status');
+    for (const key of ['muscleGroups','exercises','capabilities'])
+      if (item[key] !== undefined && (!Array.isArray(item[key]) || !item[key].every(value => typeof value === 'string')))
+        throw Error('Invalid published exercise metadata');
+  }
 }
 
 function workoutEquipment(item) {
@@ -126,6 +162,10 @@ export async function workoutApi(request, env, resource) {
       return workoutError(request, 404, 'no_publication', 'Staff have not published a current gym layout.');
     }
 
+    // HEAD and 304 must not claim an unreadable snapshot is usable. Authenticate,
+    // read and validate the same row before deciding whether a body is needed.
+    const layout = JSON.parse(row.public_json);
+    validateWorkoutPublication(row, layout);
     const tag = `"gym-v${WORKOUT_API_VERSION}-r${WORKOUT_ETAG_REVISION}-${resource}-${row.id}"`;
     const headers = {'ETag': 'W/' + tag, 'Cache-Control': 'private, no-cache'};
     if (workoutEtagMatches(request.headers.get('If-None-Match'), tag)) {
@@ -133,7 +173,6 @@ export async function workoutApi(request, env, resource) {
     }
     if (request.method === 'HEAD') return workoutResponse(request, 200, null, headers);
 
-    const layout = JSON.parse(row.public_json);
     const items = layout.items.filter(item => !item.storedIn && !(item.category === 'area' && item.storage));
     const equipment = items.filter(item => ['cardio','strength','free'].includes(item.category)).map(workoutEquipment);
     const payload = {

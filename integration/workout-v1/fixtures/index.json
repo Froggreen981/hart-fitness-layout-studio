@@ -1,0 +1,42 @@
+{
+  "synthetic": true,
+  "contractRevision": "1.0.0",
+  "fixtures": [
+    {
+      "file": "populated-layout.json",
+      "status": 200,
+      "resource": "layout",
+      "definition": "layoutResponse"
+    },
+    {
+      "file": "populated-equipment.json",
+      "status": 200,
+      "resource": "equipment",
+      "definition": "equipmentResponse"
+    },
+    {
+      "file": "empty-layout.json",
+      "status": 200,
+      "resource": "layout",
+      "definition": "layoutResponse"
+    },
+    {
+      "file": "empty-equipment.json",
+      "status": 200,
+      "resource": "equipment",
+      "definition": "equipmentResponse"
+    },
+    {
+      "file": "no-publication.json",
+      "status": 404,
+      "resource": "layout",
+      "definition": "errorResponse"
+    },
+    {
+      "file": "integration-unavailable.json",
+      "status": 503,
+      "resource": "layout",
+      "definition": "errorResponse"
+    }
+  ]
+}

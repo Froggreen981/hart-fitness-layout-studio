@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gym-layout-studio.example.invalid/contracts/workout-v1/exercise-mappings-1.0.0.schema.json",
+  "title": "Workout team reviewed mapping exchange, revision 1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mappingVersion",
+    "reviewStatus",
+    "sourcePublicationId",
+    "reviewReference",
+    "mappings"
+  ],
+  "properties": {
+    "mappingVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewStatus": {
+      "enum": [
+        "fictional",
+        "reviewed"
+      ]
+    },
+    "sourcePublicationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewReference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "exerciseId",
+          "candidateEquipmentIds"
+        ],
+        "properties": {
+          "exerciseId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "candidateEquipmentIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

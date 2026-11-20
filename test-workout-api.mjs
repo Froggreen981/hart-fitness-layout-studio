@@ -239,3 +239,39 @@ test('published inventory and exercise metadata stay tied to their snapshot and 
   assert.equal(after.equipment[0].inventoryId,published.inventoryId);
   assert.equal(after.equipment[0].id,published.id);
 });
+
+test('corrupt publications fail closed for GET, HEAD and matching conditional requests without rewriting storage',async t=>{
+  const {auth,call,env}=setup(t);
+  const valid={name:'Legacy fixture',room:{width:40,length:30},items:[machine('legacy-item')]};
+  const corruptions=['{broken',null,{}, {...valid,items:[machine('bad-number',{width:null})]},
+    {...valid,items:[machine('duplicate'),machine('duplicate')]},
+    {...valid,items:[machine('private-array',{exercises:[{private:'staff details'}]})]},
+    {...valid,room:{...valid.room,zones:[{name:{private:'staff details'},x:1,y:1}]}}];
+  for(const value of corruptions){
+    const row={id:'corrupt-fixture',published_at:'2026-01-01T18:00:00.000Z',public_json:typeof value==='string'?value:JSON.stringify(value)};
+    let reads=0;
+    const bindings={...env,DB:{prepare(sql){assert.match(sql,/^SELECT /);return {async first(){reads++;return row;}};}}};
+    for(const path of [layoutPath,equipmentPath])for(const method of ['GET','HEAD'])for(const condition of [undefined,'*','W/"gym-v1-r2-'+path.split('/').at(-1)+'-corrupt-fixture"']){
+      const response=await call(path,{method,headers:{...auth,...(condition?{'If-None-Match':condition}:{})}},bindings);
+      assert.equal(response.status,500);
+      assert.equal(response.headers.get('Cache-Control'),'no-store');
+      assert.equal(response.headers.get('ETag'),null);
+      if(method==='HEAD')assert.equal(await response.text(),'');
+      else assert.deepEqual(await response.json(),{apiVersion:1,error:{code:'publication_unavailable',message:'The published layout could not be read.'}});
+    }
+    assert.equal(reads,12);
+  }
+});
+
+test('legacy publications omit catalog metadata and do not depend on the current catalog',async t=>{
+  const {auth,call,env}=setup(t);
+  for(const metadata of [{},{catalogId:'retired-fictional-model',inventoryId:'retired-fictional-unit',exercises:['historical suggestion']}]){
+    const row={id:'legacy-fixture',published_at:'2026-01-01T18:00:00.000Z',public_json:JSON.stringify({name:'Legacy',room:{width:40,length:30},items:[machine('legacy-item',metadata)]})};
+    const bindings={...env,DB:{prepare(){return {async first(){return row;}};}}};
+    const response=await call(layoutPath,{headers:auth},bindings);
+    assert.equal(response.status,200);
+    const item=(await response.json()).layout.equipment[0];
+    for(const [key,value] of Object.entries(metadata))assert.deepEqual(item[key],value);
+    if(!metadata.catalogId){assert.equal('catalogId' in item,false);assert.equal('inventoryId' in item,false);}
+  }
+});

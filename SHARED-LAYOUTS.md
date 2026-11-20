@@ -44,7 +44,7 @@ The existing `.openai/hosting.json` now declares `d1: "DB"` and preserves the Si
 
 ## Release verification
 
-The current deployment, account checks, and release gate are tracked in [LIVE-VERIFICATION.md](LIVE-VERIFICATION.md). Verify the manager in their own session and publish a physically checked arrangement before merging PR #1 or starting the muscle selector.
+The current deployment, account checks, and release gate are tracked in [LIVE-VERIFICATION.md](LIVE-VERIFICATION.md). Verify the manager in their own session and publish a physically checked arrangement before seeking authorization to merge PR #1. Workout generation and muscle selection remain the external team’s responsibility.
 
 
 ## Real equipment catalog and draft editing (November 2026)
@@ -89,9 +89,9 @@ The generated Worker is parsed as ESM and its fetch entry point is verified duri
 
 The deployed browser and D1 checks are recorded in the release checklist.
 
-## Next feature
+## Next integration milestone
 
-After the shared deployment and latest map are verified, add the reviewed equipment/exercise/muscle catalog and the patron muscle selector.
+Have the workout team validate the versioned consumer package and jointly review actual exercise-to-equipment mappings. After the independent deployment/gateway/physical-publication gates pass, verify the approved backend resolves real published instance IDs and positions. Do not add a separate workout generator or muscle selector here.
 
 ## Same-tab retries and survey follow-up
 

@@ -31,7 +31,7 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 - [ ] Make the official Sites source workflow helper available in the deployment environment, refresh the exact candidate/remote HEAD, and obtain production deployment authorization.
 - [ ] Verify the workout backend's Site gateway and separate API credential path in an authorized restricted environment; keep integration disabled until then.
 - [ ] Physically check equipment arrangement, then deliberately publish and verify the first current map under the staff workflow. Later draft edits must not change that snapshot.
-- [ ] Complete `LIVE-VERIFICATION.md` before considering PR #1 merge or the patron muscle selector.
+- [ ] Complete `LIVE-VERIFICATION.md` before seeking PR #1 merge authorization. Workout generation/muscle selection belongs to the external team.
 
 ## Continuation increments (November 19)
 
@@ -43,3 +43,7 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 - [x] Preserve workspace create/duplicate/import operation IDs across same-tab lost-response retries; cover rename/archive/restore/independent duplication in desktop/mobile browsers.
 - [ ] Have the workout team run the offline consumer harness and agree on actual exercise IDs, reviewed mappings, audience and refresh/failure policies.
 - [ ] Repeat checklist touch/recovery/backup and shared-workspace flows on real staff phones after an authorized existing-Site deployment.
+
+## Exact next milestone
+
+Joint workout-team contract acceptance: run the offline consumer harness, agree on reviewed exercise IDs/mapping ownership and availability/stale-workout policies, then add actual reviewed mapping fixtures and consumer regressions. Production access, credentials and physical publication remain separate operator gates in `OPERATIONS-HANDOFF.md`. No further schema change is needed for the current software release.

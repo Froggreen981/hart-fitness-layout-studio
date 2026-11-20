@@ -31,16 +31,24 @@ test('candidate audit detects altered payloads and packaging retains the previou
   await mkdir(join(root,'dist/server'),{recursive:true});await mkdir(join(root,'dist/.openai'),{recursive:true});
   await cp('.openai/hosting.json',join(root,'dist/.openai/hosting.json'));
   await writeFile(join(root,'dist/server/index.js'),'export default {fetch(){return new Response("fixture");}};');
-  const output=join(root,'candidate'),provenance={github_commit:'fixture-commit',source_tree:'fixture-tree'};
+  const output=join(root,'candidate'),provenance={github_commit:'fixture-commit',source_tree:'fixture-tree',
+    github_repository:'Froggreen981/hart-fitness-layout-studio',github_branch:'codex/shared-gym-layouts'};
   const checks=['npm test','npm run build','npm run test:browser','npm run test:browser:worker'].map(command=>({command:command.split(' '),status:'passed'}));
   const metadata=await packageRelease(root,output,provenance,checks);
   const audit=()=>inspectCandidate(root,output,{commit:provenance.github_commit,tree:provenance.source_tree});
   assert.equal((await audit()).archive_sha256,metadata.archive.sha256);
+  await writeFile(join(output,'release.json'),JSON.stringify({...metadata,github_repository:'unrelated/repository'}));
+  await assert.rejects(audit(),/provenance/);
+  await writeFile(join(output,'release.json'),JSON.stringify(metadata));
   await assert.rejects(packageRelease(root,output,provenance,checks));
   assert.equal((await audit()).archive_sha256,metadata.archive.sha256);
   await assert.rejects(inspectCandidate(root,output,{commit:'different',tree:provenance.source_tree}),/provenance/);
   await writeFile(join(root,'dist/server/index.js'),'export default {};');
   await assert.rejects(audit(),/does not match/);
+  await writeFile(join(root,'.env'),'PRIVATE_FIXTURE_SECRET');
+  execFileSync('tar',['-czf',metadata.archive.path,'-C',root,...releaseFiles,'.env']);
+  await writeFile(join(output,'release.json'),JSON.stringify({...metadata,archive:{...metadata.archive,sha256:sha256(await readFile(metadata.archive.path))}}));
+  await assert.rejects(audit(),/unexpected paths/,'even a matching archive hash cannot authorize extra files');
   await writeFile(metadata.archive.path,'interrupted or tampered archive');
   await assert.rejects(audit(),/hash mismatch/);
 });

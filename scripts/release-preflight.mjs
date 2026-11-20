@@ -10,7 +10,8 @@ export async function inspectCandidate(root,directory,{commit,tree}={}){
   const metadata=JSON.parse(await readFile(join(directory,'release.json'),'utf8'));
   const archive=join(directory,'candidate.tar.gz');
   if(!(await lstat(archive)).isFile())throw Error('Candidate archive must be a regular file.');
-  if(metadata.format!=='gym-local-release-v1'||metadata.github_commit!==commit||metadata.source_tree!==tree)
+  if(metadata.format!=='gym-local-release-v1'||metadata.github_commit!==commit||metadata.source_tree!==tree||
+      metadata.github_repository!=='Froggreen981/hart-fitness-layout-studio'||metadata.github_branch!=='codex/shared-gym-layouts')
     throw Error('Candidate provenance does not match the reviewed GitHub commit/tree.');
   if(metadata.archive?.sha256!==sha256(await readFile(archive)))throw Error('Candidate archive hash mismatch.');
   const members=execFileSync('tar',['-tzf',archive],{encoding:'utf8'}).trim().split('\n').sort();
@@ -38,7 +39,7 @@ export async function releasePreflight(root=resolve('.'),{candidate,remote=false
   const commit=git('rev-parse','HEAD'),tree=git('rev-parse','HEAD^{tree}');
   const branch=git('branch','--show-current'),clean=!git('status','--porcelain');
   const contract=await checkReleaseContract(root),worker=await checkBuiltWorker(root);
-  const report={format:'gym-release-preflight-v1',github_commit:commit,source_tree:tree,branch,clean,
+  const report={format:'gym-release-preflight-v1',checked_at:new Date().toISOString(),github_commit:commit,source_tree:tree,branch,clean,
     contract,worker,remote_head:null,candidate:null,local_ready:false,
     production_verified:false,manual_gates:[
       'Supported full D1 backup/restore point and applied migration ledger',
@@ -53,7 +54,7 @@ export async function releasePreflight(root=resolve('.'),{candidate,remote=false
       throw Error('Unexpected GitHub origin.');
     report.remote_head=git('ls-remote','--exit-code','origin','refs/heads/codex/shared-gym-layouts').split(/\s/)[0];
   }
-  if(candidate)report.candidate=await inspectCandidate(root,resolve(candidate),{commit,tree});
+  if(candidate)report.candidate=await inspectCandidate(root,resolve(root,candidate),{commit,tree});
   report.local_ready=clean&&branch==='codex/shared-gym-layouts'&&report.remote_head===commit&&!!report.candidate;
   return report;
 }

@@ -1,6 +1,6 @@
 # Update the existing Gym Layout Studio Site
 
-This runbook prepares a code update, not a new gym-map publication. **No production deployment, runtime-setting change, D1 write or merge into `main` is authorized yet.** GitHub remains authoritative; Sites remains the deployment target.
+See [OPERATIONS-HANDOFF.md](OPERATIONS-HANDOFF.md) for the ordered staff/host/workout-team actions and evidence. This runbook prepares a code update, not a new gym-map publication. **No production deployment, runtime-setting change, D1 write or merge into `main` is authorized yet.** GitHub remains authoritative; Sites remains the deployment target.
 
 ## Verified target and baseline
 
@@ -17,7 +17,9 @@ This runbook prepares a code update, not a new gym-map publication. **No product
 | Runtime identity setting | Existing secret `STAFF_OWNER_EMAIL`; preserve its value |
 | Audience/domain | Preserve existing custom visitor policy and domain/TLS |
 
-The Sites repository was cloned read-only using an ordinary short-lived source credential with no publish-on-push opt-in. Its HEAD matches saved version 13, and its entire tree matches the GitHub baseline above. Current manifest, schema, SQL, Drizzle journal/snapshot and building geometry are identical to that source. `npm run release:check` enforces the pinned hashes in `release/sites-v13-baseline.json`. **No schema migration is introduced by this release.**
+November 19 metadata refresh still reports version 13, its retained successful deployment, active custom domain/TLS, the existing `DB` tables and owner-only visitor listing under the unchanged custom policy. No new source clone, live staff session, row audit or migration-ledger check was performed in this continuation. The official helper remains unavailable here.
+
+The Sites repository was previously cloned read-only using an ordinary short-lived source credential with no publish-on-push opt-in. Its HEAD matches saved version 13, and its entire tree matches the GitHub baseline above. Current manifest, schema, SQL, Drizzle journal/snapshot and building geometry are identical to that source. `npm run release:check` enforces the pinned hashes in `release/sites-v13-baseline.json`. **No schema migration is introduced by this release.**
 
 Sites still reports four user tables: `gym_drafts`, `gym_staff`, `gym_publications`, `gym_imports`. The owner-email secret key is present, but its value is masked by the read API; masking does not mean it is empty. Current visitor metadata lists only the owner, whereas a separate application editor role was previously confirmed. Do not change either permission layer as a side effect of deploying code.
 
@@ -123,6 +125,6 @@ After building, run `npm run release:preflight` for local source/Worker hashes a
 npm run release:preflight -- --remote --candidate build/releases/<full-github-sha>
 ```
 
-`--remote` only reads the authoritative GitHub branch HEAD. The candidate audit verifies exact regular-file archive membership, archive hash, every archived file against the current pinned source/build, commit/tree provenance and recorded required checks. `local_ready: true` requires a clean correct branch, matching remote HEAD and matching candidate; it never establishes production approval, live verification or CI success. Recorded checks are preparation evidence, not signed attestations. Keep `release.json` with its archive; the pair can be moved together because verification uses the supplied directory, not the stored absolute path.
+`--remote` only reads the authoritative GitHub branch HEAD. The candidate audit verifies exact regular-file archive membership, archive hash, every archived file against the current pinned source/build, repository/branch/commit/tree provenance and recorded required checks. Unexpected archive entries are rejected even if someone updates the metadata to match the altered archive hash. `local_ready: true` requires a clean correct branch, matching remote HEAD and matching candidate; it never establishes production approval, live verification or CI success. Recorded checks are preparation evidence, not signed attestations. Keep `release.json` with its archive; the pair can be moved together because verification uses the supplied directory, not the stored absolute path.
 
 Preparation now rechecks the remote after tests and publishes the archive/metadata pair locally with one directory rename. A failed/interrupted preparation cannot replace a completed candidate. Existing candidate directories are retained; audit an existing pair rather than overwrite it. An interrupted process can leave an ignored `.gym-candidate-*` directory beside the intended output. Treat it as incomplete, retain any evidence needed privately, and remove only that temporary directory before retrying. Never save/deploy an archive from an incomplete preparation. If GitHub advances during checks, reconcile and prepare the new reviewed commit; do not force-push.

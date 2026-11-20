@@ -2,11 +2,13 @@
 
 The staff workspace is live at https://gym.huffworkshop.com/workspace.html with its custom visitor audience. Source changes are tracked in PR #1 in Froggreen981/hart-fitness-layout-studio. The current gym map awaits a verified equipment arrangement.
 
-Reconciliation update (November 13, 2026): see [DEVELOPMENT-STATUS.md](DEVELOPMENT-STATUS.md). Sites confirms deployed version 13; newer catalog commits are not verified as deployed. Current D1 inspection confirms an editor role and zero publications. The current Site access response lists only the owner and zero external visitors, so the historical manager visitor-grant claim below requires re-verification. No hosted staff browser checks were repeated during this review.
+Current review: **November 19, 2026 (America/Denver)**. Development verification and production verification are separate. See [DEVELOPMENT-STATUS.md](DEVELOPMENT-STATUS.md), [RELEASE-PLAN.md](RELEASE-PLAN.md) and the ordered [operational handoff](OPERATIONS-HANDOFF.md).
 
-Subsequent local development now passes **55 Node tests and 32 Playwright desktop/mobile checks**, including browser save/reload, multi-staff conflict recovery, offline recovery, publication protections, checklist backup/restore, staff catalog search, storage, tiled printing and keyboard/touch editing against disposable SQLite. Workout-branch code is reconciled and the API remains disabled without its separate credential. These checks do not verify the hosted version, real staff identities or the gym's physical arrangement.
+Read-only Sites metadata confirms the retained version-13 source and successful deployment, active custom domain/TLS and the existing `DB` binding with four expected user tables. The visitor response still lists only the owner / zero external visitors. Manager Site access and a live owner session were not verified in this continuation. Existing production draft/publication contents and migration-ledger state were not re-audited. Historical owner-browser checks below are prior evidence only.
 
-Release preparation extends this to **60 Node tests and 36 browser checks on each of the source server and packaged Worker**. The saved version-13 source was read and its complete tree matched GitHub `5f6db7a`; schema/migration/identity hashes remain unchanged. [RELEASE-PLAN.md](RELEASE-PLAN.md) separates an authorized software update from the first real gym publication. Deploying planner/catalog code may retain an empty current map and disabled workout API; do not publish a sample arrangement to complete a software smoke check.
+Local validation now covers **71 Node tests and 50 desktop/mobile browser checks on each of the source server and packaged Worker**, plus the release contract and Worker build. New checks cover workout response contracts/caching/corruption, checklist reports/recovery/two-tab preservation, staff lost-response retries and rename/archive/restore/duplication. They use offline responses or disposable SQLite and never production data. Exact GitHub CI evidence is recorded separately in `DEVELOPMENT-STATUS.md`; local results do not establish hosted functionality.
+
+The version-13 source tree previously matched GitHub `5f6db7a`; schema/migration/identity/geometry hashes remain unchanged. An authorized planner/catalog code update may keep an empty current map and disabled workout API. Never publish a sample arrangement to complete a smoke check. The new software has not been deployed. Backup, ledger, staff access, supported source tooling and exact-candidate authorization remain release gates.
 
 ## Owner and manager setup
 
@@ -43,9 +45,9 @@ These are new manual QA steps. Automated checks have passed but this end-to-end 
 
 ## Merge gate
 
-Record the two verified identities/roles without passwords or session data, the verified draft revision/publication ID, browser findings and passing CI. Only then merge PR #1. The muscle selector stays deferred.
+Record the two verified identities/roles without passwords or session data, the verified draft revision/publication ID, browser findings and passing CI. Only then seek explicit authorization to merge PR #1. Workout generation and muscle selection belong to the external workout team.
 
-## Completed automated/hosted checks
+## Historical completed checks (earlier sessions)
 
 - 37 Node test files/subtests pass at `c10f05c` (previously 30 before catalog additions), including the existing inline geometry, editing, storage, import and print-region assertions.
 - Tests cover two staff roles, recoverable stale saves, SQLite persistence, simultaneous publication conflicts, immutable history, imports beyond 100 drafts, the latest Hart geometry and deployable Worker entrypoints.
@@ -54,6 +56,6 @@ Record the two verified identities/roles without passwords or session data, the 
 - Live public snapshot reads work through the authorized service boundary; staff endpoints reject identity-less requests with 401.
 - Forged owner headers through Sites dispatch receive 401.
 
-## Live browser progress
+## Historical live browser progress (not repeated November 19)
 
 Two owner browser tabs verified persistent D1 saves after reload, rejection of a stale save, and an available recovery action. The BYU-Idaho planner renders the corrected Hart wall geometry, including the lower CrossFit opening and blocked man door. The manager's independent sign-in and the first physical-state publication are the remaining live checks.

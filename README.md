@@ -2,7 +2,7 @@
 
 A floor planner and shared staff layout workspace for the BYU-Idaho Hart Fitness Center.
 
-GitHub is the authoritative source repository; continue development on `codex/shared-gym-layouts`. ChatGPT Sites is the existing shared application's deployment target. See [Development status](DEVELOPMENT-STATUS.md) for verified branch differences, deployment provenance and reconciliation gates.
+GitHub is the authoritative source repository; continue development on `codex/shared-gym-layouts`. ChatGPT Sites is the existing shared application's deployment target. See the [operational handoff](OPERATIONS-HANDOFF.md) for remaining staff/host/workout-team actions and [Development status](DEVELOPMENT-STATUS.md) for verified branch differences, deployment provenance and reconciliation gates.
 
 ## Editing
 

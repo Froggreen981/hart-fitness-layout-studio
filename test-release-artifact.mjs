@@ -23,3 +23,24 @@ test('release archive contains only Worker, existing manifest and immutable migr
   const stored=JSON.parse(await readFile(join(root,'output/release.json'),'utf8'));
   assert.equal(stored.github_commit,'fixture-only');assert.equal(stored.contract.schema_change,false);
 });
+
+test('candidate audit detects altered payloads and packaging retains the previous complete candidate',async t=>{
+  const {inspectCandidate}=await import('./scripts/release-preflight.mjs');
+  const root=await mkdtemp(join(tmpdir(),'gym-candidate-audit-'));t.after(()=>rm(root,{recursive:true,force:true}));
+  for(const path of ['release','.openai','db','drizzle','drizzle.config.ts','dist/building-plan.mjs'])await cp(path,join(root,path),{recursive:true});
+  await mkdir(join(root,'dist/server'),{recursive:true});await mkdir(join(root,'dist/.openai'),{recursive:true});
+  await cp('.openai/hosting.json',join(root,'dist/.openai/hosting.json'));
+  await writeFile(join(root,'dist/server/index.js'),'export default {fetch(){return new Response("fixture");}};');
+  const output=join(root,'candidate'),provenance={github_commit:'fixture-commit',source_tree:'fixture-tree'};
+  const checks=['npm test','npm run build','npm run test:browser','npm run test:browser:worker'].map(command=>({command:command.split(' '),status:'passed'}));
+  const metadata=await packageRelease(root,output,provenance,checks);
+  const audit=()=>inspectCandidate(root,output,{commit:provenance.github_commit,tree:provenance.source_tree});
+  assert.equal((await audit()).archive_sha256,metadata.archive.sha256);
+  await assert.rejects(packageRelease(root,output,provenance,checks));
+  assert.equal((await audit()).archive_sha256,metadata.archive.sha256);
+  await assert.rejects(inspectCandidate(root,output,{commit:'different',tree:provenance.source_tree}),/provenance/);
+  await writeFile(join(root,'dist/server/index.js'),'export default {};');
+  await assert.rejects(audit(),/does not match/);
+  await writeFile(metadata.archive.path,'interrupted or tampered archive');
+  await assert.rejects(audit(),/hash mismatch/);
+});

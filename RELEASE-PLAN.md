@@ -114,3 +114,15 @@ With rollback authorization, redeploy the retained version-13 saved version:
 `appgprj_6ae42d870d0481918f92cb6a7697a4d6~appgver_04426369c27081919e4e41ed8a268ff2`
 
 Use the same project and the current audience-appropriate native deployment operation. This release makes no schema changes, so code rollback does not require reverting tables or overwriting newer drafts with an old database backup. Recheck sign-in, drafts and current publication after rollback. A failed deployment can apply pending migrations before Worker upload; investigate actual migration state before any retry if the verified no-migration contract was changed.
+
+## Read-only candidate preflight and interrupted preparation
+
+After building, run `npm run release:preflight` for local source/Worker hashes and explicit manual gates. It performs no writes or production requests. After preparing a candidate on the clean pushed branch, run:
+
+```sh
+npm run release:preflight -- --remote --candidate build/releases/<full-github-sha>
+```
+
+`--remote` only reads the authoritative GitHub branch HEAD. The candidate audit verifies exact regular-file archive membership, archive hash, every archived file against the current pinned source/build, commit/tree provenance and recorded required checks. `local_ready: true` requires a clean correct branch, matching remote HEAD and matching candidate; it never establishes production approval, live verification or CI success. Recorded checks are preparation evidence, not signed attestations. Keep `release.json` with its archive; the pair can be moved together because verification uses the supplied directory, not the stored absolute path.
+
+Preparation now rechecks the remote after tests and publishes the archive/metadata pair locally with one directory rename. A failed/interrupted preparation cannot replace a completed candidate. Existing candidate directories are retained; audit an existing pair rather than overwrite it. An interrupted process can leave an ignored `.gym-candidate-*` directory beside the intended output. Treat it as incomplete, retain any evidence needed privately, and remove only that temporary directory before retrying. Never save/deploy an archive from an incomplete preparation. If GitHub advances during checks, reconcile and prepare the new reviewed commit; do not force-push.

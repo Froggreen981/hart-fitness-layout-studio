@@ -13,7 +13,8 @@
     "test:browser": "playwright test",
     "release:check": "node scripts/release-contract.mjs",
     "test:browser:worker": "node scripts/run-worker-browser-tests.mjs",
-    "release:prepare": "node scripts/prepare-release.mjs"
+    "release:prepare": "node scripts/prepare-release.mjs",
+    "release:preflight": "node scripts/release-preflight.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

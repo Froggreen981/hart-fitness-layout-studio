@@ -32,3 +32,11 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 - [ ] Verify the workout backend's Site gateway and separate API credential path in an authorized restricted environment; keep integration disabled until then.
 - [ ] Physically check equipment arrangement, then deliberately publish and verify the first current map under the staff workflow. Later draft edits must not change that snapshot.
 - [ ] Complete `LIVE-VERIFICATION.md` before considering PR #1 merge or the patron muscle selector.
+
+## Continuation increments (November 19)
+
+- [x] Re-run the exact remote baseline on Node 24, review both PRs/current CI and refresh read-only Sites version/domain/audience metadata.
+- [x] Add read-only candidate preflight, archive/provenance verification, atomic local preparation and a remote-head recheck after tests.
+- [ ] Deliver versioned workout response schemas, synthetic fixtures, safe backend cache client and consumer contract harness.
+- [ ] Close publication-corruption gaps in GET/HEAD/conditional API behavior.
+- [ ] Improve survey outstanding-work visibility and protect observations against accidental loss.

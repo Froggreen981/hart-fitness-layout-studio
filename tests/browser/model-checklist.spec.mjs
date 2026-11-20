@@ -68,3 +68,70 @@ test('blocked browser storage warns and still permits checks and backup export',
   const wait=page.waitForEvent('download');await page.locator('#backup').click();
   const backup=JSON.parse(await downloadText(await wait));expect(backup.records['CHK-001'].answer).toBe('yes');
 });
+
+test('survey filters expose mismatches, uncertain references and an exportable group summary',async({page})=>{
+  await page.goto('/equipment-checklist.html');
+  await page.locator('#item-CHK-001').getByRole('radio',{name:'No',exact:true}).check();
+  await page.locator('#correct-CHK-001').fill('OBSERVED-ONLY');
+  await page.locator('#item-CHK-094').getByRole('radio',{name:'Can’t find',exact:true}).check();
+  await page.locator('#observation-filter').selectOption('mismatch');
+  await expect(page.locator('.card:visible')).toHaveCount(1);await expect(page.locator('#item-CHK-001')).toBeVisible();
+  await page.locator('#observation-filter').selectOption('unknown');
+  await expect(page.locator('.card:visible')).toHaveCount(1);await expect(page.locator('#item-CHK-094')).toBeVisible();
+  await page.locator('#observation-filter').selectOption('');
+  await page.locator('#confidence-filter').selectOption('reported');
+  await expect(page.locator('#item-CHK-073')).toBeVisible();await expect(page.locator('#item-CHK-001')).toBeHidden();
+  await page.locator('#confidence-filter').selectOption('');
+  await page.locator('#missing-dimensions').check();
+  await expect(page.locator('#item-CHK-094')).toBeVisible();
+  await page.locator('.survey-summary summary').click();
+  await expect(page.locator('#survey-totals')).toContainText('2 / 95 groups observed');
+  const wait=page.waitForEvent('download');await page.locator('#report').click();
+  const report=JSON.parse(await downloadText(await wait));
+  expect(report.format).toBe('hart-survey-report-v1');expect(report.summary.observedGroups).toBe(2);
+  expect(report.summary.units).toBe(155);expect(report.outstanding.some(item=>item.catalogId==='CHK-001')).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('a clear and a restore each retain a recoverable previous checklist across reloads',async({page})=>{
+  page.on('dialog',dialog=>dialog.accept());
+  await page.goto('/equipment-checklist.html');
+  await page.locator('#item-CHK-001').getByRole('radio',{name:'No',exact:true}).check();
+  await page.locator('#correct-CHK-001').fill('KEEP-ME');
+  await page.locator('#reset').click();await expect(page.locator('#progress')).toHaveText('0 / 95 checked');
+  await page.reload();await page.locator('#undo-replace').click();
+  await expect(page.locator('#progress')).toHaveText('1 / 95 checked');
+  await expect(page.locator('#correct-CHK-001')).toHaveValue('KEEP-ME');
+  const backup={format:key,records:{'CHK-094':{answer:'unknown',correct:''}}};
+  await page.locator('#import').setInputFiles({name:'replacement.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});
+  await expect(page.locator('#notice')).toContainText('Checklist backup restored');
+  await page.reload();await page.locator('#undo-replace').click();
+  await expect(page.locator('#correct-CHK-001')).toHaveValue('KEEP-ME');
+  const records=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
+  expect(Object.keys(records)).toEqual(['CHK-001']);
+});
+
+test('two checklist tabs retain unrelated observations and notify about external changes',async({page,context})=>{
+  await page.goto('/equipment-checklist.html');const other=await context.newPage();await other.goto('/equipment-checklist.html');
+  await page.locator('#item-CHK-001').getByRole('radio',{name:'Yes',exact:true}).check();
+  await expect(other.locator('#progress')).toHaveText('1 / 95 checked');
+  await expect(other.locator('#notice')).toContainText('Another tab changed');
+  await other.locator('#item-CHK-002').getByRole('radio',{name:'Can’t find',exact:true}).check();
+  await expect(page.locator('#progress')).toHaveText('2 / 95 checked');
+  await page.reload();await expect(page.locator('#progress')).toHaveText('2 / 95 checked');
+  const records=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),key);
+  expect(records['CHK-001'].answer).toBe('yes');expect(records['CHK-002'].answer).toBe('unknown');
+});
+
+test('failed recovery storage prevents destructive checklist replacement',async({page})=>{
+  await page.addInitScript(()=>{
+    const set=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(key,value){if(key==='hart-model-check-v2:before-replace')throw new Error('Fixture quota failure');return set.call(this,key,value);};
+  });
+  page.on('dialog',dialog=>dialog.accept());await page.goto('/equipment-checklist.html');
+  await page.locator('#item-CHK-001').getByRole('radio',{name:'Yes',exact:true}).check();
+  await page.locator('#reset').click();
+  await expect(page.locator('#storage-status')).toContainText('No checks changed');
+  await expect(page.locator('#progress')).toHaveText('1 / 95 checked');
+  await page.reload();await expect(page.locator('#progress')).toHaveText('1 / 95 checked');
+});

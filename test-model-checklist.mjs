@@ -39,3 +39,25 @@ test('CSV retains all surveyed groups and neutralizes spreadsheet formulas in co
   assert.ok(csv.includes('HART-0104, HART-0105, HART-0154, HART-0155'));
   assert.ok(csv.includes('Model not found')===false);
 });
+
+test('survey report separates group observations, confidence, reference changes and source-dimension gaps',async()=>{
+  const {checklistReport,checklistFollowUp,checklistReferenceChanged}=await import('./dist/model-checklist.mjs');
+  const records=checklistRecords({
+    'CHK-001':{answer:'yes',correct:'OLDER',modelAtCheck:'OLDER'},
+    'CHK-073':{answer:'identified',correct:'OBSERVED-ONLY'}
+  });
+  const report=checklistReport(records);
+  assert.equal(report.summary.groups,95);assert.equal(report.summary.units,155);
+  assert.equal(report.summary.observedGroups,2);assert.equal(report.summary.unitsInObservedGroups,5);
+  assert.equal(report.summary.uncheckedGroups,93);assert.equal(report.summary.changedReferenceGroups,1);
+  assert.match(report.scope,/do not certify/);
+  const item=equipmentCatalog.find(item=>item.id==='CHK-001');
+  assert.equal(checklistReferenceChanged(item,records[item.id]),true);
+  assert.equal(checklistFollowUp(item,records[item.id]),true);
+  const changed=report.outstanding.find(item=>item.catalogId==='CHK-001');assert.equal(changed.referenceChanged,true);
+  assert.ok(report.areas.every(area=>area.groups>=area.observedGroups));
+  assert.equal(report.areas.reduce((sum,area)=>sum+area.observedGroups,0),2);
+  assert.ok(report.summary.groupsWithoutSourceDimensions>0);
+  assert.match(checklistCSV(records),/Catalog confidence.*Model at check.*Reference changed.*Follow-up needed/);
+  assert.equal(equipmentCatalog.find(item=>item.id==='CHK-073').modelStatus,'reported');
+});

@@ -2,6 +2,7 @@ import {equipmentCatalog,getCatalogRecord} from './equipment-catalog.mjs';
 
 // Preserve the original phone checklist's browser key and JSON backup format.
 export const CHECKLIST_KEY='hart-model-check-v2';
+export const CHECKLIST_RECOVERY_KEY=CHECKLIST_KEY+':before-replace';
 const answers=new Set(['yes','no','unknown','identified']);
 
 export function checklistRecords(input,{strict=true}={}){
@@ -36,6 +37,35 @@ export function checklistProgress(records){
   return progress;
 }
 
+export function checklistReferenceChanged(item,record){
+  if(!record)return false;
+  const reference=record.modelAtCheck??(record.answer==='yes'?record.correct:null);
+  return reference!==null&&reference!==undefined&&reference!==(item.modelNumber||'');
+}
+
+export function checklistFollowUp(item,record){
+  return !record||record.answer!=='yes'||checklistReferenceChanged(item,record)||item.modelStatus!=='verified';
+}
+
+export function checklistReport(records){
+  const rows=equipmentCatalog.map(item=>({catalogId:item.id,area:item.area,name:item.name,
+    quantity:item.quantity,inventoryIds:[...item.inventoryIds],modelNumber:item.modelNumber,
+    modelStatus:item.modelStatus,hasSourceDimensions:!!item.dimensionsIn,
+    answer:records[item.id]?.answer||'unchecked',observedModel:records[item.id]?.correct||'',
+    referenceChanged:checklistReferenceChanged(item,records[item.id]),
+    followUp:checklistFollowUp(item,records[item.id])}));
+  const summarize=items=>({groups:items.length,units:items.reduce((sum,item)=>sum+item.quantity,0),
+    observedGroups:items.filter(item=>item.answer!=='unchecked').length,
+    unitsInObservedGroups:items.filter(item=>item.answer!=='unchecked').reduce((sum,item)=>sum+item.quantity,0),
+    uncheckedGroups:items.filter(item=>item.answer==='unchecked').length,
+    followUpGroups:items.filter(item=>item.followUp).length,
+    changedReferenceGroups:items.filter(item=>item.referenceChanged).length,
+    groupsWithoutSourceDimensions:items.filter(item=>!item.hasSourceDimensions).length});
+  return {format:'hart-survey-report-v1',scope:'Model observations by group; unit counts do not certify individual units, measurements or placement.',
+    summary:summarize(rows),areas:[...new Set(rows.map(item=>item.area))].map(area=>({area,...summarize(rows.filter(item=>item.area===area))})),
+    outstanding:rows.filter(item=>item.followUp||!item.hasSourceDimensions)};
+}
+
 function csvCell(value){
   let text=String(value??'');
   // Quoting alone does not prevent spreadsheet formulas in staff-entered corrections.
@@ -44,13 +74,14 @@ function csvCell(value){
 }
 
 export function checklistCSV(records){
-  const rows=[['Check ID','Area','Manufacturer','Equipment','Quantity','Suspected model','Alternative codes','Verified?','Correct model','Inventory IDs','Checked at']];
+  const rows=[['Check ID','Area','Manufacturer','Equipment','Quantity','Suspected model','Alternative codes','Verified?','Correct model','Inventory IDs','Checked at','Catalog confidence','Model at check','Reference changed','Follow-up needed','Manufacturer dimensions sourced']];
   const statuses={yes:'Yes',no:'No',identified:'Model entered',unknown:'Model not found'};
   for(const item of equipmentCatalog){
     const record=records[item.id]||{};
     rows.push([item.id,item.area,item.manufacturer,item.name,item.quantity,item.modelNumber||'',
       item.modelCandidates.join(' | '),statuses[record.answer]||'Not checked',record.correct||'',
-      item.inventoryIds.join(', '),record.updated||'']);
+      item.inventoryIds.join(', '),record.updated||'',item.modelStatus,record.modelAtCheck??'',
+      checklistReferenceChanged(item,record)?'Yes':'No',checklistFollowUp(item,record)?'Yes':'No',item.dimensionsIn?'Yes':'No']);
   }
   return rows.map(row=>row.map(csvCell).join(',')).join('\r\n')+'\r\n';
 }

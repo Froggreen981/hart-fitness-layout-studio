@@ -101,33 +101,15 @@ The catalog uses the same equipment records at the top level. This example shows
 On the backend, revalidate the same snapshot in a single sequential poll. Give each poller a separate cache for its base URL and credential context.
 
 ```js
-let cachedLayout;
+import {createGymClient} from './integration/workout-v1/client.mjs';
 
-async function readGymLayout({gymOrigin, workoutToken, siteServiceToken}) {
-  const response = await fetch(new URL('/api/v1/layout', gymOrigin), {
-    redirect: 'error',
-    headers: {
-      Authorization: `Bearer ${workoutToken}`,
-      ...(siteServiceToken && {'OAI-Sites-Authorization': `Bearer ${siteServiceToken}`}),
-      ...(cachedLayout?.etag && {'If-None-Match': cachedLayout.etag})
-    }
-  });
-
-  if (response.status === 304 && cachedLayout) return cachedLayout.body;
-  if (!response.ok) {
-    cachedLayout = undefined;
-    const error = await response.json().catch(() => null);
-    if (response.status === 404 && error?.error?.code === 'no_publication') return null;
-    throw new Error(`Gym layout request failed (${response.status})`);
-  }
-
-  const body = await response.json();
-  if (body.apiVersion !== 1 || !body.publication?.id || !Array.isArray(body.layout?.equipment)) {
-    throw new Error('Unexpected gym layout response');
-  }
-  cachedLayout = {etag: response.headers.get('ETag'), body};
-  return body;
-}
+// Backend only: this client keeps its cache isolated to these fixed credentials/origin.
+const gym = createGymClient({
+  gymOrigin: process.env.GYM_ORIGIN,
+  workoutToken: process.env.GYM_WORKOUT_TOKEN,
+  siteServiceToken: process.env.GYM_SITE_SERVICE_TOKEN
+});
+const snapshot = await gym.getLayout(); // null means no official publication yet
 ```
 
 Pass equipment IDs from the workout to the renderer. The following sample workout references one fixture ID and one missing ID. Deduplicate IDs for drawing while retaining the original exercise order in the workout.

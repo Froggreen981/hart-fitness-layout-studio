@@ -207,3 +207,71 @@ test('inventory search filters physical IDs, exercise terms and available source
   await expect.poll(async()=>(await read(request,layout.id)).layout.items.length).toBe(2);
   expect((await read(request,layout.id)).layout.items[1]).toMatchObject({catalogId:'CHK-016',inventoryId:'HART-0016',width:4.75});
 });
+
+test('new and duplicate draft retries reuse identifiers after a committed response is lost',async({page,request})=>{
+  const before=await current(request),attempts=[];
+  let loseNext=true;
+  await page.route('**/api/drafts',async route=>{
+    if(route.request().method()!=='POST')return route.continue();
+    attempts.push(route.request().postDataJSON());
+    if(loseNext){loseNext=false;const response=await route.fetch();expect(response.ok()).toBeTruthy();await route.abort('failed');}
+    else await route.continue();
+  });
+  await page.goto('/workspace.html');await page.locator('#newDraft').click();
+  await expect(page.locator('#notice')).not.toBeEmpty();
+  await expect(page.locator('#newDraft')).toBeEnabled();
+  await page.locator('#newDraft').click();await expect(page).toHaveURL(/index\.html\?draft=/);
+  expect(attempts).toHaveLength(2);expect(attempts[1]).toEqual(attempts[0]);
+  const created=await read(request,attempts[0].layout.id);expect(created.revision).toBe(1);
+  await page.goto('/workspace.html');
+  const row=page.locator('#draftRows tr').filter({has:page.locator('[data-id="'+created.layout.id+'"][data-action="duplicate"]')});
+  await row.getByRole('button',{name:'Duplicate',exact:true}).click();
+  await page.locator('#newName').fill('TEST ONLY retry duplicate '+randomUUID());loseNext=true;
+  await page.locator('#saveName').click();await expect(page.locator('#nameError')).not.toBeEmpty();
+  await page.locator('#saveName').click();await expect(page.locator('#nameDialog')).not.toBeVisible();
+  expect(attempts).toHaveLength(4);expect(attempts[3]).toEqual(attempts[2]);
+  expect(attempts[2].layout.id).not.toBe(created.layout.id);
+  const copy=await read(request,attempts[2].layout.id);expect(copy.revision).toBe(1);
+  expect(copy.layout.room).toEqual(created.layout.room);expect(copy.layout.items).toEqual(created.layout.items);
+  expect(await current(request)).toEqual(before);
+});
+
+test('JSON import retries retain their receipt and preserve existing drafts after a lost response',async({page,request})=>{
+  const before=await current(request),original=await draft(request,[bench()]),attempts=[],results=[];
+  await page.route('**/api/import',async route=>{
+    attempts.push(route.request().postDataJSON());
+    if(attempts.length===1){const response=await route.fetch();expect(response.ok()).toBeTruthy();results.push(await response.json());await route.abort('failed');}
+    else {const response=await route.fetch();results.push(await response.json());await route.fulfill({response});}
+  });
+  await page.goto('/workspace.html');
+  const input={name:'fictional-import.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:2,active:original.id,layouts:[original],library:[]}))};
+  await page.locator('#jsonFile').setInputFiles(input);await expect(page.locator('#notice')).not.toBeEmpty();
+  await page.locator('#jsonFile').setInputFiles(input);await expect(page.locator('#notice')).toContainText('1 layouts imported');
+  expect(attempts).toHaveLength(2);expect(attempts[1].requestId).toBe(attempts[0].requestId);expect(results[1]).toEqual(results[0]);
+  const imported=await read(request,results[0].imported[0].id);expect(imported.layout.id).not.toBe(original.id);
+  expect(imported.layout.items).toEqual((await read(request,original.id)).layout.items);
+  expect(await current(request)).toEqual(before);
+});
+
+test('workspace rename, duplicate, archive and restore preserve geometry and independent revisions',async({page,request})=>{
+  const before=await current(request),original=await draft(request,[bench()]);
+  const row=id=>page.locator('#draftRows tr').filter({has:page.locator('[data-id="'+id+'"][data-action="duplicate"]')});
+  await page.goto('/workspace.html');await row(original.id).getByRole('button',{name:'Rename',exact:true}).click();
+  const name='TEST ONLY renamed '+randomUUID();await page.locator('#newName').fill(name);await page.locator('#saveName').click();
+  await expect(row(original.id)).toContainText(name);
+  const renamed=await read(request,original.id);expect(renamed.revision).toBe(2);expect(renamed.layout.items).toEqual(original.items);
+  await row(original.id).getByRole('button',{name:'Duplicate',exact:true}).click();
+  await page.locator('#newName').fill(name+' copy');await page.locator('#saveName').click();
+  await expect(page.locator('#nameDialog')).not.toBeVisible();await expect(page.locator('#notice')).toHaveText('Shared draft created.');
+  const copyRow=page.locator('#draftRows tr').filter({hasText:name+' copy'});
+  await expect(copyRow).toHaveCount(1);const copyId=await copyRow.locator('[data-action="duplicate"]').getAttribute('data-id');
+  const copy=await read(request,copyId);expect(copy.revision).toBe(1);expect(copy.layout.items).toEqual(renamed.layout.items);
+  await row(original.id).getByRole('button',{name:'Archive',exact:true}).click();await expect(row(original.id)).toHaveCount(0);
+  await page.locator('#showArchived').check();await expect(row(original.id)).toBeVisible();
+  await expect(row(original.id).getByRole('link',{name:'Open draft'})).toHaveCount(0);
+  await row(original.id).getByRole('button',{name:'Restore draft',exact:true}).click();await expect(row(original.id)).toHaveCount(0);
+  await page.locator('#showArchived').uncheck();await expect(row(original.id)).toBeVisible();
+  const restored=await read(request,original.id);expect(restored.revision).toBe(4);expect(restored.archived).toBe(false);
+  expect(restored.layout.items).toEqual(renamed.layout.items);expect(await read(request,copyId)).toEqual(copy);
+  expect(await current(request)).toEqual(before);
+});

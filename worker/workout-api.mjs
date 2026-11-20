@@ -1,4 +1,4 @@
-import {itemPoints,roomPoints,size,wallPolygons,validateRoomGeometry} from '../dist/model.mjs';
+import {itemPoints,roomPoints,size,wallPolygons,validateRoomGeometry,simplePolygon} from '../dist/model.mjs';
 
 const WORKOUT_API_VERSION = 1;
 // Bump the representation revision if an existing publication renders differently.
@@ -47,10 +47,10 @@ function workoutName(name) {
 function validateWorkoutPublication(row, layout) {
   // Validate the stored snapshot without consulting today's catalog or rewriting it.
   // An older publication may omit every catalog field or reference a retired model.
-  if (typeof row.id !== 'string' || !row.id || typeof row.published_at !== 'string' ||
+  if (typeof row.id !== 'string' || !/^[a-zA-Z0-9_.-]{1,120}$/.test(row.id) || typeof row.published_at !== 'string' ||
       !Number.isFinite(Date.parse(row.published_at)) || !layout || typeof layout.name !== 'string' ||
-      !layout.room || ![layout.room.width,layout.room.length].every(value => Number.isFinite(value) && value > 0) ||
-      !Array.isArray(layout.items)) throw Error('Invalid publication');
+      !layout.room || ![layout.room.width,layout.room.length].every(value => Number.isFinite(value) && value >= 5 && value <= 500) ||
+      !Array.isArray(layout.items) || layout.items.length > 1000) throw Error('Invalid publication');
   validateRoomGeometry(layout.room);
   const ids = new Set();
   for (const item of layout.items) {
@@ -58,16 +58,18 @@ function validateWorkoutPublication(row, layout) {
         !['cardio','strength','free','obstacle','area'].includes(item.category) ||
         !['treadmill','elliptical','bike','rack','bench','cable','column','custom','area'].includes(item.kind) ||
         ![item.x,item.y,item.width,item.length,item.rotation].every(Number.isFinite) ||
-        item.width <= 0 || item.length <= 0 || item.rotation < 0 || item.rotation >= 360 ||
+        item.width <= 0 || item.length <= 0 || item.width > 100 || item.length > 100 ||
+        Math.abs(item.x) > 1000 || Math.abs(item.y) > 1000 || item.rotation < 0 || item.rotation >= 360 ||
         item.status !== undefined && !['available','out-of-service'].includes(item.status)) throw Error('Invalid published item');
     ids.add(item.id);
     if (item.category === 'area') {
       if (typeof item.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(item.color) ||
           !['allowed','keep-clear'].includes(item.placement) ||
-          item.label !== undefined && (!item.label || ![item.label.x,item.label.y,item.label.rotation].every(Number.isFinite)))
+          item.label !== undefined && (!item.label || ![item.label.x,item.label.y,item.label.rotation].every(Number.isFinite) ||
+            item.label.x < 0 || item.label.x > 1 || item.label.y < 0 || item.label.y > 1 || Math.abs(item.label.rotation) > 360))
         throw Error('Invalid published area');
-      if (item.vertices !== undefined && (!Array.isArray(item.vertices) || item.vertices.length < 3 ||
-          !item.vertices.every(point => Array.isArray(point) && point.length === 2 && point.every(Number.isFinite))))
+      if (item.vertices !== undefined && (!simplePolygon(item.vertices) ||
+          !item.vertices.every(point => point.every(value => value >= 0 && value <= 1))))
         throw Error('Invalid area footprint');
     }
     for (const key of ['catalogId','inventoryId','manufacturer','modelNumber','modelStatus'])

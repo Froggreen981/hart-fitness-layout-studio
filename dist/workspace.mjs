@@ -2,6 +2,8 @@ import {buildingPlan} from './building-plan.mjs';
 import {request,send,escapeHTML as esc,editLink} from './shared-api.mjs';
 const $=id=>document.getElementById(id),when=v=>new Date(v).toLocaleString();
 let user,current=null,drafts=[],draftOffset=null,historyOffset=null,publishAction=null,nameAction=null;
+let createAttempt=null;
+const importAttempts=new Map();
 function notice(message){$('notice').textContent=message;}
 function error(e){notice(e.message);if(e.status===409)notice(e.message+' Refresh the workspace before retrying.');}
 async function loadDrafts(append=false){
@@ -25,8 +27,11 @@ async function loadStaff(){
  const data=await request('/api/staff');$('staffList').innerHTML=data.staff.map(s=>'<li>'+esc(s.email)+' · '+esc(s.role)+' <button data-remove-staff="'+esc(s.email)+'">Remove access</button></li>').join('');
 }
 async function refresh(){await loadDrafts();await loadHistory();}
-async function importProject(project,requestId=crypto.randomUUID()){
- const result=await send('/api/import',{project,requestId});notice(result.imported.length+' layouts imported as new shared drafts. Existing layouts were preserved.');await refresh();
+async function importProject(project){
+ const fingerprint=JSON.stringify(project);
+ const requestId=importAttempts.get(fingerprint)??crypto.randomUUID();importAttempts.set(fingerprint,requestId);
+ const result=await send('/api/import',{project,requestId});
+ importAttempts.delete(fingerprint);notice(result.imported.length+' layouts imported as new shared drafts. Existing layouts were preserved.');await refresh();
 }
 function beginPublish(action){
  publishAction={...action,expectedCurrentId:current?.id||null,requestId:crypto.randomUUID()};
@@ -39,14 +44,14 @@ $('draftRows').onclick=async e=>{
  try{const d=drafts.find(x=>x.id===b.dataset.id);
  if(b.dataset.action==='archive'){await send('/api/drafts/'+d.id+'/archive',{expectedRevision:d.revision,archived:!d.archived});await refresh();return;}
  if(b.dataset.action==='publish'){beginPublish({id:d.id,expectedRevision:d.revision,name:d.name});return;}
- const doc=await request('/api/drafts/'+d.id);nameAction={type:b.dataset.action,doc};
+ const doc=await request('/api/drafts/'+d.id);nameAction={type:b.dataset.action,doc,id:crypto.randomUUID()};
  $('nameTitle').textContent=b.dataset.action==='rename'?'Rename draft':'Duplicate layout';
  $('newName').value=(doc.layout.name+(b.dataset.action==='duplicate'?' copy':'')).slice(0,100);$('nameError').textContent='';$('nameDialog').showModal();
  }catch(err){error(err);}finally{b.disabled=false;}
 };
 $('nameForm').onsubmit=async e=>{e.preventDefault();$('saveName').disabled=true;
- try{const {type,doc}=nameAction;const name=$('newName').value.trim();if(!name)throw new Error('Enter a name.');
- const layout={...doc.layout,name,...(type==='duplicate'?{id:crypto.randomUUID()}:{})};
+ try{const {type,doc,id}=nameAction;const name=$('newName').value.trim();if(!name)throw new Error('Enter a name.');
+ const layout={...doc.layout,name,...(type==='duplicate'?{id}:{})};
  if(type==='duplicate')await send('/api/drafts',{layout,library:doc.library});else await send('/api/drafts/'+layout.id,{layout,library:doc.library,expectedRevision:doc.revision},'PUT');
  $('nameDialog').close();await refresh();notice(type==='duplicate'?'Shared draft created.':'Draft renamed.');
  }catch(err){$('nameError').textContent=err.message;}finally{$('saveName').disabled=false;}
@@ -58,7 +63,12 @@ $('publishForm').onsubmit=async e=>{e.preventDefault();if(!$('confirmActual').ch
  try{const p=publishAction;await send(p.restore?'/api/history/'+p.restore+'/restore':'/api/drafts/'+p.id+'/publish',{requestId:p.requestId,expectedCurrentId:p.expectedCurrentId,expectedRevision:p.expectedRevision,confirmActual:true});$('publishDialog').close();notice('Current gym map updated.');await refresh();}
  catch(err){$('publishError').textContent=err.message;}finally{$('confirmPublish').disabled=false;}
 };
-$('newDraft').onclick=async()=>{try{const layout={...buildingPlan(),id:crypto.randomUUID(),name:'Hart layout draft'};const doc=await send('/api/drafts',{layout,library:[]});location.href=editLink(doc.layout.id);}catch(err){error(err);}};
+$('newDraft').onclick=async()=>{
+ $('newDraft').disabled=true;
+ try{createAttempt??={layout:{...buildingPlan(),id:crypto.randomUUID(),name:'Hart layout draft'},library:[]};
+ const doc=await send('/api/drafts',createAttempt);location.href=editLink(doc.layout.id);
+ }catch(err){error(err);}finally{$('newDraft').disabled=false;}
+};
 $('refresh').onclick=()=>refresh().catch(error);
 $('showArchived').onchange=()=>loadDrafts().catch(error);
 $('moreDrafts').onclick=()=>loadDrafts(true).catch(error);

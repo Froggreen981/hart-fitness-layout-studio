@@ -244,6 +244,7 @@ test('corrupt publications fail closed for GET, HEAD and matching conditional re
   const {auth,call,env}=setup(t);
   const valid={name:'Legacy fixture',room:{width:40,length:30},items:[machine('legacy-item')]};
   const corruptions=['{broken',null,{}, {...valid,items:[machine('bad-number',{width:null})]},
+    {...valid,items:[machine('overflow',{width:1e308})]},
     {...valid,items:[machine('duplicate'),machine('duplicate')]},
     {...valid,items:[machine('private-array',{exercises:[{private:'staff details'}]})]},
     {...valid,room:{...valid.room,zones:[{name:{private:'staff details'},x:1,y:1}]}}];

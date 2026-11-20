@@ -92,3 +92,9 @@ The deployed browser and D1 checks are recorded in the release checklist.
 ## Next feature
 
 After the shared deployment and latest map are verified, add the reviewed equipment/exercise/muscle catalog and the patron muscle selector.
+
+## Same-tab retries and survey follow-up
+
+The workspace retains operation IDs for uncertain **New Hart draft**, duplicate-dialog and identical JSON/browser-import attempts. If the server saved the first attempt but its response was lost, retrying the same action in the same tab reuses the existing draft/receipt. Rename/save/publication and editor recovery retain their existing revision/idempotency protections. After reloading or cancelling/reopening a duplicate dialog, inspect the workspace for the earlier result before starting another action. These transient operation IDs are not a new production database or cross-device recovery mechanism.
+
+The model checklist provides follow-up/confidence/source-dimension filters and an area summary/report. Its observations, prior-checklist recovery and tab synchronization remain browser-local. Unit counts describe units belonging to observed groups, not completed per-unit verification. Clear/restore refuses to replace progress unless it can retain the prior checklist; external JSON backups still protect against browser storage clearing. Coordinate concurrent changes to the same group, whose latest saved answer wins.

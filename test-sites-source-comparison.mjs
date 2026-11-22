@@ -10,10 +10,13 @@ import {packageRelease} from './scripts/prepare-release.mjs';
 const git=(root,...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 async function setup(t){
   const dir=await mkdtemp(join(tmpdir(),'gym-source-compare-'));t.after(()=>rm(dir,{recursive:true,force:true}));
-  const archive=execFileSync('git',['archive','HEAD'],{maxBuffer:16*1024*1024});
   const githubRoot=join(dir,'github'),sitesRoot=join(dir,'sites');
   for(const root of [githubRoot,sitesRoot]){
-    await mkdir(root);execFileSync('tar',['-x','-C',root],{input:archive});
+    await mkdir(root);
+    // Test the reviewed working inputs, not the parent checkout's HEAD: the
+    // official helper may run checks before committing an overlaid source tree.
+    for(const path of ['release','.openai','db','drizzle','drizzle.config.ts','dist/building-plan.mjs','.gitignore','README.md'])
+      await cp(path,join(root,path),{recursive:true});
     git(root,'init','-q');git(root,'config','user.name','Source comparison fixture');git(root,'config','user.email','fixture@example.test');
     git(root,'add','.');git(root,'commit','-qm',root===githubRoot?'GitHub fixture':'Sites fixture');
     await mkdir(join(root,'dist/server'),{recursive:true});await mkdir(join(root,'dist/.openai'),{recursive:true});

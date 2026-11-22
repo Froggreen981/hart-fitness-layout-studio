@@ -46,7 +46,7 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 
 ## Exact next milestone
 
-Joint workout-team contract acceptance: run the offline consumer harness, agree on reviewed exercise IDs/mapping ownership and availability/stale-workout policies, then add actual reviewed mapping fixtures and consumer regressions. Production access, credentials and physical publication remain separate operator gates in `OPERATIONS-HANDOFF.md`. No further schema change is needed for the current software release.
+Complete the host backup/restore and applied-ledger proof, real owner/manager read-only sessions and official Sites helper availability; then review and explicitly authorize the exact existing-Site release. Independent software preparation now includes read-only smoke/source comparison, rollback preservation/limitations and workout-team acceptance cases. Actual exercise/mapping/renderer signoff and physical publication remain separate external/on-site milestones.
 
 ## Production-readiness continuation (November 21)
 
@@ -55,4 +55,6 @@ Joint workout-team contract acceptance: run the offline consumer harness, agree 
 - [x] Add GET-only operational diagnostics, exact asset fingerprints and before/after preservation evidence with source/Worker fixture coverage.
 - [x] Add reproducible read-only GitHub/Sites source and rebuilt-Worker comparison for the authorized source handoff.
 - [x] Prepare explicit workout-team acceptance cases/checklist and close demonstrated consumer gaps.
-- [ ] Complete the final clean pushed candidate, exact-head CI and staff/host execution handoff.
+- [x] Prepare rollback/forward preservation checks and explicit staff editing/publication limits for version-13 rollback.
+- [x] Prepare staged read-only/authorized-write/physical-publication staff QA and prioritized host/owner actions.
+- [ ] Complete the final clean pushed candidate and exact-head CI evidence.

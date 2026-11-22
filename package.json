@@ -16,7 +16,8 @@
     "release:prepare": "node scripts/prepare-release.mjs",
     "release:preflight": "node scripts/release-preflight.mjs",
     "test:consumer": "node --test test-workout-consumer.mjs",
-    "release:smoke": "node --use-env-proxy scripts/read-only-smoke.mjs"
+    "release:smoke": "node --use-env-proxy scripts/read-only-smoke.mjs",
+    "release:compare-source": "node scripts/compare-sites-source.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

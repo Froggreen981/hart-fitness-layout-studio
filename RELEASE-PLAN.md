@@ -134,3 +134,17 @@ Preparation now rechecks the remote after tests and publishes the archive/metada
 `release/production-audit-2026-11-21.json` records sanitized read-only findings. Version 13 and its successful deployment/domain/TLS remain unchanged; one application editor is present but not listed as a Site visitor, and zero publications are confirmed. The masked owner key exists; the workout digest does not. Full D1 backup/restore and migration-ledger operations are still absent from the connected tool surface. The official source helper was searched again and remains unavailable; the saved archive remains inaccessible. Direct HTTPS is still denied by the environment proxy. No source credential refresh or other credential/access change was made.
 
 Use `RELEASE-VERIFICATION.md` for the new read-only before/after capture, role checks and exact candidate-asset smoke procedure. Candidate metadata adds `static_assets` fingerprints; deployment archive membership is unchanged. A passed role response does not verify real Sites identity, metadata fingerprints do not replace a full D1 backup, and static hashes do not establish Worker/source identity. Keep all those release gates separate.
+
+## Read-only comparison after official source synchronization
+
+After a separately authorized source credential/push operation through the official helper, use its **returned checkout path and full Sites commit**, together with the reviewed GitHub candidate:
+
+```sh
+npm run --silent release:compare-source -- --candidate build/releases/<full-github-sha> --sites-checkout <official-checkout-path> --sites-commit <full-helper-sites-sha>
+```
+
+This command performs no fetch, commit, push, save, deployment or database access. It first reuses candidate/archive preflight, then compares the two committed source trees, clean working-tree state, project/`DB`/hosting identity, every pinned protected file, and the Sites rebuilt Worker's SHA-256/hosting manifest against the candidate. Distinct GitHub and Sites commits can validly contain the same tree. Advanced/unreviewed/dirty source, wrong identity, missing or mismatched build output, and missing/mismatched helper commit all prevent `comparison_passed: true`. Exit 0 means these local comparisons pass; exit 2 means they do not.
+
+The script cannot prove the native repository origin or grant authorization; it explicitly records those limits. Use only the checkout and commit from the official supported workflow, not an arbitrary clone with a copied manifest. This environment still lacks that helper/source access, so only disposable comparison fixtures have been verified here. Do not mark current Sites source synchronized because a fixture comparison passed. Preserve unrelated source history and reconcile it; never force push or substitute a GitHub commit identifier for the actual helper-returned Sites commit.
+
+The current authorization still excludes creating/refreshing a source credential, pushing Site source or deploying. Prepare these exact commands and identifiers for explicit authorization; do not call the credential tool merely to get around the absent helper.

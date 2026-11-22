@@ -1,0 +1,309 @@
+{
+  "sourceCommit": "4f13c2d02b6fde4f724ab7576207d76e5538bd07",
+  "groups": 95,
+  "units": 155,
+  "sourcedGroups": 20,
+  "sourcedUnits": 25,
+  "records": [
+    {
+      "id": "CHK-001",
+      "dimensionsIn": {
+        "length": 70.87,
+        "width": 29.92,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 180,
+        "width": 76,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-002",
+      "dimensionsIn": {
+        "length": 70.87,
+        "width": 29.92,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 180,
+        "width": 76,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-004",
+      "dimensionsIn": {
+        "length": 77.17,
+        "width": 48.03,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 196,
+        "width": 122,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-005",
+      "dimensionsIn": {
+        "length": 61.02,
+        "width": 50,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 155,
+        "width": 127,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-007",
+      "dimensionsIn": {
+        "length": 62.99,
+        "width": 48.03,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 160,
+        "width": 122,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-011",
+      "dimensionsIn": {
+        "length": 61.02,
+        "width": 48.03,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 155,
+        "width": 122,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-014",
+      "dimensionsIn": {
+        "length": 38,
+        "width": 58,
+        "height": 59,
+        "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-biceps-curl",
+        "source": "manufacturer-published",
+        "verifiedAt": "2026-11-13"
+      }
+    },
+    {
+      "id": "CHK-016",
+      "dimensionsIn": {
+        "length": 48.03,
+        "width": 43.31,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/catalog/Precor-2020-Catalog-NLD.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 122,
+        "width": 110,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-017",
+      "dimensionsIn": {
+        "length": 48.03,
+        "width": 43.31,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/catalog/Precor-2020-Catalog-NLD.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 122,
+        "width": 110,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-022",
+      "dimensionsIn": {
+        "length": 55.91,
+        "width": 38.19,
+        "height": 84.25,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 142,
+        "width": 97,
+        "height": 214
+      }
+    },
+    {
+      "id": "CHK-028",
+      "dimensionsIn": {
+        "length": 57.48,
+        "width": 49.61,
+        "height": 81.1,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 146,
+        "width": 126,
+        "height": 206
+      }
+    },
+    {
+      "id": "CHK-029",
+      "dimensionsIn": {
+        "length": 48.03,
+        "width": 48.82,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 122,
+        "width": 124,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-031",
+      "dimensionsIn": {
+        "length": 62.99,
+        "width": 54.72,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 160,
+        "width": 139,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-036",
+      "dimensionsIn": {
+        "length": 61.02,
+        "width": 59.06,
+        "height": 59.84,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 155,
+        "width": 150,
+        "height": 152
+      }
+    },
+    {
+      "id": "CHK-040",
+      "dimensionsIn": {
+        "length": 72.83,
+        "width": 49.61,
+        "height": 72.83,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 185,
+        "width": 126,
+        "height": 185
+      }
+    },
+    {
+      "id": "CHK-041",
+      "dimensionsIn": {
+        "length": 47.4,
+        "width": 40.5,
+        "height": 57.8,
+        "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2020/07/ES819-Abdominal-Crunch.pdf",
+        "source": "manufacturer-published",
+        "verifiedAt": "2026-11-13"
+      }
+    },
+    {
+      "id": "CHK-042",
+      "dimensionsIn": {
+        "length": 53.15,
+        "width": 44.09,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 135,
+        "width": 112,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-053",
+      "dimensionsIn": {
+        "length": 77.17,
+        "width": 48.03,
+        "height": 58.27,
+        "sourceUrl": "https://static.precor.com/PDF/Precor-Digital-Catalog-EN.pdf",
+        "source": "manufacturer-catalog-converted",
+        "verifiedAt": "2026-11-13"
+      },
+      "dimensionsCm": {
+        "length": 196,
+        "width": 122,
+        "height": 148
+      }
+    },
+    {
+      "id": "CHK-072",
+      "dimensionsIn": {
+        "length": 53.5,
+        "width": 49.5,
+        "height": 57.75,
+        "sourceUrl": "https://www.roguefitness.com/rogue-monster-lite-competition-bench",
+        "source": "manufacturer-published",
+        "verifiedAt": "2026-11-13"
+      }
+    },
+    {
+      "id": "CHK-073",
+      "dimensionsIn": {
+        "length": 53.5,
+        "width": 49.5,
+        "height": 57.75,
+        "sourceUrl": "https://www.roguefitness.com/rogue-monster-lite-competition-bench",
+        "source": "manufacturer-published",
+        "verifiedAt": "2026-11-13"
+      }
+    }
+  ]
+}

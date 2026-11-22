@@ -5,6 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {checkReleaseContract,checkBuiltWorker,sha256} from './release-contract.mjs';
 import {releaseFiles} from './prepare-release.mjs';
+import {assetFingerprints} from './worker-assets.mjs';
 
 export async function inspectCandidate(root,directory,{commit,tree}={}){
   const metadata=JSON.parse(await readFile(join(directory,'release.json'),'utf8'));
@@ -27,6 +28,8 @@ export async function inspectCandidate(root,directory,{commit,tree}={}){
   if(metadata.worker?.sha256!==worker.sha256||metadata.contract?.schema_change!==false||
       metadata.contract?.project_id!==contract.project_id||metadata.contract?.d1_binding!==contract.d1_binding)
     throw Error('Candidate contract or Worker provenance mismatch.');
+  if(metadata.static_assets&&JSON.stringify(metadata.static_assets)!==JSON.stringify(await assetFingerprints(join(root,'dist'))))
+    throw Error('Candidate static-asset fingerprints do not match the reviewed source.');
   const required=['npm test','npm run build','npm run test:browser','npm run test:browser:worker'];
   if(required.some(command=>!metadata.checks?.some(check=>check.command?.join(' ')===command&&check.status==='passed')))
     throw Error('Candidate is missing required verification records.');

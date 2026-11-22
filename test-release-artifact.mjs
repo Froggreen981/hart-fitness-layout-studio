@@ -16,6 +16,7 @@ test('release archive contains only Worker, existing manifest and immutable migr
   await writeFile(join(root,'.env'),'PRIVATE_FIXTURE_SECRET');await writeFile(join(root,'.gym-dev.sqlite'),'PRIVATE_FIXTURE_DATA');
   const result=await packageRelease(root,join(root,'output'),{github_commit:'fixture-only'},[{command:['fixture-check'],status:'passed'}]);
   assert.deepEqual(result.archive.files,[...releaseFiles].sort());
+  assert.equal(result.static_assets['/building-plan.mjs'].sha256,sha256(await readFile(join(root,'dist/building-plan.mjs'))));
   assert.equal(result.archive.sha256,sha256(await readFile(result.archive.path)));
   assert.equal(result.production_deployed,false);assert.equal(result.sites_version_saved,false);
   const worker=execFileSync('tar',['-xOzf',result.archive.path,'dist/server/index.js'],{encoding:'utf8'});
@@ -39,6 +40,10 @@ test('candidate audit detects altered payloads and packaging retains the previou
   assert.equal((await audit()).archive_sha256,metadata.archive.sha256);
   await writeFile(join(output,'release.json'),JSON.stringify({...metadata,github_repository:'unrelated/repository'}));
   await assert.rejects(audit(),/provenance/);
+  await writeFile(join(output,'release.json'),JSON.stringify(metadata));
+  const badAssets=structuredClone(metadata);badAssets.static_assets['/building-plan.mjs'].sha256='0'.repeat(64);
+  await writeFile(join(output,'release.json'),JSON.stringify(badAssets));
+  await assert.rejects(audit(),/static-asset fingerprints/);
   await writeFile(join(output,'release.json'),JSON.stringify(metadata));
   await assert.rejects(packageRelease(root,output,provenance,checks));
   assert.equal((await audit()).archive_sha256,metadata.archive.sha256);

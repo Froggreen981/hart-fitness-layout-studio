@@ -47,3 +47,12 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 ## Exact next milestone
 
 Joint workout-team contract acceptance: run the offline consumer harness, agree on reviewed exercise IDs/mapping ownership and availability/stale-workout policies, then add actual reviewed mapping fixtures and consumer regressions. Production access, credentials and physical publication remain separate operator gates in `OPERATIONS-HANDOFF.md`. No further schema change is needed for the current software release.
+
+## Production-readiness continuation (November 21)
+
+- [x] Reverify `d0c15ad` locally and in GitHub, current Site version/domain/audience, bounded staff/publication state and runtime key names.
+- [x] Re-discover supported source/database capabilities and record precise remaining host/session/authorization limits without production changes.
+- [x] Add GET-only operational diagnostics, exact asset fingerprints and before/after preservation evidence with source/Worker fixture coverage.
+- [ ] Add reproducible read-only GitHub/Sites source and rebuilt-Worker comparison for the authorized source handoff.
+- [ ] Prepare explicit workout-team acceptance cases/checklist and close demonstrated consumer gaps.
+- [ ] Complete the final clean pushed candidate, exact-head CI and staff/host execution handoff.

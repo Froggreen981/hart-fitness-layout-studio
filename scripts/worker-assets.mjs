@@ -1,5 +1,6 @@
 import {readFile,readdir} from 'node:fs/promises';
 import {resolve,relative,extname} from 'node:path';
+import {createHash} from 'node:crypto';
 
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg'};
 
@@ -18,4 +19,9 @@ export async function collectWorkerAssets(staticRoot){
     }
   }
   await collect(staticRoot);return assets;
+}
+
+export async function assetFingerprints(staticRoot){
+  return Object.fromEntries(Object.entries(await collectWorkerAssets(staticRoot)).map(([path,[content_type,base64]])=>
+    [path,{content_type,sha256:createHash('sha256').update(Buffer.from(base64,'base64')).digest('hex')}]));
 }

@@ -4,6 +4,7 @@ import {tmpdir} from 'node:os';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {checkReleaseContract,checkBuiltWorker,sha256} from './release-contract.mjs';
+import {assetFingerprints} from './worker-assets.mjs';
 
 export const releaseFiles=['.openai/hosting.json','dist/server/index.js',
   'drizzle/0000_shared_layouts.sql','drizzle/meta/_journal.json','drizzle/meta/0000_snapshot.json'];
@@ -20,7 +21,8 @@ export async function packageRelease(root,output,provenance,checks){
     const contents=execFileSync('tar',['-tzf',archive],{encoding:'utf8'}).trim().split('\n').sort();
     if(JSON.stringify(contents)!==JSON.stringify([...releaseFiles].sort()))throw Error('Unexpected release archive contents.');
     const metadata={format:'gym-local-release-v1',prepared_at:new Date().toISOString(),
-      ...provenance,contract,worker,checks,archive:{path:resolve(output,'candidate.tar.gz'),sha256:sha256(await readFile(archive)),files:contents},
+      ...provenance,contract,worker,checks,static_assets:await assetFingerprints(join(root,'dist')),
+      archive:{path:resolve(output,'candidate.tar.gz'),sha256:sha256(await readFile(archive)),files:contents},
       sites_version_saved:false,production_deployed:false,
       note:'Local candidate only. Before native save, synchronize this exact source tree through the Sites source workflow, rebuild/package there, and compare Worker hashes.'};
     await writeFile(join(pending,'release.json'),JSON.stringify(metadata,null,2)+'\n');

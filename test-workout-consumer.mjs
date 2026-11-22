@@ -107,3 +107,59 @@ test('mapping exchange rejects fictional approval, stale publications and non-in
   assert.throws(()=>validateExerciseMappings({...reviewed,mappings:[{exerciseId:'demo',candidateEquipmentIds:['FICTIONAL-UNIT-A']}]},snapshot),/instance ID/);
   assert.throws(()=>validateExerciseMappings({...reviewed,mappings:[...reviewed.mappings,...reviewed.mappings]},snapshot),/Duplicate/);
 });
+
+test('304 requires a validator actually sent by the backend and refuses a changed response tag',async()=>{
+  const body=await fixture('populated-layout');
+  for(const firstTag of [null,'not-an-entity-tag']){
+    let count=0;
+    const client=createGymClient({gymOrigin:origin,workoutToken:token,fetchImpl:async(url,{headers})=>{
+      count++;assert.equal(headers['If-None-Match'],undefined);
+      return count===2?reply(null,304):reply(body,200,firstTag);
+    }});
+    await client.getLayout();await assert.rejects(client.getLayout(),{code:'unexpected_304'});assert.deepEqual(await client.getLayout(),body);
+  }
+  let count=0;
+  const changed=createGymClient({gymOrigin:origin,workoutToken:token,fetchImpl:async()=>++count===1?reply(body):reply(null,304,'W/"unrelated"')});
+  await changed.getLayout();await assert.rejects(changed.getLayout(),{code:'invalid_revalidation'});
+  let weakCount=0;
+  const equivalent=createGymClient({gymOrigin:origin,workoutToken:token,fetchImpl:async()=>++weakCount===1?reply(body):reply(null,304,'"fixture"')});
+  await equivalent.getLayout();assert.deepEqual(await equivalent.getLayout(),body);
+});
+
+test('no-store responses are not retained for later conditional reuse',async()=>{
+  const body=await fixture('populated-layout');let count=0;
+  const client=createGymClient({gymOrigin:origin,workoutToken:token,fetchImpl:async(url,{headers})=>{
+    count++;assert.equal(headers['If-None-Match'],undefined);
+    if(count===2)return reply(null,304);
+    const response=reply(body);response.headers.set('Cache-Control','private, no-store');return response;
+  }});
+  await client.getLayout();await assert.rejects(client.getLayout(),{code:'unexpected_304'});assert.deepEqual(await client.getLayout(),body);
+});
+
+test('publication refresh replaces the whole snapshot and re-resolves moved, absent and unavailable workout references',async()=>{
+  const first=await fixture('populated-layout'),next=await fixture('refreshed-layout');let count=0;
+  const client=createGymClient({gymOrigin:origin,workoutToken:token,fetchImpl:async(url,{headers})=>{
+    count++;if(count===1)return reply(first,200,'W/"first"');assert.equal(headers['If-None-Match'],'W/"first"');return reply(next,200,'W/"next"');
+  }});
+  const before=await client.getLayout(),after=await client.getLayout();
+  const references={publicationId:before.publication.id,equipmentIds:['fictional-instance-rack-a','fictional-instance-bike-b','fictional-instance-rack-c']};
+  const result=resolveWorkoutEquipment(after,references);
+  assert.equal(result.publicationChanged,true);assert.deepEqual(result.equipment.map(item=>item.status),['available','missing','out-of-service']);
+  assert.equal(result.equipment[0].equipment.x,18);assert.equal(result.equipment[0].equipment.rotation,45);
+  assert.notDeepEqual(result.equipment[0].equipment.footprint,before.layout.equipment[0].footprint);
+  assert.deepEqual(after,next);assert.deepEqual(before,first);
+  const {validateExerciseMappings}=await import('./integration/workout-v1/mappings.mjs');
+  assert.throws(()=>validateExerciseMappings({mappingVersion:'demo',reviewStatus:'reviewed',reviewReference:'fictional test only',
+    sourcePublicationId:first.publication.id,mappings:[{exerciseId:'fictional-placeholder',candidateEquipmentIds:['fictional-instance-rack-a']}]},after),/Revalidate/);
+});
+
+test('independent mapping and highlighting helpers reject ambiguous instance or physical-unit identities',async()=>{
+  const {validateExerciseMappings}=await import('./integration/workout-v1/mappings.mjs');
+  const first=await fixture('populated-layout'),mapping={...(await fixture('fictional-mappings')),reviewStatus:'reviewed',reviewReference:'fictional test only'};
+  for(const duplicatePhysical of [false,true]){
+    const body=structuredClone(first),item=structuredClone(body.layout.equipment[0]);
+    if(duplicatePhysical)item.id='fictional-other-instance';body.layout.equipment.push(item);
+    assert.throws(()=>resolveWorkoutEquipment(body,{publicationId:body.publication.id,equipmentIds:[item.id]}),/unambiguous/);
+    assert.throws(()=>validateExerciseMappings(mapping,body),/unambiguous/);
+  }
+});

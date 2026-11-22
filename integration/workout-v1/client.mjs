@@ -2,6 +2,7 @@
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import schema from './response.schema.json' with {type:'json'};
+import {indexPublishedEquipment} from './snapshot.mjs';
 
 const ajv=new Ajv2020({strict:true});
 addFormats(ajv);
@@ -39,12 +40,19 @@ export function createGymClient({gymOrigin,workoutToken,siteServiceToken,fetchIm
   let cached,pending;
   async function load(){
     try{
+      const validator=cached?.etag;
       const response=await fetchImpl(url,{redirect:'error',cache:'no-store',signal:AbortSignal.timeout(timeoutMs),headers:{
         Accept:'application/json',Authorization:'Bearer '+workoutToken,
         ...(siteServiceToken?{'OAI-Sites-Authorization':'Bearer '+siteServiceToken}:{}),
-        ...(cached?.etag?{'If-None-Match':cached.etag}:{})
+        ...(validator?{'If-None-Match':validator}:{})
       }});
-      if(response.status===304){if(!cached)throw new GymApiError('unexpected_304',304);return cached.body;}
+      const responseTag=response.headers.get('ETag');
+      const noStore=/(?:^|,)\s*no-store\s*(?=,|$)/i.test(response.headers.get('Cache-Control')||'');
+      if(response.status===304){
+        if(!cached||!validator)throw new GymApiError('unexpected_304',304);
+        if(responseTag&&responseTag.replace(/^W\//,'')!==validator.replace(/^W\//,''))throw new GymApiError('invalid_revalidation',304);
+        const body=cached.body;if(noStore)cached=undefined;return body;
+      }
       const body=await jsonBody(response,maxBytes);
       if(response.status===404&&validateError(body)&&body.error.code==='no_publication'){cached=undefined;return null;}
       if(response.status!==200){
@@ -52,10 +60,9 @@ export function createGymClient({gymOrigin,workoutToken,siteServiceToken,fetchIm
         throw new GymApiError(code,response.status);
       }
       if(!validateLayout(body))throw new GymApiError('invalid_response',200);
-      const ids=body.layout.equipment.map(item=>item.id),inventoryIds=body.layout.equipment.map(item=>item.inventoryId).filter(Boolean);
-      if(new Set(ids).size!==ids.length||new Set(inventoryIds).size!==inventoryIds.length)
-        throw new GymApiError('ambiguous_equipment',200);
-      cached={body,etag:response.headers.get('ETag')};
+      try{indexPublishedEquipment(body);}catch{throw new GymApiError('ambiguous_equipment',200);}
+      const etag=/^(?:W\/)?"[^"\r\n]*"$/.test(responseTag||'')?responseTag:null;
+      cached=noStore?undefined:{body,etag};
       return body;
     }catch(error){
       // Never serve stale equipment after a network/authentication/gateway failure.
@@ -74,7 +81,7 @@ export function createGymClient({gymOrigin,workoutToken,siteServiceToken,fetchIm
 export function resolveWorkoutEquipment(snapshot,{publicationId,equipmentIds}){
   if(!snapshot?.publication?.id||!Array.isArray(snapshot.layout?.equipment)||typeof publicationId!=='string'||
       !Array.isArray(equipmentIds)||!equipmentIds.every(id=>typeof id==='string'))throw new Error('Use a snapshot and explicit workout instance IDs.');
-  const byId=new Map(snapshot.layout.equipment.map(item=>[item.id,item]));
+  const byId=indexPublishedEquipment(snapshot);
   return {publicationChanged:publicationId!==snapshot.publication.id,publicationId:snapshot.publication.id,
     equipment:[...new Set(equipmentIds)].map(id=>{
       const item=byId.get(id);

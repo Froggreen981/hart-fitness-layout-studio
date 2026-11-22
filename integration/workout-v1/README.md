@@ -2,13 +2,16 @@
 
 This package exposes Gym Layout Studio's **official published arrangement**. The workout team owns exercises, muscle selection, exercise compatibility and routine generation. Nothing here publishes a layout or enables production access. All checked-in responses and mappings are **fictional**, not a Hart equipment arrangement or a compatibility claim.
 
+See [ACCEPTANCE.md](ACCEPTANCE.md) for the external team’s exact offline cases and the review record that remains pending.
+
 ## Files and quick start
 
 | File | Purpose |
 | --- | --- |
 | `response.schema.json` | JSON Schema 2020-12 for API v1 layout, equipment and errors; `$defs` permits validating one response type. |
-| `fixtures/index.json` | HTTP status/resource/schema definition for six synthetic success/error responses. |
+| `fixtures/index.json` | HTTP status/resource/schema definition for seven synthetic success/error responses, including a refreshed publication. |
 | `client.mjs` | Backend HTTPS client, private ETag cache, bounded response/timeout and equipment reference resolution. |
+| `snapshot.mjs` | Shared identity validation for client, mappings and highlighting; rejects ambiguous IDs. |
 | `exercise-mappings.schema.json`, `mappings.mjs` | Separately versioned mapping exchange and review/publication/ID validation. |
 | `fixtures/fictional-mappings.json` | Explicitly fictional mapping, rejected for normal use until joint review. |
 
@@ -45,7 +48,7 @@ Supply only an approved HTTPS origin, without URL credentials, query strings or 
 
 `apiVersion: 1` is the HTTP representation version; package/schema revision **1.0.0** identifies this handoff. Publication IDs and ETags are opaque. Store them unchanged and compare IDs for equality. A new publish or history restore gets a new ID; a draft edit changes neither the publication nor its equipment. The schema permits unknown additive fields for v1 evolution; ignore them. A breaking shape change requires a new API version. Consumers must also enforce equipment `id` uniqueness; the example additionally rejects duplicate assigned `inventoryId` values.
 
-A private cache may store `200` responses but must revalidate (`private, no-cache`). Send the endpoint's ETag in `If-None-Match`; `304` means reuse its existing body. Resource ETags differ. If independently fetching both resources yields different publication IDs, discard the mixed result and use a fresh layout response. The example makes a single layout request per refresh, keeps its ETag scoped to one client, and clears the cache on failures. It never silently serves stale locations after an auth, network, gateway or validation failure. It intentionally provides no background scheduler: refresh on map open/focus, before generating/resuming a workout, and at an agreed bounded interval while visible. Back off with jitter after failures rather than continuously retrying.
+A private cache may store `200` responses but must revalidate (`private, no-cache`). Send the endpoint's ETag in `If-None-Match`; `304` means reuse its existing body only after sending that cached body’s valid validator. Unsolicited or contradictory `304` responses fail closed, and `no-store` responses are not retained. Resource ETags differ. If independently fetching both resources yields different publication IDs, discard the mixed result and use a fresh layout response. The example makes a single layout request per refresh, keeps its ETag scoped to one client, and clears the cache on failures. It never silently serves stale locations after an auth, network, gateway or validation failure. It intentionally provides no background scheduler: refresh on map open/focus, before generating/resuming a workout, and at an agreed bounded interval while visible. Back off with jitter after failures rather than continuously retrying.
 
 | Result | Consumer action |
 | --- | --- |

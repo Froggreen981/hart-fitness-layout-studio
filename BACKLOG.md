@@ -54,5 +54,5 @@ Joint workout-team contract acceptance: run the offline consumer harness, agree 
 - [x] Re-discover supported source/database capabilities and record precise remaining host/session/authorization limits without production changes.
 - [x] Add GET-only operational diagnostics, exact asset fingerprints and before/after preservation evidence with source/Worker fixture coverage.
 - [x] Add reproducible read-only GitHub/Sites source and rebuilt-Worker comparison for the authorized source handoff.
-- [ ] Prepare explicit workout-team acceptance cases/checklist and close demonstrated consumer gaps.
+- [x] Prepare explicit workout-team acceptance cases/checklist and close demonstrated consumer gaps.
 - [ ] Complete the final clean pushed candidate, exact-head CI and staff/host execution handoff.

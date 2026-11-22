@@ -37,6 +37,12 @@
       "status": 503,
       "resource": "layout",
       "definition": "errorResponse"
+    },
+    {
+      "file": "refreshed-layout.json",
+      "status": 200,
+      "resource": "layout",
+      "definition": "layoutResponse"
     }
   ]
 }

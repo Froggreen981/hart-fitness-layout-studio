@@ -4,7 +4,7 @@ This API gives the workout app the same published arrangement shown on the curre
 
 ## Consumer integration package
 
-The versioned [integration handoff](integration/workout-v1/README.md) includes JSON Schema 2020-12 contracts (revision 1.0.0), six fictional response fixtures, a tested backend cache client, rendering/identity/stale-workout guidance and a separately reviewed exercise-mapping exchange. Run `npm run test:consumer` without production credentials. Prefer that client over adapting the short illustrative snippet below; it adds isolated caches, contract validation, bounded reads/timeouts, concurrent-call coalescing and safe errors.
+The versioned [integration handoff](integration/workout-v1/README.md) includes JSON Schema 2020-12 contracts (revision 1.0.0), six fictional response fixtures, a tested backend cache client, rendering/identity/stale-workout guidance and a separately reviewed exercise-mapping exchange. Run `npm run test:consumer` without production credentials. The [acceptance checklist](integration/workout-v1/ACCEPTANCE.md) distinguishes offline evidence from still-pending real mapping, renderer and gateway acceptance. Prefer that client over adapting the short illustrative snippet below; it adds isolated caches, contract validation, bounded reads/timeouts, concurrent-call coalescing and safe errors.
 
 ## Requests
 

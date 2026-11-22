@@ -44,7 +44,7 @@ function workoutName(name) {
   return name;
 }
 
-function validateWorkoutPublication(row, layout) {
+export function validateWorkoutPublication(row, layout) {
   // Validate the stored snapshot without consulting today's catalog or rewriting it.
   // An older publication may omit every catalog field or reference a retired model.
   if (typeof row.id !== 'string' || !/^[a-zA-Z0-9_.-]{1,120}$/.test(row.id) || typeof row.published_at !== 'string' ||

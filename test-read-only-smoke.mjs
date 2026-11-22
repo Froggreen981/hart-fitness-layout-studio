@@ -111,3 +111,37 @@ test('smoke options refuse credential URLs, non-loopback HTTP, protocol-relative
   await assert.rejects(readOnlySmoke({origin,fetchImpl,assets:{}}));
   assert.equal(calls,0);
 });
+
+test('concurrent pagination overlap or incorrect archive filtering cannot produce passed preservation evidence',async t=>{
+  const f=await fixture(t),transport=f.transport(),before=await f.rows();
+  const duplicate=await readOnlySmoke({origin,fetchImpl:async(url,options)=>{
+    const query=new URL(url);
+    if(query.pathname==='/api/drafts'&&query.searchParams.get('archived')==='false')return Response.json({
+      drafts:[{id:'overlap-fixture',name:'PRIVATE overlap',revision:1,archived:false}],nextOffset:query.searchParams.get('offset')==='0'?50:null
+    });
+    return transport(url,options);
+  }});
+  assert.equal(duplicate.status,'blocked');assert.equal(duplicate.snapshot.complete,false);
+  assert.ok(duplicate.checks.some(check=>check.reason==='duplicate_identity_across_pages'));
+  assert.equal(duplicate.limits.atomic_database_snapshot,false);
+  const badFilter=await readOnlySmoke({origin,fetchImpl:async(url,options)=>{
+    const query=new URL(url);
+    if(query.pathname==='/api/drafts'&&query.searchParams.get('archived')==='true')return Response.json({
+      drafts:[{id:'wrong-archive-fixture',name:'PRIVATE wrong archive state',revision:1,archived:false}],nextOffset:null
+    });
+    return transport(url,options);
+  }});
+  assert.equal(badFilter.status,'failed');assert.equal(badFilter.snapshot.complete,false);
+  assert.deepEqual(await f.rows(),before);
+});
+
+test('a 200 current-map response with corrupted publication geometry cannot pass release verification',async t=>{
+  const f=await fixture(t),transport=f.transport();
+  for(const layout of ['PRIVATE invalid shape',{}, {name:'PRIVATE invalid room',room:{width:50,length:50},items:[{id:'bad',width:null}]}]){
+    const report=await readOnlySmoke({origin,fetchImpl:async(url,options)=>new URL(url).pathname==='/api/current'?
+      Response.json({current:{id:'fixture-corrupt-publication',publishedAt:'2026-01-01T00:00:00.000Z',layout}}):transport(url,options)});
+    assert.equal(report.status,'failed');assert.equal(report.snapshot.complete,false);
+    assert.equal(report.checks.find(check=>check.name==='current_publication').reason,'response_or_asset_mismatch');
+    assert.doesNotMatch(JSON.stringify(report),/PRIVATE/);
+  }
+});

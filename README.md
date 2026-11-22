@@ -89,3 +89,6 @@ For the other development team, [the workout integration package](integration/wo
 
 
 Release operators can use [read-only verification](RELEASE-VERIFICATION.md) for before/after asset, role and preservation evidence, and `release:compare-source` for the official helper’s source/Worker comparison. The [workout-team acceptance checklist](integration/workout-v1/ACCEPTANCE.md) supplies offline cases without real credentials or fabricated mappings. Version-13 rollback is verified for reading newer records, with a required staff editing/publication pause because that older code lacks later inventory/publication safeguards; see `RELEASE-PLAN.md`.
+
+
+The full repository tests need the audited rollback baseline in Git history; CI checks out full history. In an existing Sites checkout, the separately pinned Sites baseline is accepted only when its complete source tree matches the audited baseline. The offline workout consumer harness does not need production access or historical source.

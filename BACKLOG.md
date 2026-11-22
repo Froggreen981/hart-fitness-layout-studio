@@ -57,4 +57,5 @@ Complete the host backup/restore and applied-ledger proof, real owner/manager re
 - [x] Prepare explicit workout-team acceptance cases/checklist and close demonstrated consumer gaps.
 - [x] Prepare rollback/forward preservation checks and explicit staff editing/publication limits for version-13 rollback.
 - [x] Prepare staged read-only/authorized-write/physical-publication staff QA and prioritized host/owner actions.
-- [ ] Complete the final clean pushed candidate and exact-head CI evidence.
+- [x] Verify a clean pushed milestone candidate and exact-head CI (`37e369f`); refresh current observations under `build/releases/<full-sha>/` after each later release preparation.
+- [x] Reject overlapping/incomplete pagination and malformed current-map payloads in read-only preservation evidence.

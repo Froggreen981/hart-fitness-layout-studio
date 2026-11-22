@@ -3,6 +3,7 @@ import {createHash} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {validateWorkoutPublication} from '../worker/workout-api.mjs';
 
 function canonical(value){
   if(Array.isArray(value))return value.map(canonical);
@@ -38,7 +39,7 @@ export async function readOnlySmoke({origin,profile='candidate',expectedRole='ow
     throw Error('Use the candidate static_assets manifest without API paths or traversal.');
   const report={format:'gym-readonly-verification-v1',observed_at:new Date().toISOString(),origin,profile,expected_role:expectedRole,
     reported_role:null,status:'blocked',checks:[],snapshot:{complete:false},
-    limits:{full_database_backup:false,migration_ledger_verified:false,platform_identity_verified:false,
+    limits:{full_database_backup:false,atomic_database_snapshot:false,migration_ledger_verified:false,platform_identity_verified:false,
       worker_byte_identity_verified:false,note:'Role is an HTTP observation. Verify the real signed-in identity separately. Metadata fingerprints are not a full backup.'}};
   function result(name,path,status,reason,httpStatus){
     const check={name,path:name==='selected_draft'?'/api/drafts/[selected]':path,status,...(reason?{reason}:{}),...(httpStatus?{http_status:httpStatus}:{})};report.checks.push(check);return check;
@@ -76,19 +77,25 @@ export async function readOnlySmoke({origin,profile='candidate',expectedRole='ow
       type.split(';')[0]===entry.content_type.split(';')[0]:path.endsWith('.html')?/^text\/html\b/i.test(type):/^(text|application)\/javascript\b/i.test(type)});
   }
   report.asset_hashes_verified=!!assets&&report.checks.filter(check=>check.name==='static_asset').every(check=>check.status==='pass');
-  const current=await get('/api/current','current_publication',{validate:body=>body&&
-    (body.current===null||idOK(body.current?.id)&&typeof body.current?.publishedAt==='string'&&!!body.current?.layout)});
+  const current=await get('/api/current','current_publication',{validate:body=>{
+    if(body?.current===null)return true;
+    try{validateWorkoutPublication({id:body?.current?.id,published_at:body?.current?.publishedAt},body?.current?.layout);return true;}
+    catch{return false;}
+  }});
   if(current)report.snapshot.current=current.current===null?{published:false}:{published:true,
     id_sha256:digest(current.current.id),layout_sha256:digest(current.current.layout),published_at:current.current.publishedAt};
 
   let complete=true;
   async function pages(path,key,name,validate){
-    const rows=[],seen=new Set();let offset=0;
+    const rows=[],seen=new Set(),ids=new Set();let offset=0;
     for(let n=0;n<maxPages;n++){
       const separator=path.includes('?')?'&':'?';
       const body=await get(path+separator+'offset='+offset,name,{validate:body=>Array.isArray(body?.[key])&&body[key].every(validate)&&
         (body.nextOffset===null||Number.isSafeInteger(body.nextOffset)&&body.nextOffset>offset)});
       if(!body){complete=false;return rows;}
+      if(body[key].some(row=>{if(ids.has(row.id))return true;ids.add(row.id);return false;})){
+        result(name,path,'blocked','duplicate_identity_across_pages');complete=false;return rows;
+      }
       rows.push(...body[key]);
       if(body.nextOffset===null)return rows;
       if(seen.has(body.nextOffset)){result(name,path,'fail','repeated_pagination');complete=false;return rows;}
@@ -97,8 +104,8 @@ export async function readOnlySmoke({origin,profile='candidate',expectedRole='ow
     result(name,path,'blocked','pagination_limit_reached');complete=false;return rows;
   }
   const validDraft=row=>idOK(row?.id)&&typeof row.name==='string'&&Number.isSafeInteger(row.revision)&&row.revision>=1&&typeof row.archived==='boolean';
-  const active=await pages('/api/drafts?limit=50&archived=false','drafts','active_draft_metadata',validDraft);
-  const archived=await pages('/api/drafts?limit=50&archived=true','drafts','archived_draft_metadata',validDraft);
+  const active=await pages('/api/drafts?limit=50&archived=false','drafts','active_draft_metadata',row=>validDraft(row)&&!row.archived);
+  const archived=await pages('/api/drafts?limit=50&archived=true','drafts','archived_draft_metadata',row=>validDraft(row)&&row.archived);
   const history=await pages('/api/history','history','publication_history',row=>idOK(row?.id)&&typeof row.publishedAt==='string');
   const draftMetadata=rows=>rows.map(row=>({id_sha256:digest(row.id),revision:row.revision,archived:row.archived,
     metadata_sha256:digest(row)})).sort((a,b)=>a.id_sha256.localeCompare(b.id_sha256));

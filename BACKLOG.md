@@ -15,6 +15,9 @@ Persistent findings and completed validation live in [DEVELOPMENT-STATUS.md](DEV
 
 - [x] Port the useful phone model-verification checklist from `main`, preserving browser progress and reconciling it with the catalog.
 - [ ] Continue source-backed dimension/exercise research for unknown models; confirm matches and measurements on site.
+- [x] Research and integrate 57 additional dimension-source groups (79 units), preserving survey identities and all existing footprints; distinguish manufacturer, secondary, retained and reference-only evidence.
+- [x] Show derived group/unit source coverage, record model/generation conflicts and prevent unrelated source inheritance after model corrections.
+- [ ] Use `research/remaining-dimensions-walkthrough.csv` to identify/configure and measure the remaining 18 unsourced groups / 51 units; resolve the 17 sourced groups with conflicting specifications. Recheck the 20 retained historical sources and physically confirm all units before verified placement.
 - [ ] Define reviewed exercise-to-equipment mappings with the workout app; distinguish layout-instance IDs from surveyed physical inventory IDs.
 - [x] Add broader browser coverage for storage, printing, touch interaction and keyboard accessibility.
 - [x] Add staff inventory search by physical/model ID, exercise metadata, source availability and unassigned units.

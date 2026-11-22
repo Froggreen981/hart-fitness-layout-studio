@@ -114,6 +114,33 @@ test('linking another model preserves geometry and replaces incompatible exercis
   await expect(page.locator('[data-catalog-field="inventoryId"]')).toHaveValue('HART-0014');
 });
 
+test('dimension sources distinguish evidence and do not leak through corrected model metadata',async({page,request})=>{
+  const unit=bench(),layout=await draft(request,[unit]);await open(page,layout.id);
+  await edit(page,'[data-catalog-field="modelNumber"]','STAFF-CORRECTED-MODEL');
+  await expect(page.locator('.catalog-editor')).toContainText('Source model differs from selected model');
+  await expect(page.locator('.catalog-editor a')).toHaveCount(0);
+  const saved=(await read(request,layout.id)).layout.items[0];
+  expect(saved).toMatchObject({x:unit.x,y:unit.y,width:unit.width,length:unit.length,rotation:unit.rotation});
+  await page.locator('#catalogAddBtn').click();
+  await expect(page.locator('#catalogFilterStatus')).toContainText('77 / 95 groups · 104 / 155 units');
+  await page.locator('#catalogPick').selectOption('CHK-003');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Manufacturer · exact model code');
+  await expect(page.locator('#catalogWidth')).toHaveValue('2.375');
+  await page.locator('#catalogPick').selectOption('CHK-043');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Secondary source · exact model code');
+  await page.locator('#catalogPick').selectOption('CHK-012');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Comparable model · estimate only');
+  await expect(page.locator('#catalogWidth')).toBeEmpty();
+  await expect(page.locator('#catalogLength')).toBeEmpty();
+  await page.locator('#catalogPick').selectOption('CHK-067');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Conflicting specifications');
+  await expect(page.locator('#catalogWidth')).toBeEmpty();
+  await page.locator('#catalogPick').selectOption('CHK-094');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Dimensions unknown');
+  await expect(page.locator('#catalogDimensionSource')).toBeHidden();
+  await page.locator('#catalogCancel').click();
+});
+
 test('a stale staff save creates a separate recovery draft without replacing the newer save',async({page,request,browser})=>{
   const layout=await draft(request,[bench()]),other=await editorContext(browser,request);
   try{
@@ -134,10 +161,15 @@ test('a stale staff save creates a separate recovery draft without replacing the
 
 test('offline edits survive closing the tab and recover as an independent draft',async({page,context,request})=>{
   const layout=await draft(request,[bench()]);await open(page,layout.id);
+  // Guarantee the write never reaches the fixture server. Browser offline mode
+  // alone can race transport teardown and simulate a lost response after commit.
+  const offlineWrite=route=>route.request().method()==='PUT'?route.abort('internetdisconnected'):route.continue();
+  await context.route('**/api/drafts/**',offlineWrite);
   await context.setOffline(true);
   await edit(page,'[data-prop="x"]',33);
   await expect(page.locator('#saveStatus')).toContainText('Not saved to shared workspace');
   page.on('dialog',dialog=>dialog.accept());await page.close();
+  await context.unroute('**/api/drafts/**',offlineWrite);
   await context.setOffline(false);
   const reopened=await context.newPage();await open(reopened,layout.id);
   await expect(reopened.locator('#sharedRecovery')).toBeVisible();

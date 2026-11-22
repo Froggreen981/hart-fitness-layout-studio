@@ -86,10 +86,14 @@ test('survey filters expose mismatches, uncertain references and an exportable g
   await expect(page.locator('#item-CHK-094')).toBeVisible();
   await page.locator('.survey-summary summary').click();
   await expect(page.locator('#survey-totals')).toContainText('2 / 95 groups observed');
+  await expect(page.locator('#dimension-coverage')).toContainText('77 / 95 groups · 104 / 155 units');
+  await expect(page.locator('#item-CHK-001 .dimension-evidence')).toContainText('Source model differs');
+  await expect(page.locator('#item-CHK-001 .dimension-evidence a')).toHaveCount(0);
   const wait=page.waitForEvent('download');await page.locator('#report').click();
   const report=JSON.parse(await downloadText(await wait));
   expect(report.format).toBe('hart-survey-report-v1');expect(report.summary.observedGroups).toBe(2);
   expect(report.summary.units).toBe(155);expect(report.outstanding.some(item=>item.catalogId==='CHK-001')).toBe(true);
+  expect(report.dimensionCoverage.sourced).toEqual({groups:77,units:104});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 

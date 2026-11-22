@@ -1,7 +1,17 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {CHECKLIST_KEY,checklistRecords,checklistBackup,checklistProgress,checklistCSV} from './dist/model-checklist.mjs';
-import {equipmentCatalog} from './dist/equipment-catalog.mjs';
+import {CHECKLIST_KEY,checklistRecords,checklistBackup,checklistProgress,checklistCSV,checklistDimensionTarget} from './dist/model-checklist.mjs';
+import {equipmentCatalog,getDimensionInfo,getCatalogRecord} from './dist/equipment-catalog.mjs';
+
+test('corrected checklist observations cannot inherit a catalog dimension source in exports',()=>{
+  const entry=getCatalogRecord('CHK-003'),record={answer:'no',correct:'ACTUAL-OTHER-MODEL',modelAtCheck:entry.modelNumber};
+  const target=checklistDimensionTarget(entry,record),info=getDimensionInfo(entry,target);
+  assert.equal(info.sourced,false);assert.equal(info.kind,'model-mismatch');
+  const row=checklistCSV({[entry.id]:record}).split('\r\n').find(line=>line.startsWith('"CHK-003"'));
+  assert.match(row,/Source model differs from selected model/);
+  assert.ok(!row.includes(entry.dimensionsIn.sourceUrl));
+  assert.equal(getDimensionInfo(getCatalogRecord('CHK-094'),{...getCatalogRecord('CHK-094'),modelNumber:'NEWLY-IDENTIFIED'}).kind,'unknown');
+});
 
 test('existing v2 checklist backups retain answers and timestamps against the shared catalog',()=>{
   const legacy={

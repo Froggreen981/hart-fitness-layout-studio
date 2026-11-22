@@ -1,5 +1,5 @@
 import {SharedEditor,bindSharedEditor} from './shared-client.mjs';
-import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity,findCatalogRecords} from './equipment-catalog.mjs';
+import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity,findCatalogRecords,getDimensionInfo,dimensionDescription,getDimensionCoverage} from './equipment-catalog.mjs';
 import {STORAGE_ID,isEquipment,storagePose,storeEquipment,migrateStorage,storageView} from './storage.mjs';
 import {localPoint,resizeArea,areaFromWorldPoints,printTiles} from './editor.mjs';
 import {gymSketch} from './sketch.mjs';
@@ -72,7 +72,7 @@ function catalogOptions(selected='',entries=equipmentCatalog) {
 }
 function catalogEditor(i) {
   if(!isEquipment(i)) return '';
-  const e=getCatalogRecord(i.catalogId);
+  const e=getCatalogRecord(i.catalogId),dimensionInfo=getDimensionInfo(e,i);
   const fields=[
     ['manufacturer','Manufacturer',i.manufacturer||''],
     ['modelNumber','Model number',i.modelNumber||''],
@@ -88,7 +88,8 @@ function catalogEditor(i) {
     fields.map(([prop,label,value])=>'<label>'+label+'<input data-catalog-field="'+prop+'" maxlength="100" value="'+esc(value)+'"></label>').join('')+
     '<label>Identification confidence<select data-catalog-field="modelStatus">'+statusOptions+'</select></label>'+
     [['muscleGroups','Target muscles'],['exercises','Exercises'],['capabilities','Capabilities']].map(([prop,label])=>'<label>'+label+' (comma separated)<input data-catalog-field="'+prop+'" maxlength="600" value="'+esc((i[prop]||[]).join(', '))+'" placeholder="Add reviewed information"></label>').join('')+
-    (e?.dimensionsIn?'<p class="small muted">Manufacturer footprint: '+esc(e.dimensionsIn.length+' × '+e.dimensionsIn.width+' in (L × W)')+'. <a target="_blank" rel="noopener noreferrer" href="'+esc(e.dimensionsIn.sourceUrl)+'">Official specifications</a>. This does not change the selected footprint.</p>':'')+
+    '<p class="small muted">Planner footprint: entered or copied dimensions; no on-site measurement is recorded here.</p>'+
+    (e?'<p class="small muted">'+esc(dimensionDescription(e,i))+(dimensionInfo.sourced||dimensionInfo.kind==='reference-only'?' <a target="_blank" rel="noopener noreferrer" href="'+esc(dimensionInfo.evidence.sourceUrl)+'">Dimension source</a>':'')+'</p>':'')+
     '<p class="small muted">Exercise metadata can be refined as sources are verified.</p></details>';
 }
 
@@ -121,12 +122,12 @@ function updateCatalogPicker() {
   note.textContent=e.manufacturer+' · '+(e.modelNumber||'Model unidentified')+' · '+e.modelStatus+'. '+available.length+' unassigned ID(s).';
   $('catalogInventoryPick').innerHTML=available.map(id=>'<option value="'+esc(id)+'">'+esc(id)+'</option>').join('');
   $('catalogCreateBtn').disabled=!available.length;
-  const example=layout().items.find(i=>i.catalogId===e.id);
-  const dims=e.dimensionsIn;
+  const example=layout().items.find(i=>i.catalogId===e.id&&getDimensionInfo(e,i).kind!=='model-mismatch'&&i.modelNumber===e.modelNumber&&i.manufacturer===e.manufacturer);
+  const info=getDimensionInfo(e),dims=info.canPrefill?info.dimensions:null;
   $('catalogWidth').value=example?example.width:dims?Number((dims.width/12).toFixed(3)):'';
   $('catalogLength').value=example?example.length:dims?Number((dims.length/12).toFixed(3)):'';
-  $('catalogDimensionNote').textContent=example?'Dimensions copied from another item in this draft. Confirm them before publishing.':dims?'Manufacturer model dimensions: '+dims.length+' × '+dims.width+' in (L × W). These are not an on-site measurement; change them if necessary.':'No sourced dimensions for this model yet. Enter actual measurements in feet.';
-  if(dims){$('catalogDimensionSource').href=dims.sourceUrl;$('catalogDimensionSource').hidden=false;}
+  $('catalogDimensionNote').textContent=(example?'Dimensions copied from another matching item in this draft; no on-site measurement recorded. ':'')+dimensionDescription(e)+(info.sourced&&!info.canPrefill?' Enter actual dimensions; conflicting or unresolved source specifications are not prefilled.':'');
+  if(info.sourced||info.kind==='reference-only'){$('catalogDimensionSource').href=info.evidence.sourceUrl;$('catalogDimensionSource').textContent='Dimension source';$('catalogDimensionSource').hidden=false;}
   $('catalogExerciseNote').textContent=e.exercises.length?'Catalog exercises: '+e.exercises.join(', ')+'. Confirm the model match before using these for workout planning.':'Exercise metadata has not been reviewed for this model.';
   const name=e.name.toLowerCase();
   $('catalogCategory').value=/bench|rack|platform|bar tree|plate tree/.test(name)?'free':'strength';
@@ -137,7 +138,8 @@ function filterCatalogPicker(){
   $('catalogPick').innerHTML='<option value="">'+(entries.length?'Choose equipment':'No matching equipment')+'</option>'+catalogOptions(selected,entries);
   $('catalogPick').value=entries.some(entry=>entry.id===selected)?selected:'';
   const units=entries.reduce((sum,entry)=>sum+getAvailableInventoryIds(entry,layout().items).length,0);
-  $('catalogFilterStatus').textContent=entries.length+' model group(s) · '+units+' unassigned physical unit(s)';
+  const coverage=getDimensionCoverage();
+  $('catalogFilterStatus').textContent=entries.length+' model group(s) · '+units+' unassigned physical unit(s). Catalog source coverage: '+coverage.sourced.groups+' / '+coverage.total.groups+' groups · '+coverage.sourced.units+' / '+coverage.total.units+' units ('+coverage.manufacturer.groups+' manufacturer, '+coverage.secondary.groups+' secondary, '+coverage.legacy.groups+' prior sources).';
   // Keep operator-entered dimensions when the selected model remains in the results.
   if($('catalogPick').value!==selected)updateCatalogPicker();
 }

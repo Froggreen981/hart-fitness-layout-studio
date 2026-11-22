@@ -1,5 +1,5 @@
-import {equipmentCatalog} from './equipment-catalog.mjs';
-import {CHECKLIST_KEY,CHECKLIST_RECOVERY_KEY,checklistRecords,checklistBackup,checklistProgress,checklistCSV,checklistReferenceChanged,checklistFollowUp,checklistReport} from './model-checklist.mjs';
+import {equipmentCatalog,getDimensionInfo,dimensionDescription,getDimensionCoverage} from './equipment-catalog.mjs';
+import {CHECKLIST_KEY,CHECKLIST_RECOVERY_KEY,checklistRecords,checklistBackup,checklistProgress,checklistCSV,checklistReferenceChanged,checklistFollowUp,checklistReport,checklistDimensionTarget} from './model-checklist.mjs';
 import {escapeHTML as esc} from './shared-api.mjs';
 
 const $=id=>document.getElementById(id);
@@ -16,7 +16,7 @@ $('areas').innerHTML=groups.map((area,index)=>'<section class="area" id="area-'+
     '<div class="correction" '+(item.modelNumber?'data-conditional':'')+'><label for="correct-'+item.id+'">'+(item.modelNumber?'Correct model number if No':'Model number observed')+'</label><input type="text" id="correct-'+item.id+'" maxlength="100" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false">'+
     (item.modelCandidates.length?'<div class="alts">Other candidates: '+item.modelCandidates.filter(code=>code!==item.modelNumber).map(code=>'<button type="button" class="alt" data-alternative="'+esc(code)+'">'+esc(code)+'</button>').join('')+'</div>':'')+'</div>'+
     '<p class="reference-change warning" hidden></p>'+
-    (item.dimensionsIn?'<p class="fine"><a href="'+esc(item.dimensionsIn.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Manufacturer specifications</a>: '+esc(item.dimensionsIn.length+' × '+item.dimensionsIn.width+' in (L × W)')+'. Confirm actual model and footprint on site.</p>':'')+'</article>';
+    '<p class="fine dimension-evidence">'+esc(dimensionDescription(item))+((getDimensionInfo(item).sourced||item.dimensionReference)?' <a href="'+esc(getDimensionInfo(item).evidence.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Dimension source</a>':'')+'</p></article>';
 }).join('')+'</section>').join('');
 $('area-filter').innerHTML='<option value="">All areas</option>'+groups.map(area=>'<option>'+esc(area)+'</option>').join('');
 
@@ -40,6 +40,8 @@ function paint(item){
   const input=card.querySelector('input[type="text"]');if(input!==document.activeElement)input.value=record.correct||'';
   const reference=record.modelAtCheck??(answer==='yes'?record.correct:null);
   const changed=checklistReferenceChanged(item,record);
+  const target=checklistDimensionTarget(item,record),info=getDimensionInfo(item,target);
+  card.querySelector('.dimension-evidence').innerHTML=esc(dimensionDescription(item,target))+((info.sourced||info.kind==='reference-only')?' <a href="'+esc(info.evidence.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Dimension source</a>':'');
   const note=card.querySelector('.reference-change');note.hidden=!changed;
   note.textContent=changed?'The catalog model changed since this check ('+(reference||'unidentified')+'). Recheck before applying this observation.':'';
 }
@@ -53,7 +55,7 @@ function filter(){
       observation==='mismatch'&&['no','identified'].includes(record?.answer)||
       observation==='unknown'&&record?.answer==='unknown'||observation==='changed'&&checklistReferenceChanged(item,record);
     const matches=(!area||item.area===area)&&(!unchecked||!record)&&observationMatch&&
-      (!confidence||item.modelStatus===confidence)&&(!missingDimensions||!item.dimensionsIn)&&
+      (!confidence||item.modelStatus===confidence)&&(!missingDimensions||!getDimensionInfo(item).sourced)&&
       (!query||[item.id,item.name,item.manufacturer,item.modelNumber,...item.inventoryIds].join(' ').toLowerCase().includes(query));
     $('item-'+item.id).hidden=!matches;if(matches)visible++;
   }
@@ -68,6 +70,8 @@ function progress(){
   $('progressbar').setAttribute('aria-valuenow',p.checked);filter();
   const report=checklistReport(records),s=report.summary;
   $('survey-totals').textContent=s.observedGroups+' / '+s.groups+' groups observed · '+s.unitsInObservedGroups+' / '+s.units+' units in those groups · '+s.followUpGroups+' groups need follow-up · '+s.groupsWithoutSourceDimensions+' lack source dimensions';
+  const coverage=getDimensionCoverage();
+  $('dimension-coverage').textContent='Source coverage: '+coverage.sourced.groups+' / '+coverage.total.groups+' groups · '+coverage.sourced.units+' / '+coverage.total.units+' units. '+coverage.manufacturer.groups+' manufacturer · '+coverage.secondary.groups+' secondary · '+coverage.legacy.groups+' prior sources not rechecked · '+coverage.reference.groups+' reference only · '+coverage.unknown.groups+' unknown. '+coverage.conflicts.groups+' sourced groups have conflicting specifications. No on-site dimensions have been recorded in this catalog.';
   $('area-progress').innerHTML=report.areas.map(area=>'<li>'+esc(area.area)+': '+area.observedGroups+' / '+area.groups+' groups observed; '+area.followUpGroups+' need follow-up</li>').join('');
 }
 function syncRecords(){

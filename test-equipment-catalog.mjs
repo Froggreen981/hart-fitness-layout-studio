@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity,findCatalogRecords} from './dist/equipment-catalog.mjs';
+import {readFileSync} from 'node:fs';
+import {equipmentCatalog,getCatalogRecord,getAvailableInventoryIds,applyCatalogIdentity,findCatalogRecords,getDimensionInfo,getDimensionCoverage,dimensionDescription} from './dist/equipment-catalog.mjs';
 import {validateProject} from './dist/model.mjs';
 
 test('all surveyed inventory records remain stable and individually identifiable',()=>{
@@ -91,14 +92,28 @@ test('imports enforce model-to-unit membership and validate template metadata',(
   assert.throws(()=>validateProject({...project({}),library:[{...template,exercises:{notes:'invalid'}}]}),/exercise metadata/);
 });
 
-test('all sourced manufacturer footprints retain positive dimensions and dated HTTPS provenance',()=>{
+test('all sourced footprints retain positive available dimensions and dated HTTPS provenance',()=>{
   const sourced=equipmentCatalog.filter(entry=>entry.dimensionsIn);
   assert.ok(sourced.length>=11);
   for(const {id,dimensionsIn:d} of sourced){
-    assert.ok([d.width,d.length,d.height].every(n=>Number.isFinite(n)&&n>0),id);
+    assert.ok([d.width,d.length,...(d.height===undefined?[]:[d.height])].every(n=>Number.isFinite(n)&&n>0),id);
     assert.equal(new URL(d.sourceUrl).protocol,'https:',id);
     assert.match(d.verifiedAt,/^\d{4}-\d{2}-\d{2}$/,id);
-    assert.match(d.source,/^manufacturer-/,id);
+    assert.match(d.source,/^(manufacturer|secondary)-/,id);
+  }
+});
+
+test('dimension research preserves every survey identity and historical dimension value',()=>{
+  const baseline=JSON.parse(readFileSync(new URL('./research/equipment-identities-baseline.json',import.meta.url)));
+  for(const original of baseline.records){
+    const current=getCatalogRecord(original.id);
+    assert.deepEqual(Object.fromEntries(Object.keys(original).map(key=>[key,current[key]])),original,original.id);
+  }
+  const dimensions=JSON.parse(readFileSync(new URL('./research/dimensions-baseline.json',import.meta.url)));
+  assert.equal(dimensions.sourcedGroups,20);assert.equal(dimensions.sourcedUnits,25);
+  for(const original of dimensions.records){
+    assert.deepEqual(getCatalogRecord(original.id).dimensionsIn,original.dimensionsIn,original.id);
+    if(original.dimensionsCm)assert.deepEqual(getCatalogRecord(original.id).dimensionsCm,original.dimensionsCm);
   }
 });
 
@@ -111,4 +126,50 @@ test('staff catalog search combines physical/model IDs, exercise terms, sourced 
   assert.deepEqual(findCatalogRecords({query:'CHK-094',sourcedOnly:true}),[]);
   assert.equal(findCatalogRecords({query:'CHK-094'})[0].modelStatus,'unidentified');
   assert.equal(equipmentCatalog.length,95);
+});
+
+test('dimension evidence retains original units, accurate conversions and exact model bindings',()=>{
+  const findings=JSON.parse(readFileSync(new URL('./research/dimension-findings.json',import.meta.url)));
+  for(const record of findings.records){
+    const entry=getCatalogRecord(record.id),info=getDimensionInfo(entry),e=entry.dimensionEvidence;
+    assert.deepEqual(e,Object.fromEntries(Object.entries(record).filter(([key])=>key!=='id')),entry.id);
+    assert.ok(info.sourced,entry.id);
+    assert.equal(e.modelNumber,entry.modelNumber);assert.equal(e.manufacturer,entry.manufacturer);
+    assert.ok(e.reference);assert.equal(e.originalUnits,'in');assert.equal(e.reviewedAt,'2026-11-22');
+    for(const key of ['length','width','height']){
+      if(e.original[key]===undefined){assert.equal(info.dimensions[key],undefined);continue;}
+      assert.equal(info.dimensions[key],e.original[key]);
+      assert.ok(Math.abs(info.convertedCm[key]-e.original[key]*2.54)<0.000051);
+    }
+    for(const patch of [{modelNumber:'OTHER-MODEL'},{manufacturer:'Other maker'}]){
+      const changed=getDimensionInfo(entry,{...entry,...patch});
+      assert.equal(changed.kind,'model-mismatch');assert.equal(changed.dimensions,null);assert.equal(changed.canPrefill,false);
+    }
+  }
+});
+
+test('references, unknown heights and manufacturer conflicts never silently become exact footprints',()=>{
+  for(const entry of equipmentCatalog.filter(e=>e.dimensionReference)){
+    const info=getDimensionInfo(entry);
+    assert.equal(info.kind,'reference-only');assert.equal(info.sourced,false);assert.equal(info.canPrefill,false);assert.equal(info.dimensions,null);
+    assert.match(dimensionDescription(entry),/reference only|estimate only/);
+    assert.equal(getDimensionInfo(entry,{...entry,modelNumber:'STAFF-CORRECTION'}).kind,'model-mismatch');
+  }
+  for(const entry of equipmentCatalog.filter(e=>e.dimensionEvidence?.conflicts?.length)){
+    assert.equal(getDimensionInfo(entry).canPrefill,false,entry.id);
+    assert.match(dimensionDescription(entry),/Conflicting specifications/);
+    for(const conflict of entry.dimensionEvidence.conflicts)assert.equal(new URL(conflict.sourceUrl).protocol,'https:');
+  }
+  assert.equal(getDimensionInfo(getCatalogRecord('CHK-081')).dimensions.height,undefined);
+  assert.match(dimensionDescription(getCatalogRecord('CHK-081')),/Height unknown/);
+  assert.equal(getDimensionInfo(getCatalogRecord('CHK-092')).dimensions.height,48);
+  assert.equal(getDimensionInfo(getCatalogRecord('CHK-094')).kind,'unknown');
+});
+
+test('source coverage counts catalog groups and represented physical units independently',()=>{
+  const c=getDimensionCoverage();
+  assert.deepEqual(c.total,{groups:95,units:155});assert.deepEqual(c.sourced,{groups:77,units:104});
+  assert.equal(c.manufacturer.groups+c.secondary.groups+c.legacy.groups,c.sourced.groups);
+  assert.equal(c.reference.groups+c.unknown.groups+c.sourced.groups,c.total.groups);
+  assert.deepEqual(getDimensionCoverage([getCatalogRecord('CHK-051')]).unknown,{groups:1,units:20});
 });

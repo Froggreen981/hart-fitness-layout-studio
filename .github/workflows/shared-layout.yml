@@ -18,6 +18,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run release:check
+      - run: node scripts/generate-dimension-research.mjs --check
       - run: node --check dist/app.js
       - run: node --check worker/service.mjs
       - run: node --test test-*.mjs

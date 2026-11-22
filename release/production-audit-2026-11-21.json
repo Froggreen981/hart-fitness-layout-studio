@@ -1,0 +1,73 @@
+{
+  "format": "gym-production-audit-v1",
+  "review_date": "2026-11-21",
+  "timezone": "America/Denver",
+  "production_mutations": false,
+  "project_id": "appgprj_6ae42d870d0481918f92cb6a7697a4d6",
+  "site_status": "active",
+  "version": 13,
+  "sites_commit": "c6920abd0815145bb956dacc364331cacb463695",
+  "retained_deployment": {
+    "id": "appgdep_6aefa97473e88191be4810874fb3c8df",
+    "status": "succeeded"
+  },
+  "domain": {
+    "hostname": "gym.huffworkshop.com",
+    "status": "active",
+    "ssl_status": "active"
+  },
+  "access": {
+    "mode": "custom",
+    "listed_roles": [
+      "owner"
+    ],
+    "external_visitor_count": 0,
+    "application_editor_count": 1,
+    "all_application_editors_listed_as_visitors": false,
+    "live_owner_session_verified": false,
+    "independent_manager_session_verified": false
+  },
+  "database": {
+    "binding": "DB",
+    "tables": [
+      "gym_drafts",
+      "gym_imports",
+      "gym_publications",
+      "gym_staff"
+    ],
+    "publications": 0,
+    "publications_view_complete": true,
+    "full_backup_available_in_connected_tools": false,
+    "restore_procedure_verified": false,
+    "applied_migration_ledger_verified": false,
+    "note": "Only bounded staff/publication reads were used. No draft documents or private migration bookkeeping were exported."
+  },
+  "runtime_keys": [
+    {
+      "key": "STAFF_OWNER_EMAIL",
+      "is_secret": true
+    }
+  ],
+  "tooling": {
+    "official_source_helper_found": false,
+    "helper_cloud_resource_readable": false,
+    "saved_archive_download_available": false,
+    "native_source_credential_tool_available": true,
+    "source_credential_created": false,
+    "site_source_push_authorized": false,
+    "site_source_comparison": "Version-13 immutable identifiers match the previously verified baseline. Fresh archive download failed; no new source clone.",
+    "direct_http": {
+      "verified": false,
+      "reason": "Environment proxy rejected CONNECT with 403; application status was not observed."
+    }
+  },
+  "remaining_gates": [
+    "supported full D1 backup and restoration procedure",
+    "applied migration ledger",
+    "live owner session",
+    "manager visitor grant plus independent editor session",
+    "official Sites source workflow",
+    "exact candidate deployment authorization"
+  ],
+  "note": "Sanitized operational observations, not a backup, live-session proof, release approval or external-team acceptance."
+}

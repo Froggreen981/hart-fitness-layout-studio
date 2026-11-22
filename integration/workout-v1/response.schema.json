@@ -1,0 +1,425 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gym-layout-studio.example.invalid/contracts/workout-v1/response-1.0.0.schema.json",
+  "title": "Gym Layout Studio workout API v1",
+  "description": "Contract revision 1.0.0. Coordinates are feet in a Y-down frame. Unknown additive fields are allowed; consumers must never infer exercise compatibility.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/layoutResponse"
+    },
+    {
+      "$ref": "#/$defs/equipmentResponse"
+    },
+    {
+      "$ref": "#/$defs/errorResponse"
+    }
+  ],
+  "$defs": {
+    "point": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "polygon": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/point"
+      },
+      "minItems": 3
+    },
+    "publication": {
+      "type": "object",
+      "required": [
+        "id",
+        "publishedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "equipment": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "category",
+        "kind",
+        "x",
+        "y",
+        "width",
+        "length",
+        "rotation",
+        "status",
+        "footprint"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "cardio",
+            "strength",
+            "free"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "treadmill",
+            "elliptical",
+            "bike",
+            "rack",
+            "bench",
+            "cable",
+            "column",
+            "custom",
+            "area"
+          ]
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "length": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rotation": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 360
+        },
+        "status": {
+          "enum": [
+            "available",
+            "out-of-service"
+          ]
+        },
+        "footprint": {
+          "$ref": "#/$defs/polygon"
+        },
+        "catalogId": {
+          "type": "string"
+        },
+        "inventoryId": {
+          "type": "string"
+        },
+        "manufacturer": {
+          "type": "string"
+        },
+        "modelNumber": {
+          "type": "string"
+        },
+        "modelStatus": {
+          "enum": [
+            "verified",
+            "probable",
+            "reported",
+            "corrected",
+            "unidentified"
+          ]
+        },
+        "muscleGroups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exercises": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "area": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "footprint",
+        "color",
+        "placement",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "footprint": {
+          "$ref": "#/$defs/polygon"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "placement": {
+          "enum": [
+            "allowed",
+            "keep-clear"
+          ]
+        },
+        "label": {
+          "type": "object",
+          "required": [
+            "x",
+            "y",
+            "rotation"
+          ],
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            },
+            "rotation": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "room": {
+      "type": "object",
+      "required": [
+        "width",
+        "length",
+        "boundary",
+        "walls",
+        "zones"
+      ],
+      "properties": {
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "length": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "boundary": {
+          "$ref": "#/$defs/polygon"
+        },
+        "walls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "type",
+              "footprints"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "full",
+                  "half"
+                ]
+              },
+              "footprints": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/polygon"
+                },
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "x",
+              "y",
+              "angle"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "angle": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "required": [
+        "name",
+        "room",
+        "areas",
+        "obstacles",
+        "equipment"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "room": {
+          "$ref": "#/$defs/room"
+        },
+        "areas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/area"
+          }
+        },
+        "obstacles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "footprint"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "footprint": {
+                "$ref": "#/$defs/polygon"
+              }
+            }
+          }
+        },
+        "equipment": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/equipment"
+          }
+        }
+      }
+    },
+    "layoutResponse": {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "publication",
+        "layout"
+      ],
+      "properties": {
+        "apiVersion": {
+          "const": 1
+        },
+        "publication": {
+          "$ref": "#/$defs/publication"
+        },
+        "layout": {
+          "$ref": "#/$defs/layout"
+        }
+      }
+    },
+    "equipmentResponse": {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "publication",
+        "equipment"
+      ],
+      "properties": {
+        "apiVersion": {
+          "const": 1
+        },
+        "publication": {
+          "$ref": "#/$defs/publication"
+        },
+        "equipment": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/equipment"
+          }
+        }
+      }
+    },
+    "errorResponse": {
+      "type": "object",
+      "required": [
+        "apiVersion",
+        "error"
+      ],
+      "properties": {
+        "apiVersion": {
+          "const": 1
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "enum": [
+                "unauthorized",
+                "origin_denied",
+                "no_publication",
+                "endpoint_not_found",
+                "method_not_allowed",
+                "publication_unavailable",
+                "integration_unavailable"
+              ]
+            },
+            "message": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

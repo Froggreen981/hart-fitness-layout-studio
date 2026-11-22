@@ -1,0 +1,1172 @@
+{
+  "date": "2026-11-22",
+  "records": [
+    {
+      "id": "CHK-003",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES809",
+      "originalUnits": "in",
+      "original": {
+        "length": 62.5,
+        "width": 28.5,
+        "height": 58
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 254–255, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-006",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES803",
+      "originalUnits": "in",
+      "original": {
+        "length": 48.9,
+        "width": 59,
+        "height": 57.8
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 252–253, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-008",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSKC",
+      "originalUnits": "in",
+      "original": {
+        "length": 45,
+        "width": 62,
+        "height": 54
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-kneeling-leg-curl",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "Older manufacturer catalog on secondary host lists 52 × 56 × 54 in, differing from current 45 × 62 × 54 in. Confirm manufacturing generation.",
+          "sourceUrl": "https://device.report/m/32828f5f46408ac7b37331e23131879d89fee468454846f89482e2c527fd38f3.pdf",
+          "originalUnits": "in",
+          "original": {
+            "length": 52,
+            "width": 56,
+            "height": 54
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-009",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSLE",
+      "originalUnits": "in",
+      "original": {
+        "length": 48,
+        "width": 57,
+        "height": 55
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-leg-extension",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-010",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES820",
+      "originalUnits": "in",
+      "original": {
+        "length": 72.8,
+        "width": 31.9,
+        "height": 57.8
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 254–255, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-013",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSAB",
+      "originalUnits": "in",
+      "original": {
+        "length": 44,
+        "width": 39,
+        "height": 56
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-abdominal-crunch",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-015",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSTE",
+      "originalUnits": "in",
+      "original": {
+        "length": 36,
+        "width": 52,
+        "height": 60
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/mts-iso-lateral-triceps-extension",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-018",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES811",
+      "originalUnits": "in",
+      "original": {
+        "length": 40.5,
+        "width": 50.6,
+        "height": 57.8
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 254–255, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-019",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES810",
+      "originalUnits": "in",
+      "original": {
+        "length": 40.5,
+        "width": 50,
+        "height": 57.8
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 254–255, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-020",
+      "quality": "secondary",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSVS",
+      "originalUnits": "in",
+      "original": {
+        "length": 96,
+        "width": 31,
+        "height": 79
+      },
+      "sourceUrl": "https://www.globalfitness.com/products/used-hammer-strength-mts-v-squat",
+      "reference": "MPN MTSVS, Technical Specifications",
+      "reviewedAt": "2026-11-22",
+      "corroborationUrl": "https://device.report/m/32828f5f46408ac7b37331e23131879d89fee468454846f89482e2c527fd38f3.pdf",
+      "corroborationReference": "Manufacturer catalog on secondary host, printed p. 13"
+    },
+    {
+      "id": "CHK-021",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES806",
+      "originalUnits": "in",
+      "original": {
+        "length": 33.3,
+        "width": 53.5,
+        "height": 76.2
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 252–253, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-023",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSHR",
+      "originalUnits": "in",
+      "original": {
+        "length": 51,
+        "width": 62,
+        "height": 82
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-high-row",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 47,
+            "width": 72,
+            "height": 77
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-024",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES817",
+      "originalUnits": "in",
+      "original": {
+        "length": 39.7,
+        "width": 69,
+        "height": 57.8
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 254–255, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-025",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES802",
+      "originalUnits": "in",
+      "original": {
+        "length": 51.8,
+        "width": 66.5,
+        "height": 76.8
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 252–253, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-026",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSRW",
+      "originalUnits": "in",
+      "original": {
+        "length": 51,
+        "width": 62,
+        "height": 82
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-row",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-027",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSFP",
+      "originalUnits": "in",
+      "original": {
+        "length": 48,
+        "width": 58,
+        "height": 80
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-front-pulldown",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-030",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES815",
+      "originalUnits": "in",
+      "original": {
+        "length": 53.4,
+        "width": 66.4,
+        "height": 57.8
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 254–255, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-032",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "ILSP",
+      "originalUnits": "in",
+      "original": {
+        "length": 59,
+        "width": 52,
+        "height": 86
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.17; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-SP",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 51,
+            "width": 58,
+            "height": 74
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-033",
+      "quality": "secondary",
+      "match": "exact-model",
+      "manufacturer": "Life Fitness",
+      "modelNumber": "PSFLYSE",
+      "originalUnits": "in",
+      "original": {
+        "length": 49,
+        "width": 56,
+        "height": 71
+      },
+      "sourceUrl": "https://device.report/m/eba3c7708e52ced58da70558224f7dc8676ae81b1ac9175eef2c442d6c073ab4.pdf",
+      "reference": "Life Fitness Pro2 Series specification table, Pectoral Fly / Rear Delt PSFLYSE",
+      "reviewedAt": "2026-11-22",
+      "documentOrigin": "manufacturer-document-secondary-host"
+    },
+    {
+      "id": "CHK-034",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSCP",
+      "originalUnits": "in",
+      "original": {
+        "length": 40,
+        "width": 67,
+        "height": 77
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-chest-press",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 40,
+            "width": 68,
+            "height": 77
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-035",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSIP",
+      "originalUnits": "in",
+      "original": {
+        "length": 40,
+        "width": 68,
+        "height": 77
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-incline-press",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "Manufacturer page pairs 77 in height with 296 cm; incompatible unit pair. Inch values retained, conversions computed from inches.",
+          "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/hammer-strength-mts-iso-lateral-incline-press"
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-037",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "MTSSP",
+      "originalUnits": "in",
+      "original": {
+        "length": 45,
+        "width": 62,
+        "height": 54
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/mts-iso-lateral-shoulder-press",
+      "reference": "Product code and Size (L × W × H) table",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "Manufacturer page pairs 45 in length with 155 cm; incompatible unit pair. Inch values retained, conversions computed from inches.",
+          "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/selectorized/mts-iso-lateral-shoulder-press"
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-038",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES807",
+      "originalUnits": "in",
+      "original": {
+        "length": 61.4,
+        "width": 64.1,
+        "height": 57.8
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 254–255, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-039",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES800",
+      "originalUnits": "in",
+      "original": {
+        "length": 61.7,
+        "width": 42,
+        "height": 72
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 252–253, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-043",
+      "quality": "secondary",
+      "match": "exact-model",
+      "manufacturer": "Hoist Fitness",
+      "modelNumber": "RS-1601",
+      "originalUnits": "in",
+      "original": {
+        "length": 41,
+        "width": 63.5,
+        "height": 61.75
+      },
+      "sourceUrl": "https://www.fitnessgallery.com/shop/commercial/comm-strength/selectorized/hoist-roc-it-abdominals-rs-1601-selectorized/",
+      "reference": "RS-1601 specifications, product length / width / height",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Official legacy model page located, but its accessible text omits dimensions; exact-model dealer table used."
+    },
+    {
+      "id": "CHK-044",
+      "quality": "secondary",
+      "match": "exact-model",
+      "manufacturer": "Precor",
+      "modelNumber": "AB103",
+      "originalUnits": "in",
+      "original": {
+        "length": 50,
+        "width": 28,
+        "height": 63
+      },
+      "sourceUrl": "https://www.globalfitness.com/products/used-precor-icarian-v-crunch-vkr",
+      "reference": "MPN AB103, Technical Specifications",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-045",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Precor",
+      "modelNumber": "320",
+      "originalUnits": "in",
+      "original": {
+        "length": 61,
+        "width": 54,
+        "height": 93
+      },
+      "sourceUrl": "https://static.precor.com/spec-tables/en-us/Functional-Selectorized-Spec-Tables.pdf",
+      "reference": "Icarian Functional Selectorized specification table, 320 Dip / Chin Assist",
+      "reviewedAt": "2026-11-22",
+      "reviewRequired": true,
+      "configurationNote": "Survey equipment name retains “320?” despite verified model status. Confirm the complete physical label before using source dimensions."
+    },
+    {
+      "id": "CHK-046",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Freemotion",
+      "modelNumber": "ES812",
+      "originalUnits": "in",
+      "original": {
+        "length": 48.3,
+        "width": 62.1,
+        "height": 99.6
+      },
+      "sourceUrl": "https://freemotionfitness.com/wp-content/uploads/2022/01/FM-Full-Catalog_V1_0122.pdf",
+      "reference": "2022 full catalog, printed pp. 254–255, EPIC Selectorized product dimensions table",
+      "reviewedAt": "2026-11-22",
+      "accessNote": "Manufacturer-hosted indexed PDF table; current PDF redirect failed to open during review. 2024 catalog indexed table also inspected."
+    },
+    {
+      "id": "CHK-047",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "FW-AC",
+      "originalUnits": "in",
+      "original": {
+        "length": 38,
+        "width": 34,
+        "height": 42
+      },
+      "sourceUrl": "https://kb.cybexintl.com/Owners_Manuals/Strength/OM_Hammer_Strength_FW_Series_1003085-0001.pdf",
+      "reference": "Free Weight Owner’s Manual, Seated Arm Curl FW-AC, Size table",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "Older dealer proposal lists 39 × 36 × 43 in for FW-AC; current manufacturer manual lists 38 × 34 × 42 in. Confirm generation.",
+          "sourceUrl": "https://fayettevilleflyer.com/wp-content/uploads/2022/05/a10-1.pdf",
+          "originalUnits": "in",
+          "original": {
+            "length": 39,
+            "width": 36,
+            "height": 43
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-052",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "HSLLP",
+      "originalUnits": "in",
+      "original": {
+        "length": 95,
+        "width": 65,
+        "height": 57
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-eu/catalog/strength-training/plate-loaded/plate-loaded-linear-leg-press",
+      "reference": "Product code and Dimensions (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-054",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hoist Fitness",
+      "modelNumber": "CF-3356",
+      "originalUnits": "in",
+      "original": {
+        "length": 87,
+        "width": 60.75,
+        "height": 61.75
+      },
+      "sourceUrl": "https://www.hoistfitness.com/products/cf-3356-hack-squat",
+      "reference": "CF-3356 specifications, Length / Width / Height",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-055",
+      "quality": "secondary",
+      "match": "exact-model",
+      "manufacturer": "Nautilus",
+      "modelNumber": "NP-L1131",
+      "originalUnits": "in",
+      "original": {
+        "length": 62,
+        "width": 60,
+        "height": 35
+      },
+      "sourceUrl": "https://www.comm-fit.com/wp-content/uploads/2020/08/NP-L1131-NAUTILUS-GLUTE-DRIVE.pdf",
+      "reference": "Nautilus Glute Drive manufacturer sell sheet hosted by dealer; model NP-L1131 table",
+      "reviewedAt": "2026-11-22",
+      "documentOrigin": "manufacturer-document-secondary-host"
+    },
+    {
+      "id": "CHK-058",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "PL-PO",
+      "originalUnits": "in",
+      "original": {
+        "length": 55,
+        "width": 64,
+        "height": 58
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/plate-loaded/plate-loaded-pullover",
+      "reference": "Product code and Dimensions (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-060",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "PL-FLY",
+      "originalUnits": "in",
+      "original": {
+        "length": 82,
+        "width": 86,
+        "height": 41
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/plate-loaded/super-fly",
+      "reference": "Product code and Dimensions (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-061",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-LC",
+      "originalUnits": "in",
+      "original": {
+        "length": 69,
+        "width": 57,
+        "height": 41
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/plate-loaded/plate-loaded-iso-lateral-leg-curl",
+      "reference": "Product code and Dimensions (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-063",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-PD",
+      "originalUnits": "in",
+      "original": {
+        "length": 50,
+        "width": 71,
+        "height": 70
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.15; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-PD",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 65,
+            "width": 41,
+            "height": 80
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-064",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-HBP",
+      "originalUnits": "in",
+      "original": {
+        "length": 60,
+        "width": 69,
+        "height": 57
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.8; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-HBP",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 66,
+            "width": 61,
+            "height": 42
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-065",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-FMP",
+      "originalUnits": "in",
+      "original": {
+        "length": 59,
+        "width": 58,
+        "height": 61
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.6; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-FMP",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 50,
+            "width": 59,
+            "height": 60
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-066",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-LE",
+      "originalUnits": "in",
+      "original": {
+        "length": 60,
+        "width": 73,
+        "height": 54
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.12; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-LE",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-067",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "PL-AB",
+      "originalUnits": "in",
+      "original": {
+        "length": 44,
+        "width": 58,
+        "height": 54
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/plate-loaded/plate-loaded-abdominal-oblique-crunch",
+      "reference": "Product Code PL-AB, Dimensions table",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "Official shop same-code listing reports 58 × 57 × 61 in. Confirm generation/configuration before choosing a footprint.",
+          "sourceUrl": "https://shop.lifefitness.com/products/hammer-strength-plate-loaded-abdominal-oblique-crunch-1",
+          "originalUnits": "in",
+          "original": {
+            "length": 58,
+            "width": 57,
+            "height": 61
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-068",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-WPD",
+      "originalUnits": "in",
+      "original": {
+        "length": 49,
+        "width": 71,
+        "height": 79
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.20; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-WPD",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 71,
+            "width": 42,
+            "height": 80
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-070",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-DCP",
+      "originalUnits": "in",
+      "original": {
+        "length": 57,
+        "width": 67,
+        "height": 68
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/plate-loaded/iso-lateral-decline-chest-press",
+      "reference": "Product Code IL-DCP, Dimensions table",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "Manufacturer Iso-Lateral owner manual section 2.4 lists 66 × 67 × 67 in; 2024 catalog lists 51 × 54 × 68 in. Confirm generation.",
+          "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+          "originalUnits": "in",
+          "original": {
+            "length": 66,
+            "width": 67,
+            "height": 67
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-076",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-ROW",
+      "originalUnits": "in",
+      "original": {
+        "length": 48,
+        "width": 61,
+        "height": 57
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.16; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-ROW",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 59,
+            "width": 50,
+            "height": 51
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-077",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-DRW",
+      "originalUnits": "in",
+      "original": {
+        "length": 60,
+        "width": 60,
+        "height": 85
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.5; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-DRW",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-078",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-LR",
+      "originalUnits": "in",
+      "original": {
+        "length": 48,
+        "width": 53,
+        "height": 82
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.14; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-LR",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-079",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "IL-HR",
+      "originalUnits": "in",
+      "original": {
+        "length": 57,
+        "width": 66,
+        "height": 88
+      },
+      "sourceUrl": "https://resources.lifefitness.com/hub/life-fitness/en-US/1000419-0001-xd_32ce9968be620066-6b5ac64-1817a3e5ec1--7f3d.ditamap?onepage=true",
+      "reference": "Hammer Strength Iso-Lateral Owner’s Manual 1000419-0001 AC, section 2.7; size excludes weight plates",
+      "reviewedAt": "2026-11-22",
+      "sourceModel": "IL-HR",
+      "configurationNote": "Size without weight plates. Live area is separate. Confirm manufacturing generation before using as a physical footprint.",
+      "conflicts": [
+        {
+          "note": "2024 manufacturer catalog on dealer host lists different same-code dimensions. Manufacturing generation/configuration must be checked; no automatic footprint prefill.",
+          "sourceUrl": "https://cdncloudcart.com/26906/files/doc/2024-hammer-strength-asbu-catalog-final-reduced-66c45fa3ac942.pdf?1724145573=",
+          "originalUnits": "in",
+          "original": {
+            "length": 61,
+            "width": 41,
+            "height": 79
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-080",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "PL-DIP",
+      "originalUnits": "in",
+      "original": {
+        "length": 66,
+        "width": 49,
+        "height": 43
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-gb/catalog/strength-training/plate-loaded/plate-loaded-seated-dip",
+      "reference": "Product code and Dimensions (L × W × H) table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-081",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Rogue",
+      "modelNumber": "R-DP",
+      "originalUnits": "in",
+      "original": {
+        "length": 100,
+        "width": 52
+      },
+      "sourceUrl": "https://www.roguefitness.com/rogue-deadlift-platform",
+      "reference": "Gear Specs: 8 ft 4 in length, 4 ft 4 in width; overall frame, not nominal 8 × 4 ft mat area",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-082",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Hammer Strength",
+      "modelNumber": "GB-MSQ",
+      "originalUnits": "in",
+      "original": {
+        "length": 54,
+        "width": 61,
+        "height": 37
+      },
+      "sourceUrl": "https://shop.lifefitness.com/products/hammer-strength-ground-base-multi-squat",
+      "reference": "SKU GB-MSQ, Dimensions table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-083",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Life Fitness",
+      "modelNumber": "CMDAP",
+      "originalUnits": "in",
+      "original": {
+        "length": 44,
+        "width": 62,
+        "height": 95
+      },
+      "sourceUrl": "https://www.lifefitness.com/en-us/catalog/strength-training/cable-machines-functional-trainers/life-fitness-dual-adjustable-pulley",
+      "reference": "Product Code CMDAP, Dimensions table",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-084",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Precor",
+      "modelNumber": "FTS-GLIDE",
+      "originalUnits": "in",
+      "original": {
+        "length": 52,
+        "width": 58,
+        "height": 85
+      },
+      "sourceUrl": "https://static.precor.com/precor-at-home/legacy/CW33615-104_FTS_Glide_Assembly_Maintenance_Guide_with_Addendum_4-2016_WEB.pdf",
+      "reference": "FTS Glide Assembly and Maintenance Guide, 4/2016 addendum, Equipment Dimensions",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "Manufacturer spec table lists 53 × 48 × 85 in; sell sheet lists 58 × 52 × 85 in. Confirm generation and axis orientation; no automatic prefill.",
+          "sourceUrl": "https://static.precor.com/spec-tables/en-us/FTS-Glide-Spec-Tables.pdf",
+          "originalUnits": "in",
+          "original": {
+            "length": 53,
+            "width": 48,
+            "height": 85
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-085",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Precor",
+      "modelNumber": "VSL026BP",
+      "originalUnits": "in",
+      "original": {
+        "length": 79,
+        "width": 52,
+        "height": 87
+      },
+      "sourceUrl": "https://www.precor.com/en-US/products/VSL026BP",
+      "reference": "VSL026BP specifications, Dimensions",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-089",
+      "quality": "secondary",
+      "match": "exact-model",
+      "manufacturer": "TuffStuff",
+      "modelNumber": "PPF-800",
+      "originalUnits": "in",
+      "original": {
+        "length": 78,
+        "width": 63,
+        "height": 95
+      },
+      "sourceUrl": "https://wetaskiwin.civicweb.net/document/26510/",
+      "reference": "TuffStuff fitness equipment proposal, PPF-800 Deluxe Power Rack, Foot Print (LWH)",
+      "reviewedAt": "2026-11-22",
+      "reviewRequired": true,
+      "configurationNote": "Catalog calls PPF-800 a Deluxe Power Rack; survey calls it Squat Rack. Confirm product label and fitted platform. Dealer page reports a different 100 × 80 × 54 in without reliable axis assignment."
+    },
+    {
+      "id": "CHK-090",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Precor",
+      "modelNumber": "DPL0802",
+      "originalUnits": "in",
+      "original": {
+        "length": 58,
+        "width": 84,
+        "height": 91
+      },
+      "sourceUrl": "https://assets.precor.com/en-US/products/DPL0802",
+      "reference": "DPL0802 specifications, Dimensions",
+      "reviewedAt": "2026-11-22",
+      "conflicts": [
+        {
+          "note": "2022 manufacturer catalog reports 56 × 84 × 90 in; current exact-code page reports 58 × 84 × 91 in. Confirm generation on site.",
+          "sourceUrl": "https://static.precor.com/catalog/Precor-2022-Catalog-ENG.pdf",
+          "originalUnits": "in",
+          "original": {
+            "length": 56,
+            "width": 84,
+            "height": 90
+          }
+        }
+      ],
+      "reviewRequired": true
+    },
+    {
+      "id": "CHK-092",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Rogue",
+      "modelNumber": "Abram GHD 2.0",
+      "originalUnits": "in",
+      "original": {
+        "length": 73,
+        "width": 44.5,
+        "height": 48
+      },
+      "sourceUrl": "https://www.roguefitness.com/gb/rogue-abram-ghd-eu",
+      "reference": "Rogue Abram GHD 2.0 Gear Specs: overall height 48 in, distinct from 43 in hip-pad height; footprint 73 × 44.5 in",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-093",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Precor",
+      "modelNumber": "VBR6240",
+      "originalUnits": "in",
+      "original": {
+        "length": 60,
+        "width": 36,
+        "height": 40
+      },
+      "sourceUrl": "https://www.precor.com/en-US/products/VBR6240",
+      "reference": "VBR6240 specifications, Dimensions",
+      "reviewedAt": "2026-11-22"
+    },
+    {
+      "id": "CHK-095",
+      "quality": "manufacturer",
+      "match": "exact-model",
+      "manufacturer": "Rogue",
+      "modelNumber": "Floor Glute",
+      "originalUnits": "in",
+      "original": {
+        "length": 62,
+        "width": 24
+      },
+      "sourceUrl": "https://www.roguefitness.com/floor-glute?sku=RF0583",
+      "reference": "Gear Specs: length / width; adjustable height 15–20 in",
+      "reviewedAt": "2026-11-22",
+      "heightRangeIn": [
+        15,
+        20
+      ]
+    }
+  ]
+}

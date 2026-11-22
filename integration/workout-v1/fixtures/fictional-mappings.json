@@ -1,0 +1,14 @@
+{
+  "mappingVersion": "fictional-demo-1",
+  "reviewStatus": "fictional",
+  "sourcePublicationId": "fictional-publication-1",
+  "reviewReference": "FICTIONAL TEST DATA ONLY. This does not claim any exercise compatibility.",
+  "mappings": [
+    {
+      "exerciseId": "fictional-exercise-placeholder",
+      "candidateEquipmentIds": [
+        "fictional-instance-rack-a"
+      ]
+    }
+  ]
+}

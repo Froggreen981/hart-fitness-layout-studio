@@ -1,0 +1,144 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {SharedEditor} from './dist/shared-client.mjs';
+import {api} from './worker/service.mjs';
+import {sqliteDB} from './scripts/sqlite-db.mjs';
+function setup(t){
+ const db=sqliteDB(),env={DB:db,STAFF_OWNER_EMAIL:'owner@example.test'},values=new Map();
+ const before={fetch:globalThis.fetch,window:globalThis.window,localStorage:globalThis.localStorage};
+ globalThis.window={addEventListener(){}};
+ globalThis.localStorage={get length(){return values.size;},key(n){return [...values.keys()][n]||null;},getItem(k){return values.get(k)||null;},setItem(k,v){values.set(k,v);},removeItem(k){values.delete(k);}};
+ let offline=false,loseResponse=false,nextSave=null;
+ const fetcher=async(path,options={})=>{
+  if(offline)throw new TypeError('Network unavailable');
+  const headers=new Headers(options.headers);headers.set('oai-authenticated-user-id','owner');headers.set('oai-authenticated-user-email','owner@example.test');
+  const result=await api(new Request('https://gym.example.test'+path,{...options,headers}),env);
+  if(nextSave&&options.method==='PUT'){
+   const save=nextSave;nextSave=null;
+   save.started();await save.released;
+  }
+  if(loseResponse&&options.method==='PUT'){loseResponse=false;throw new TypeError('Response lost');}
+  return result;
+ };
+ globalThis.fetch=fetcher;
+ t.after(()=>{db.close();for(const [key,value]of Object.entries(before))if(value===undefined)delete globalThis[key];else globalThis[key]=value;});
+ const layout={id:'draft',name:'Client test',room:{width:100,length:90},items:[{id:'rack',name:'Rack',category:'strength',kind:'rack',width:4,length:7,x:10,y:10,rotation:0,locked:false,buffer:0}]};
+ function holdNextSave(){
+  const started=Promise.withResolvers(),released=Promise.withResolvers();
+  nextSave={started:started.resolve,released:released.promise};
+  return {started:started.promise,release:released.resolve};
+ }
+ return {values,fetcher,holdNextSave,offline:v=>offline=v,loseResponse:()=>loseResponse=true,async create(){return fetcher('/api/drafts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({layout,library:[]})});}};
+}
+test('two editor tabs keep separate recovery copies and reject a stale save',async t=>{
+ const s=setup(t);await s.create();
+ const first=await SharedEditor.open('draft'),second=await SharedEditor.open('draft');
+ first.project.layouts[0].items[0].x=20;second.project.layouts[0].items[0].x=30;
+ first.queue(first.project);second.queue(second.project);
+ assert.notEqual(first.key,second.key);
+ await first.flush();assert.equal(s.values.has(second.key),true);
+ await second.flush();assert.equal(second.blocked,true);assert.equal(s.values.has(second.key),true);
+ const actual=await(await s.fetcher('/api/drafts/draft')).json();
+ assert.equal(actual.layout.items[0].x,20);
+});
+test('an offline change can be saved as a new draft without replacing the server',async t=>{
+ const s=setup(t);await s.create();const first=await SharedEditor.open('draft');
+ first.project.layouts[0].items[0].x=40;s.offline(true);first.queue(first.project);await first.flush();
+ assert.equal(first.pending.layouts[0].items[0].x,40);assert.equal(s.values.has(first.key),true);
+ s.offline(false);
+ const reopened=await SharedEditor.open('draft');assert.equal(reopened.recoveryPending,true);
+ assert.equal(reopened.project.layouts[0].items[0].x,10);
+ const recovered=await reopened.saveRecovery(reopened.project);
+ const saved=await(await s.fetcher('/api/drafts/'+recovered.imported[0].id)).json();
+ assert.equal(saved.layout.items[0].x,40);
+ assert.equal((await(await s.fetcher('/api/drafts/draft')).json()).layout.items[0].x,10);
+});
+test('a lost save response can be retried without a false conflict or extra revision',async t=>{
+ const s=setup(t);await s.create();const editor=await SharedEditor.open('draft');
+ editor.project.layouts[0].items[0].x=50;editor.queue(editor.project);s.loseResponse();await editor.flush();
+ assert.equal(editor.blocked,false);assert.notEqual(editor.pending,null);
+ await editor.flush();assert.equal(editor.pending,null);assert.equal(editor.blocked,false);
+ assert.equal(editor.known.get('draft').revision,2);assert.equal(s.values.has(editor.key),false);
+});
+
+for(const loseResponse of [false,true]){
+ test(`undo during an in-flight save is preserved${loseResponse?' after a lost response':''}`,async t=>{
+  const s=setup(t);await s.create();const editor=await SharedEditor.open('draft');
+  const held=s.holdNextSave();
+  if(loseResponse)s.loseResponse();
+  editor.project.layouts[0].items[0].x=50;
+  editor.queue(editor.project);
+  const saving=editor.flush();
+  await held.started;
+  editor.project.layouts[0].items[0].x=10;
+  editor.queue(editor.project);
+  held.release();
+  await saving;
+  if(loseResponse){
+   assert.equal(JSON.parse(s.values.get(editor.key)).project.layouts[0].items[0].x,10);
+   await editor.flush();
+  }
+  const actual=await(await s.fetcher('/api/drafts/draft')).json();
+  assert.equal(actual.layout.items[0].x,10);
+  assert.equal(actual.revision,3);
+  assert.equal(editor.blocked,false);
+  assert.equal(s.values.has(editor.key),false);
+ });
+}
+
+test('save controls are notified after the running state clears',async t=>{
+ const s=setup(t);await s.create();const editor=await SharedEditor.open('draft');
+ const states=[];editor.onStatus=status=>states.push({status,running:editor.running});
+ editor.project.layouts[0].items[0].x=60;editor.queue(editor.project);await editor.flush();
+ assert.ok(states.some(s=>s.running));
+ assert.equal(states.at(-1).running,false);
+ assert.equal(states.at(-1).status,'Saved to shared workspace');
+});
+
+test('a corrupt recovery record does not hide a valid copy from another tab',async t=>{
+ const s=setup(t);await s.create();
+ const first=await SharedEditor.open('draft');
+ s.values.set(first.key+'-corrupt','{"project":');
+ first.project.layouts[0].items[0].x=55;
+ first.queue(first.project);clearTimeout(first.timer);
+ const reopened=await SharedEditor.open('draft');
+ assert.equal(reopened.recoveryPending,true);
+ assert.equal(reopened.recoveryKey,first.key);
+ assert.equal(reopened.recovery.project.layouts[0].items[0].x,55);
+});
+
+test('a recovery import retry preserves its original snapshot and newer edits',async t=>{
+ const s=setup(t);await s.create();
+ const editor=await SharedEditor.open('draft');
+ const started=Promise.withResolvers(),released=Promise.withResolvers();
+ let loseImport=true;
+ globalThis.fetch=async(path,options)=>{
+  const response=await s.fetcher(path,options);
+  if(path==='/api/import'&&loseImport){
+   loseImport=false;started.resolve();await released.promise;
+   throw new TypeError('Import response lost');
+  }
+  return response;
+ };
+ const rack=editor.project.layouts[0].items[0];
+ rack.x=40;editor.queue(editor.project);
+ const first=editor.saveRecovery(editor.project);
+ await started.promise;
+ rack.x=50;editor.queue(editor.project);
+ await editor.flush();
+ assert.equal((await(await s.fetcher('/api/drafts/draft')).json()).layout.items[0].x,10);
+ released.resolve();
+ await assert.rejects(first,/response lost/);
+
+ const retried=await editor.saveRecovery(editor.project);
+ assert.equal(retried.newerEdits,true);
+ assert.equal((await(await s.fetcher('/api/drafts/'+retried.imported[0].id)).json()).layout.items[0].x,40);
+ assert.equal(JSON.parse(s.values.get(editor.key)).project.layouts[0].items[0].x,50);
+
+ const latest=await editor.saveRecovery(editor.project);
+ assert.equal(latest.newerEdits,false);
+ assert.notEqual(latest.imported[0].id,retried.imported[0].id);
+ assert.equal((await(await s.fetcher('/api/drafts/'+latest.imported[0].id)).json()).layout.items[0].x,50);
+ assert.equal((await(await s.fetcher('/api/drafts')).json()).drafts.length,3);
+ assert.equal(s.values.has(editor.key),false);
+});

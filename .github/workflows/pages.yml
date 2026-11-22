@@ -24,11 +24,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
       - name: Check application syntax
         run: node --check dist/app.js
       - name: Run geometry and persistence tests
-        run: node --test test-model.mjs test-sketch.mjs test-areas.mjs test-editor.mjs test-storage.mjs
+        run: node --test test-*.mjs
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static application

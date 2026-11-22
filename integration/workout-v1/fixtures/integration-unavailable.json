@@ -1,0 +1,7 @@
+{
+  "apiVersion": 1,
+  "error": {
+    "code": "integration_unavailable",
+    "message": "Workout integration is unavailable."
+  }
+}

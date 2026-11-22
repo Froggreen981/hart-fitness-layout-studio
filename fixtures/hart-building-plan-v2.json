@@ -1,0 +1,621 @@
+{
+  "id": "hart-building-plan-2024-v1",
+  "name": "Hart building plan",
+  "room": {
+    "width": 180,
+    "length": 155,
+    "shape": "polygon",
+    "mainWidth": 155,
+    "planReference": "hart-lower-level-2024",
+    "planRevision": 2,
+    "estimated": true,
+    "areasMigrated": true,
+    "vertices": [
+      [
+        0,
+        0
+      ],
+      [
+        155,
+        0
+      ],
+      [
+        155,
+        4
+      ],
+      [
+        180,
+        4
+      ],
+      [
+        180,
+        59
+      ],
+      [
+        155,
+        59
+      ],
+      [
+        155,
+        155
+      ],
+      [
+        0,
+        155
+      ]
+    ],
+    "walls": [
+      {
+        "name": "CrossFit shared wall, upper",
+        "x1": 155,
+        "y1": 4,
+        "x2": 155,
+        "y2": 28,
+        "type": "full",
+        "thickness": 0.75
+      },
+      {
+        "name": "CrossFit shared wall, lower",
+        "x1": 155,
+        "y1": 35.5,
+        "x2": 155,
+        "y2": 59,
+        "type": "full",
+        "thickness": 0.75
+      },
+      {
+        "name": "Lobby top half wall",
+        "x1": 0,
+        "y1": 112.5,
+        "x2": 31.5,
+        "y2": 112.5,
+        "type": "half",
+        "thickness": 0.5
+      },
+      {
+        "name": "Lobby right half wall",
+        "x1": 41.5,
+        "y1": 155,
+        "x2": 41.5,
+        "y2": 124,
+        "type": "half",
+        "thickness": 0.5
+      },
+      {
+        "name": "Walkway / cardio half wall",
+        "x1": 49,
+        "y1": 116.5,
+        "x2": 82.8,
+        "y2": 83.2,
+        "type": "half",
+        "thickness": 0.5
+      }
+    ]
+  },
+  "items": [
+    {
+      "id": "hart-building-plan-2024-v1-dumbbells",
+      "name": "Dumbbells",
+      "category": "area",
+      "kind": "area",
+      "x": 0,
+      "y": 0,
+      "width": 63,
+      "length": 64.5,
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          0.9079365079365079,
+          0
+        ],
+        [
+          0.9079365079365079,
+          0.9798449612403102
+        ],
+        [
+          1,
+          0.9798449612403102
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#88a5bc",
+      "placement": "allowed",
+      "label": {
+        "x": 0.4444444444444444,
+        "y": 0.4496124031007752,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-plate-loaded",
+      "name": "Plate loaded",
+      "category": "area",
+      "kind": "area",
+      "x": 57.2,
+      "y": 0,
+      "width": 73.8,
+      "length": 63.2,
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#88a5bc",
+      "placement": "allowed",
+      "label": {
+        "x": 0.4986449864498645,
+        "y": 0.5379746835443038,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-classroom",
+      "name": "Classroom",
+      "category": "area",
+      "kind": "area",
+      "x": 131,
+      "y": 0,
+      "width": 24,
+      "length": 35.4,
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#7795b6",
+      "placement": "allowed",
+      "label": {
+        "x": 0.5,
+        "y": 0.5084745762711864,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-crossfit",
+      "name": "CrossFit",
+      "category": "area",
+      "kind": "area",
+      "x": 156.5,
+      "y": 4.5,
+      "width": 23.5,
+      "length": 53.5,
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#88a5bc",
+      "placement": "allowed",
+      "label": {
+        "x": 0.5,
+        "y": 0.5514018691588785,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-circuit-area",
+      "name": "Circuit area",
+      "category": "area",
+      "kind": "area",
+      "x": 0,
+      "y": 65.5,
+      "width": 62.5,
+      "length": 46.5,
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0.34408602150537637
+        ],
+        [
+          0.896,
+          0.49247311827957
+        ],
+        [
+          0.6672,
+          0.8064516129032258
+        ],
+        [
+          0.504,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#88a5bc",
+      "placement": "allowed",
+      "label": {
+        "x": 0.432,
+        "y": 0.4838709677419355,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-squat-racks",
+      "name": "Squat racks",
+      "category": "area",
+      "kind": "area",
+      "x": 108,
+      "y": 83.5,
+      "width": 22.30000000000001,
+      "length": 24.5,
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#88a5bc",
+      "placement": "allowed",
+      "label": {
+        "x": 0.4932735426008966,
+        "y": 0.46938775510204084,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-cable",
+      "name": "Cable",
+      "category": "area",
+      "kind": "area",
+      "x": 130.8,
+      "y": 35.8,
+      "width": 24.19999999999999,
+      "length": 73.78,
+      "vertices": [
+        [
+          0.37190082644628114,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0.0206611570247934,
+          0.6397397668744917
+        ],
+        [
+          0.0206611570247934,
+          0.5042016806722689
+        ],
+        [
+          0.37190082644628114,
+          0.3185145025752236
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#88a5bc",
+      "placement": "allowed",
+      "label": {
+        "x": 0.6280991735537188,
+        "y": 0.6261859582542695,
+        "rotation": 90
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-cardio",
+      "name": "Cardio",
+      "category": "area",
+      "kind": "area",
+      "x": 41.8,
+      "y": 83.5,
+      "width": 88.50000000000001,
+      "length": 71.5,
+      "vertices": [
+        [
+          0.46553672316384176,
+          0
+        ],
+        [
+          0.7480225988700564,
+          0
+        ],
+        [
+          0.7480225988700564,
+          0.34965034965034963
+        ],
+        [
+          1,
+          0.34965034965034963
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          0.5664335664335665
+        ],
+        [
+          0.08700564971751414,
+          0.46853146853146854
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#88a5bc",
+      "placement": "allowed",
+      "label": {
+        "x": 0.49943502824858754,
+        "y": 0.6503496503496503,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-lobby",
+      "name": "Lobby",
+      "category": "area",
+      "kind": "area",
+      "x": 0,
+      "y": 113,
+      "width": 41,
+      "length": 42,
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          0.7682926829268293,
+          0
+        ],
+        [
+          1,
+          0.2619047619047619
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#68a67c",
+      "placement": "keep-clear",
+      "label": {
+        "x": 0.4634146341463415,
+        "y": 0.5,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "hart-building-plan-2024-v1-walkway",
+      "name": "Walkway",
+      "category": "area",
+      "kind": "area",
+      "x": 31.5,
+      "y": 73,
+      "width": 99,
+      "length": 50,
+      "vertices": [
+        [
+          0.10101010101010101,
+          1
+        ],
+        [
+          0.17676767676767677,
+          0.86
+        ],
+        [
+          0.5181818181818182,
+          0.19599999999999995
+        ],
+        [
+          0.6161616161616161,
+          0.19599999999999995
+        ],
+        [
+          1,
+          0.19599999999999995
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0.9545454545454546,
+          0
+        ],
+        [
+          0.40606060606060607,
+          0
+        ],
+        [
+          0.3282828282828283,
+          0.17
+        ],
+        [
+          0.2474747474747475,
+          0.31
+        ],
+        [
+          0.10303030303030306,
+          0.6
+        ],
+        [
+          0,
+          0.79
+        ]
+      ],
+      "rotation": 0,
+      "buffer": 0,
+      "buffers": {
+        "front": 0,
+        "rear": 0,
+        "left": 0,
+        "right": 0
+      },
+      "locked": false,
+      "color": "#68a67c",
+      "placement": "keep-clear",
+      "label": {
+        "x": 0.35858585858585856,
+        "y": 0.36,
+        "rotation": -45
+      }
+    }
+  ]
+}

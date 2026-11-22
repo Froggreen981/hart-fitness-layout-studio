@@ -1,0 +1,309 @@
+import {test as base,expect} from '@playwright/test';
+import {randomUUID} from 'node:crypto';
+import {applyCatalogIdentity,getCatalogRecord} from '../../dist/equipment-catalog.mjs';
+
+const test=base.extend({
+  page:async({page},use)=>{
+    const errors=[];
+    page.on('pageerror',error=>errors.push(error.message));
+    await use(page);
+    expect(errors,'uncaught application errors').toEqual([]);
+  }
+});
+
+const bench=()=>applyCatalogIdentity({id:randomUUID(),name:'Test bench',category:'free',kind:'bench',
+  width:3,length:5,x:10,y:15,rotation:90,buffer:0,locked:false},getCatalogRecord('CHK-073'),'HART-0104');
+
+async function draft(request,items=[]){
+  const layout={id:randomUUID(),name:'TEST ONLY '+randomUUID(),room:{width:60,length:50,areasMigrated:true},items};
+  const response=await request.post('/api/drafts',{data:{layout,library:[]}});
+  expect(response.ok()).toBeTruthy();
+  return (await response.json()).layout;
+}
+async function read(request,id){
+  const response=await request.get('/api/drafts/'+id);
+  expect(response.ok()).toBeTruthy();
+  return response.json();
+}
+async function current(request){return (await request.get('/api/current')).json();}
+async function open(page,id){
+  await page.goto('/index.html?draft='+id);
+  await expect(page.locator('.draft-badge')).toHaveText('SHARED DRAFT');
+}
+async function edit(page,selector,value){
+  const input=page.locator(selector);
+  await input.fill(String(value));
+  await input.press('Tab');
+}
+async function editorContext(browser,request){
+  const email='editor-'+randomUUID()+'@example.test';
+  expect((await request.post('/api/staff',{data:{email,role:'editor'}})).ok()).toBeTruthy();
+  const context=await browser.newContext();
+  await context.route('**/api/**',route=>{
+    const url=new URL(route.request().url());url.searchParams.set('test_actor',email);
+    return route.continue({url:url.href});
+  });
+  return context;
+}
+
+test('catalog dimensions, metadata and equipment edits persist across staff sessions',async({page,request,browser})=>{
+  const before=await current(request),layout=await draft(request);
+  await open(page,layout.id);
+  await page.locator('#catalogAddBtn').click();
+  await page.locator('#catalogPick').selectOption('CHK-014');
+  await expect(page.locator('#catalogWidth')).toHaveValue('4.833');
+  await expect(page.locator('#catalogLength')).toHaveValue('3.167');
+  await expect(page.locator('#catalogDimensionSource')).toHaveAttribute('href',getCatalogRecord('CHK-014').dimensionsIn.sourceUrl);
+  await expect(page.locator('#catalogExerciseNote')).toContainText('biceps curl');
+  await page.locator('#catalogPick').selectOption('');
+  await expect(page.locator('#catalogCreateBtn')).toBeDisabled();
+  await expect(page.locator('#catalogWidth')).toBeEmpty();
+  await expect(page.locator('#catalogDimensionSource')).toBeHidden();
+  await page.locator('#catalogPick').selectOption('CHK-014');
+  await page.locator('#catalogCreateBtn').click();
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items.length).toBe(1);
+  await edit(page,'[data-prop="width"]',4.25);
+  await edit(page,'[data-prop="x"]',17);
+  await edit(page,'[data-catalog-field="exercises"]','biceps curl, reviewed variation');
+  await page.getByRole('checkbox',{name:'Out of service'}).check();
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items[0].status).toBe('out-of-service');
+  const saved=(await read(request,layout.id)).layout.items[0];
+  expect(saved).toMatchObject({width:4.25,x:17,inventoryId:'HART-0014',catalogId:'CHK-014',exercises:['biceps curl','reviewed variation']});
+  const other=await browser.newContext();
+  try{
+    const reopened=await other.newPage();await open(reopened,layout.id);
+    await expect(reopened.locator('[data-prop="width"]')).toHaveValue('4.25');
+    await expect(reopened.locator('[data-prop="x"]')).toHaveValue('17');
+    await expect(reopened.locator('[data-catalog-field="exercises"]')).toHaveValue('biceps curl, reviewed variation');
+    await expect(reopened.getByRole('checkbox',{name:'Out of service'})).toBeChecked();
+  }finally{await other.close();}
+  expect(await current(request)).toEqual(before);
+});
+
+test('duplicated equipment and saved templates keep model metadata without reusing physical units',async({page,request})=>{
+  const layout=await draft(request,[bench()]);await open(page,layout.id);
+  await page.locator('[data-action="duplicate"]').click();
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items.length).toBe(2);
+  await expect(page.locator('[data-catalog-field="inventoryId"]')).toHaveValue('');
+  await page.locator('[data-action="save-template"]').click();
+  await expect.poll(async()=>(await read(request,layout.id)).library.length).toBe(1);
+  await page.locator('#equipmentLibrary [data-template]').last().click();
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items.length).toBe(3);
+  const items=(await read(request,layout.id)).layout.items;
+  expect(items.map(item=>item.inventoryId||'')).toEqual(['HART-0104','','']);
+  for(const item of items){expect(item.catalogId).toBe('CHK-073');expect(item.exercises).toEqual(['barbell bench press']);}
+  await page.locator('[data-catalog-field="inventoryId"]').selectOption('HART-0105');
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items[2].inventoryId).toBe('HART-0105');
+  await page.locator('#catalogAddBtn').click();
+  await page.locator('#catalogPick').selectOption('CHK-073');
+  const choices=await page.locator('#catalogInventoryPick option').evaluateAll(options=>options.map(option=>option.value));
+  expect(choices).toEqual(['HART-0154','HART-0155']);
+  await page.locator('#catalogCancel').click();
+});
+
+test('linking another model preserves geometry and replaces incompatible exercise defaults',async({page,request})=>{
+  const unit=bench(),layout=await draft(request,[unit]);await open(page,layout.id);
+  await page.locator('#linkedCatalogPick').selectOption('CHK-014');
+  await page.getByRole('button',{name:'Apply model and manufacturer'}).click();
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items[0].catalogId).toBe('CHK-014');
+  const linked=(await read(request,layout.id)).layout.items[0];
+  expect(linked).toMatchObject({x:unit.x,y:unit.y,width:unit.width,length:unit.length,rotation:unit.rotation,inventoryId:'',exercises:['biceps curl']});
+  await page.locator('[data-catalog-field="inventoryId"]').selectOption('HART-0014');
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items[0].inventoryId).toBe('HART-0014');
+  await page.reload();
+  await expect(page.locator('[data-catalog-field="inventoryId"]')).toHaveValue('HART-0014');
+});
+
+test('dimension sources distinguish evidence and do not leak through corrected model metadata',async({page,request})=>{
+  const unit=bench(),layout=await draft(request,[unit]);await open(page,layout.id);
+  await edit(page,'[data-catalog-field="modelNumber"]','STAFF-CORRECTED-MODEL');
+  await expect(page.locator('.catalog-editor')).toContainText('Source model differs from selected model');
+  await expect(page.locator('.catalog-editor a')).toHaveCount(0);
+  const saved=(await read(request,layout.id)).layout.items[0];
+  expect(saved).toMatchObject({x:unit.x,y:unit.y,width:unit.width,length:unit.length,rotation:unit.rotation});
+  await page.locator('#catalogAddBtn').click();
+  await expect(page.locator('#catalogFilterStatus')).toContainText('77 / 95 groups · 104 / 155 units');
+  await page.locator('#catalogPick').selectOption('CHK-003');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Manufacturer · exact model code');
+  await expect(page.locator('#catalogWidth')).toHaveValue('2.375');
+  await page.locator('#catalogPick').selectOption('CHK-043');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Secondary source · exact model code');
+  await page.locator('#catalogPick').selectOption('CHK-012');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Comparable model · estimate only');
+  await expect(page.locator('#catalogWidth')).toBeEmpty();
+  await expect(page.locator('#catalogLength')).toBeEmpty();
+  await page.locator('#catalogPick').selectOption('CHK-067');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Conflicting specifications');
+  await expect(page.locator('#catalogWidth')).toBeEmpty();
+  await page.locator('#catalogPick').selectOption('CHK-094');
+  await expect(page.locator('#catalogDimensionNote')).toContainText('Dimensions unknown');
+  await expect(page.locator('#catalogDimensionSource')).toBeHidden();
+  await page.locator('#catalogCancel').click();
+});
+
+test('a stale staff save creates a separate recovery draft without replacing the newer save',async({page,request,browser})=>{
+  const layout=await draft(request,[bench()]),other=await editorContext(browser,request);
+  try{
+    const editor=await other.newPage();await open(page,layout.id);await open(editor,layout.id);
+    await edit(page,'[data-prop="x"]',20);
+    await expect.poll(async()=>(await read(request,layout.id)).layout.items[0].x).toBe(20);
+    await edit(editor,'[data-prop="x"]',30);
+    await expect(editor.locator('#saveStatus')).toContainText('Save conflict');
+    expect((await read(request,layout.id)).layout.items[0].x).toBe(20);
+    await editor.getByRole('button',{name:'Save recovery as separate drafts',exact:true}).click();
+    await expect(editor).not.toHaveURL(new RegExp(layout.id));
+    const recoveredId=new URL(editor.url()).searchParams.get('draft');
+    expect(recoveredId).toBeTruthy();
+    expect((await read(request,recoveredId)).layout.items[0].x).toBe(30);
+    expect((await read(request,layout.id)).layout.items[0].x).toBe(20);
+  }finally{await other.close();}
+});
+
+test('offline edits survive closing the tab and recover as an independent draft',async({page,context,request})=>{
+  const layout=await draft(request,[bench()]);await open(page,layout.id);
+  // Guarantee the write never reaches the fixture server. Browser offline mode
+  // alone can race transport teardown and simulate a lost response after commit.
+  const offlineWrite=route=>route.request().method()==='PUT'?route.abort('internetdisconnected'):route.continue();
+  await context.route('**/api/drafts/**',offlineWrite);
+  await context.setOffline(true);
+  await edit(page,'[data-prop="x"]',33);
+  await expect(page.locator('#saveStatus')).toContainText('Not saved to shared workspace');
+  page.on('dialog',dialog=>dialog.accept());await page.close();
+  await context.unroute('**/api/drafts/**',offlineWrite);
+  await context.setOffline(false);
+  const reopened=await context.newPage();await open(reopened,layout.id);
+  await expect(reopened.locator('#sharedRecovery')).toBeVisible();
+  await reopened.getByRole('button',{name:'Keep recovery as separate drafts'}).click();
+  await expect(reopened).not.toHaveURL(new RegExp(layout.id));
+  const recoveredId=new URL(reopened.url()).searchParams.get('draft');
+  expect((await read(request,recoveredId)).layout.items[0].x).toBe(33);
+  expect((await read(request,layout.id)).layout.items[0].x).toBe(10);
+});
+
+test('editor-only staff cannot publish through controls or the API',async({browser,request})=>{
+  const layout=await draft(request,[bench()]),before=await current(request),context=await editorContext(browser,request);
+  try{
+    const editor=await context.newPage();await editor.goto('/workspace.html');
+    await expect(editor.locator('#draftRows')).toContainText(layout.name);
+    await expect(editor.getByRole('button',{name:'Publish',exact:true})).toHaveCount(0);
+    await expect(editor.locator('#staffSection')).toBeHidden();
+    const status=await editor.evaluate(async id=>(await fetch('/api/drafts/'+id+'/publish',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({requestId:crypto.randomUUID(),expectedRevision:1,expectedCurrentId:null,confirmActual:true})
+    })).status,layout.id);
+    expect(status).toBe(403);expect(await current(request)).toEqual(before);
+  }finally{await context.close();}
+});
+
+test('local fixture publication requires confirmation and stays unchanged after further draft edits',async({page,request})=>{
+  const layout=await draft(request,[bench()]),before=await current(request);
+  await page.goto('/workspace.html');
+  const row=page.locator('#draftRows tr').filter({hasText:layout.name});
+  await row.getByRole('button',{name:'Publish',exact:true}).click();
+  await page.getByRole('button',{name:'Publish as current',exact:true}).click();
+  await expect(page.locator('#publishDialog')).toBeVisible();
+  expect(await current(request)).toEqual(before);
+  await page.getByRole('checkbox',{name:'I checked that this arrangement matches the physical gym.'}).check();
+  await page.getByRole('button',{name:'Publish as current',exact:true}).click();
+  await expect(page.locator('#publishDialog')).not.toBeVisible();
+  const published=await current(request);expect(published.current.layout.name).toBe(layout.name);
+  await page.goto('/map.html');
+  await expect(page.locator('#mapName')).toHaveText(layout.name);
+  await page.locator('#equipmentList button').click();
+  await expect(page.locator('#equipmentDetails')).toContainText('Competition Bench');
+  await expect(page.locator('[data-prop]')).toHaveCount(0);
+  await open(page,layout.id);await edit(page,'[data-prop="x"]',25);
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items[0].x).toBe(25);
+  expect(await current(request)).toEqual(published);
+});
+
+test('inventory search filters physical IDs, exercise terms and available sourced models without losing measurements',async({page,request})=>{
+  const assigned=applyCatalogIdentity({...bench(),category:'strength'},getCatalogRecord('CHK-014'),'HART-0014');
+  const layout=await draft(request,[assigned]);await open(page,layout.id);
+  await page.locator('#catalogAddBtn').click();
+  await page.locator('#catalogSearch').fill('HART-0014');
+  await expect(page.locator('#catalogPick option')).toHaveCount(2);
+  await page.locator('#catalogPick').selectOption('CHK-014');
+  await expect(page.locator('#catalogCreateBtn')).toBeDisabled();
+  await page.locator('#catalogAvailable').check();
+  await expect(page.locator('#catalogPick option')).toHaveCount(1);
+  await expect(page.locator('#catalogWidth')).toBeEmpty();
+  await page.locator('#catalogAvailable').uncheck();await page.locator('#catalogSourced').check();
+  await page.locator('#catalogSearch').fill('biceps');
+  await page.locator('#catalogPick').selectOption('CHK-016');
+  await page.locator('#catalogWidth').fill('4.75');
+  await page.locator('#catalogSearch').fill('biceps Precor');
+  await expect(page.locator('#catalogPick')).toHaveValue('CHK-016');
+  await expect(page.locator('#catalogWidth')).toHaveValue('4.75');
+  await page.locator('#catalogCreateBtn').click();
+  await expect.poll(async()=>(await read(request,layout.id)).layout.items.length).toBe(2);
+  expect((await read(request,layout.id)).layout.items[1]).toMatchObject({catalogId:'CHK-016',inventoryId:'HART-0016',width:4.75});
+});
+
+test('new and duplicate draft retries reuse identifiers after a committed response is lost',async({page,request})=>{
+  const before=await current(request),attempts=[];
+  let loseNext=true;
+  await page.route('**/api/drafts',async route=>{
+    if(route.request().method()!=='POST')return route.continue();
+    attempts.push(route.request().postDataJSON());
+    if(loseNext){loseNext=false;const response=await route.fetch();expect(response.ok()).toBeTruthy();await route.abort('failed');}
+    else await route.continue();
+  });
+  await page.goto('/workspace.html');await page.locator('#newDraft').click();
+  await expect(page.locator('#notice')).not.toBeEmpty();
+  await expect(page.locator('#newDraft')).toBeEnabled();
+  await page.locator('#newDraft').click();await expect(page).toHaveURL(/index\.html\?draft=/);
+  expect(attempts).toHaveLength(2);expect(attempts[1]).toEqual(attempts[0]);
+  const created=await read(request,attempts[0].layout.id);expect(created.revision).toBe(1);
+  await page.goto('/workspace.html');
+  const row=page.locator('#draftRows tr').filter({has:page.locator('[data-id="'+created.layout.id+'"][data-action="duplicate"]')});
+  await row.getByRole('button',{name:'Duplicate',exact:true}).click();
+  await page.locator('#newName').fill('TEST ONLY retry duplicate '+randomUUID());loseNext=true;
+  await page.locator('#saveName').click();await expect(page.locator('#nameError')).not.toBeEmpty();
+  await page.locator('#saveName').click();await expect(page.locator('#nameDialog')).not.toBeVisible();
+  expect(attempts).toHaveLength(4);expect(attempts[3]).toEqual(attempts[2]);
+  expect(attempts[2].layout.id).not.toBe(created.layout.id);
+  const copy=await read(request,attempts[2].layout.id);expect(copy.revision).toBe(1);
+  expect(copy.layout.room).toEqual(created.layout.room);expect(copy.layout.items).toEqual(created.layout.items);
+  expect(await current(request)).toEqual(before);
+});
+
+test('JSON import retries retain their receipt and preserve existing drafts after a lost response',async({page,request})=>{
+  const before=await current(request),original=await draft(request,[bench()]),attempts=[],results=[];
+  await page.route('**/api/import',async route=>{
+    attempts.push(route.request().postDataJSON());
+    if(attempts.length===1){const response=await route.fetch();expect(response.ok()).toBeTruthy();results.push(await response.json());await route.abort('failed');}
+    else {const response=await route.fetch();results.push(await response.json());await route.fulfill({response});}
+  });
+  await page.goto('/workspace.html');
+  const input={name:'fictional-import.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:2,active:original.id,layouts:[original],library:[]}))};
+  await page.locator('#jsonFile').setInputFiles(input);await expect(page.locator('#notice')).not.toBeEmpty();
+  await page.locator('#jsonFile').setInputFiles(input);await expect(page.locator('#notice')).toContainText('1 layouts imported');
+  expect(attempts).toHaveLength(2);expect(attempts[1].requestId).toBe(attempts[0].requestId);expect(results[1]).toEqual(results[0]);
+  const imported=await read(request,results[0].imported[0].id);expect(imported.layout.id).not.toBe(original.id);
+  expect(imported.layout.items).toEqual((await read(request,original.id)).layout.items);
+  expect(await current(request)).toEqual(before);
+});
+
+test('workspace rename, duplicate, archive and restore preserve geometry and independent revisions',async({page,request})=>{
+  const before=await current(request),original=await draft(request,[bench()]);
+  const row=id=>page.locator('#draftRows tr').filter({has:page.locator('[data-id="'+id+'"][data-action="duplicate"]')});
+  await page.goto('/workspace.html');await row(original.id).getByRole('button',{name:'Rename',exact:true}).click();
+  const name='TEST ONLY renamed '+randomUUID();await page.locator('#newName').fill(name);await page.locator('#saveName').click();
+  await expect(row(original.id)).toContainText(name);
+  const renamed=await read(request,original.id);expect(renamed.revision).toBe(2);expect(renamed.layout.items).toEqual(original.items);
+  await row(original.id).getByRole('button',{name:'Duplicate',exact:true}).click();
+  await page.locator('#newName').fill(name+' copy');await page.locator('#saveName').click();
+  await expect(page.locator('#nameDialog')).not.toBeVisible();await expect(page.locator('#notice')).toHaveText('Shared draft created.');
+  const copyRow=page.locator('#draftRows tr').filter({hasText:name+' copy'});
+  await expect(copyRow).toHaveCount(1);const copyId=await copyRow.locator('[data-action="duplicate"]').getAttribute('data-id');
+  const copy=await read(request,copyId);expect(copy.revision).toBe(1);expect(copy.layout.items).toEqual(renamed.layout.items);
+  await row(original.id).getByRole('button',{name:'Archive',exact:true}).click();await expect(row(original.id)).toHaveCount(0);
+  await page.locator('#showArchived').check();await expect(row(original.id)).toBeVisible();
+  await expect(row(original.id).getByRole('link',{name:'Open draft'})).toHaveCount(0);
+  await row(original.id).getByRole('button',{name:'Restore draft',exact:true}).click();await expect(row(original.id)).toHaveCount(0);
+  await page.locator('#showArchived').uncheck();await expect(row(original.id)).toBeVisible();
+  const restored=await read(request,original.id);expect(restored.revision).toBe(4);expect(restored.archived).toBe(false);
+  expect(restored.layout.items).toEqual(renamed.layout.items);expect(await read(request,copyId)).toEqual(copy);
+  expect(await current(request)).toEqual(before);
+});

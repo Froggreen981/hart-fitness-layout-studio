@@ -1,0 +1,7 @@
+{
+  "apiVersion": 1,
+  "error": {
+    "code": "no_publication",
+    "message": "Staff have not published a current gym layout."
+  }
+}

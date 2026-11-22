@@ -1,0 +1,77 @@
+{
+  "apiVersion": 1,
+  "publication": {
+    "id": "fictional-publication-1",
+    "publishedAt": "2026-01-01T18:00:00.000Z"
+  },
+  "equipment": [
+    {
+      "id": "fictional-instance-rack-a",
+      "name": "Fictional rack A",
+      "category": "strength",
+      "kind": "rack",
+      "x": 12,
+      "y": 20,
+      "width": 4,
+      "length": 7,
+      "rotation": 90,
+      "status": "available",
+      "footprint": [
+        [
+          19,
+          20
+        ],
+        [
+          19,
+          24
+        ],
+        [
+          12,
+          24
+        ],
+        [
+          12,
+          20
+        ]
+      ],
+      "inventoryId": "FICTIONAL-UNIT-A",
+      "catalogId": "FICTIONAL-GROUP-RACK",
+      "manufacturer": "Fictional manufacturer",
+      "modelNumber": "DEMO-RACK",
+      "modelStatus": "probable",
+      "exercises": [],
+      "muscleGroups": [],
+      "capabilities": []
+    },
+    {
+      "id": "fictional-instance-bike-b",
+      "name": "Fictional bike B",
+      "category": "cardio",
+      "kind": "bike",
+      "x": 25,
+      "y": 10,
+      "width": 3,
+      "length": 5,
+      "rotation": 0,
+      "status": "out-of-service",
+      "footprint": [
+        [
+          25,
+          10
+        ],
+        [
+          28,
+          10
+        ],
+        [
+          28,
+          15
+        ],
+        [
+          25,
+          15
+        ]
+      ]
+    }
+  ]
+}
